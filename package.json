@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint src --max-warnings 0",
+    "lint": "eslint src .storybook --max-warnings 0",
     "test": "vitest",
-    "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\"",
+    "format": "prettier --write \"src/**/*.{ts,tsx,json}\" \".storybook/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\" \".storybook/**/*.{ts,tsx}\"",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
