@@ -205,3 +205,22 @@ No changes required.
 
 **Verdict:** Accepted as-is
 **Commit hash (Step 4):** cd54749
+
+---
+
+## [2026-04-27] #008 — Task 8: GitHub Actions workflows
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .github/workflows/ — lint, format, unit-tests, accessibility, e2e
+
+**Prompt (Step 1 — proactive guidance):**
+"Create five separate GitHub Actions workflows triggered on push to main and on PRs: lint.yml (ESLint + tsc --noEmit), format.yml (Prettier check), unit-tests.yml (Vitest with coverage), accessibility.yml (Storybook build), e2e.yml (Playwright with Chromium install and VITE_CONTRACT_ADDRESS stub)."
+
+**Review critique (Step 2):**
+No issues found. Workflows follow standard GitHub Actions patterns with correct Node 20 setup, npm caching, and appropriate commands per workflow type.
+
+**Resolution (Step 3):**
+No changes required.
+
+**Verdict:** Accepted as-is
+**Commit hash (Step 4):** 1cfe57c
