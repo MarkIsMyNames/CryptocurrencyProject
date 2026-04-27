@@ -81,3 +81,33 @@ Created CLAUDE.md at the project root with all sections as specified: project co
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 32c3b68
+
+---
+
+## [2026-04-27] #004 — Task 4: Foundation files
+
+**Tool:** Claude (claude-haiku-4-5)
+**Feature:** src/theme.ts, src/config.ts, src/locales/en.json, src/styled.d.ts
+
+**Prompt (Step 1 — proactive guidance):**
+"Create four foundation files for the EventTicket DApp:
+- theme.ts: single source of truth for all colours using descriptive semantic names. Must cover backgrounds, brand, status, text, and border colours. Export as const with Theme type.
+- styled.d.ts: augment DefaultTheme to match Theme type so styled-components has full type inference.
+- config.ts: all configurable variables (contractAddress from env, sepoliaChainId, ticketPriceWei, tokenSymbol, etc.) as const.
+- en.json: all user-facing strings for nav, wallet creation, balance, buyTicket, redeem, and errors.
+No raw colour values allowed anywhere except theme.ts."
+
+**Review critique (Step 2):**
+Two ESLint errors emerged during linting:
+- `config.ts`: Unsafe assignment of `import.meta.env.VITE_CONTRACT_ADDRESS` (type `any`). Required explicit type assertion to `string | undefined`.
+- `styled.d.ts`: Empty interface extending another interface is flagged as equivalent to supertype. Added eslint-disable comment to suppress the false positive (the augmentation syntax is idiomatic TypeScript ambient type declaration).
+Additionally, `.d.ts` files are ignored by `.gitignore` (line 19: `*.d.ts`), preventing commit of hand-written `src/styled.d.ts`. Required adding exception rule `!src/styled.d.ts`.
+
+**Resolution (Step 3):**
+- Cast `import.meta.env.VITE_CONTRACT_ADDRESS` as `string | undefined` in config.ts to satisfy type safety.
+- Added `// eslint-disable-next-line @typescript-eslint/no-empty-object-type` comment in styled.d.ts to suppress the spurious warning.
+- Updated `.gitignore` to include `!src/styled.d.ts` exception after the `*.d.ts` rule.
+- Verified all files created, tsc passed with no errors, eslint passed with zero warnings.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 046513f
