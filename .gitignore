@@ -30,3 +30,6 @@ vite.config.js
 *.njsproj
 *.sln
 *.sw?
+
+*storybook.log
+storybook-static
