@@ -165,6 +165,35 @@ Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`,
 
 ---
 
+## [2026-04-27] [OPTIMIZATION] #001 — Smart Contract: Security Review
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** contracts/EventTicket.sol — security audit pass
+
+**Prompt (Step 1):**
+"Review EventTicket.sol for security vulnerabilities. Specifically:
+- Are ERC-20 transfer functions restricted to prevent ticket trading?
+- Does withdrawFunds() guard against zero-balance calls?
+- Does the constructor validate inputs that would make the contract permanently unusable?
+- Are there any reentrancy risks beyond the existing nonReentrant guards?"
+
+**Review critique (Step 2):**
+Three security issues identified:
+1. ERC-20 `transfer` and `transferFrom` were inherited without restriction — tickets could be traded between wallets, violating the one-ticket-per-wallet and soulbound intent.
+2. `withdrawFunds()` would call `owner().call{value: 0}("")` when balance was zero, wasting gas and emitting misleading success.
+3. A `maxSupply` of 0 in the constructor would make the contract permanently unusable since every `buyTicket` call would revert with `SoldOut`.
+
+**Resolution (Step 3):**
+1. Overrode `_update` to revert with `TicketsAreNonTransferable()` when both `from` and `to` are non-zero addresses. This allows minting (`_mint`) and burning (`_burn`) while blocking transfers.
+2. Added `NothingToWithdraw()` revert when `address(this).balance == 0` at the start of `withdrawFunds()`.
+3. Added `if (_maxSupply == 0) revert InvalidConfiguration();` at the top of the constructor.
+Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`, `InvalidConfiguration`.
+
+**Verdict:** Modified — three security issues fixed
+**Commit hash (Step 4):** ee02873
+
+---
+
 ## [2026-04-27] #006 — Task 6: Storybook 10 setup
 
 **Tool:** Claude (claude-sonnet-4-6)
@@ -401,7 +430,7 @@ AI confirmed decimals() is pure.
 No further changes needed.
 
 **Verdict:** Accepted without modification — contract was already gas-optimised from the initial proactive prompt in entry #005.
-**Commit hash (Step 4):** [fill in after commit]
+**Commit hash (Step 4):** 3383ca6
 
 ---
 
