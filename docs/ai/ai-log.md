@@ -388,25 +388,6 @@ Updated three en.json values to match specification. Created RedeemTicket.styles
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 2b8b88d
 
----
-
-## [2026-04-27] #020 — Fix: Vitest picking up Playwright e2e specs from worktrees
-
-**Tool:** Claude (claude-sonnet-4-6)
-**Feature:** vite.config.ts test configuration
-
-**Prompt (Step 1):**
-The unit test suite (Vitest) is failing. The vitest `projects` config in `vite.config.ts` has no `include`/`exclude` on the jsdom project, so Vitest is picking up Playwright spec files from `.worktrees/*/e2e/` and `e2e/`. Constrain the jsdom project to `src/**/*.test.{ts,tsx}` only and exclude `e2e/**` and `.worktrees/**`. Also `node_modules` is missing — install with `--legacy-peer-deps` due to `eslint-plugin-jsx-a11y` peer dep conflict. After the fix, all 13 test files should pass. Log the change in `docs/ai/ai-log.md`.
-
-**Review critique (Step 2):**
-The prompt accurately diagnosed both issues upfront: missing `node_modules` and the missing `include`/`exclude` on the vitest jsdom project. No reactive guessing was needed.
-
-**Resolution (Step 3):**
-Ran `npm install --legacy-peer-deps`, then added `include: ['src/**/*.test.{ts,tsx}']` and `exclude: ['e2e/**', '.worktrees/**']` to the jsdom project in `vite.config.ts`. All 13 test files / 37 tests now pass.
-
-**Verdict:** Accepted
-**Commit hash (Step 4):** dbed855
-
 ## [2026-04-27] #016 — Task 16: App.tsx routing and main.tsx wiring
 
 **Tool:** Claude (claude-haiku-4-5)
@@ -516,3 +497,288 @@ Documented the tradeoff rather than over-engineering.
 
 **Verdict:** No code changes — tradeoff accepted and documented.
 **Commit hash (Step 4):** c1ff18a
+
+---
+
+## [2026-04-27] #020 — Fix: Vitest picking up Playwright e2e specs from worktrees
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** vite.config.ts test configuration
+
+**Prompt (Step 1):**
+The unit test suite (Vitest) is failing. The vitest `projects` config in `vite.config.ts` has no `include`/`exclude` on the jsdom project, so Vitest is picking up Playwright spec files from `.worktrees/*/e2e/` and `e2e/`. Constrain the jsdom project to `src/**/*.test.{ts,tsx}` only and exclude `e2e/**` and `.worktrees/**`. Also `node_modules` is missing — install with `--legacy-peer-deps` due to `eslint-plugin-jsx-a11y` peer dep conflict. After the fix, all 13 test files should pass. Log the change in `docs/ai/ai-log.md`.
+
+**Review critique (Step 2):**
+The prompt accurately diagnosed both issues upfront: missing `node_modules` and the missing `include`/`exclude` on the vitest jsdom project. No reactive guessing was needed.
+
+**Resolution (Step 3):**
+Ran `npm install --legacy-peer-deps`, then added `include: ['src/**/*.test.{ts,tsx}']` and `exclude: ['e2e/**', '.worktrees/**']` to the jsdom project in `vite.config.ts`. All 13 test files / 37 tests now pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** dbed855
+
+---
+
+## [2026-04-27] #021 — Refactor: Move App styled components to App.styles.ts, delete App.css
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/App.tsx, src/App.styles.ts, src/App.css
+
+**Prompt (Step 1):**
+`App.tsx` contains `GlobalStyle`, `AppHeader`, and `WalletStatusWrapper` styled components inline, violating the project convention that all styles live in a sibling `.styles.ts` file. `App.css` is a 185-line unused Vite scaffold file that should be deleted. Move the three styled components to `src/App.styles.ts`, update `App.tsx` to import from it, and delete `App.css`. Build must still pass.
+
+**Review critique (Step 2):**
+No issues. The refactor was straightforward — no logic changed, only file boundaries. Build passed clean on first attempt.
+
+**Resolution (Step 3):**
+Created `src/App.styles.ts` exporting `GlobalStyle`, `AppHeader`, and `WalletStatusWrapper`. Updated `App.tsx` to import them. Deleted `src/App.css`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** ed4e1f4
+
+---
+
+## [2026-04-27] #022 — Fix: Downgrade ESLint to v9 to resolve CI peer dependency conflict
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** package.json, package-lock.json
+
+**Prompt (Step 1):**
+All GitHub Actions were failing with `npm error ERESOLVE could not resolve` because `eslint-plugin-jsx-a11y@6.10.2` declares peer support only up to ESLint 9, but the project had `eslint@^10.2.1`. Fix the CI failure.
+
+**Review critique (Step 2):**
+The prompt was reactive — the error surfaced from CI rather than being anticipated. The root cause was already spelled out in the npm error output, so no diagnosis was needed.
+
+**Resolution (Step 3):**
+Downgraded `eslint` from `^10.2.1` to `^9.0.0` in `package.json` and regenerated `package-lock.json`. ESLint 9 supports flat config and all other plugins in the project. `npm run lint` passes clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 9b5e903
+
+---
+
+## [2026-04-27] #023 — Fix: Prettier formatting and Playwright Chromium missing in unit-tests CI
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .github/workflows/unit-tests.yml, 10 src files
+
+**Prompt (Step 1):**
+Two CI failures: (1) `npm run format:check` flagged 10 files with formatting issues. (2) `npx vitest run --coverage` crashed with an unhandled error because the Storybook vitest project uses `@vitest/browser-playwright` with Chromium, but the runner never installs the browser. Fix both.
+
+**Review critique (Step 2):**
+Both failures were reactive — surfaced from CI logs. The Playwright issue was latent from when the Storybook browser project was added to vite.config.ts without updating the workflow.
+
+**Resolution (Step 3):**
+Ran `npm run format` to auto-fix 10 files. Added `npx playwright install chromium --with-deps` to `.github/workflows/unit-tests.yml` before the vitest step so Chromium is available for the Storybook browser project.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 0cd49be
+
+---
+
+## [2026-04-27] #024 — Fix: Storybook background colour, accessibility, unused React import, and tsconfig coverage
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .storybook/preview.tsx, tsconfig.json
+
+**Prompt (Step 1):**
+Storybook canvas was rendering on the default white background instead of the app's dark theme (`#0f1117`), causing components designed for a dark background to fail WCAG 2.1 AA colour-contrast checks. Additionally, `import React` in `preview.tsx` was unused (TS6133) and `.storybook/` was absent from `tsconfig.json` so TypeScript never checked it.
+
+**Review critique (Step 2):**
+All three issues were reactive. The background omission was the root cause of the accessibility failures — the components' text colours are correct against the dark background but fail against white. The tsconfig gap meant the unused import went undetected.
+
+**Resolution (Step 3):**
+Removed `import React from 'react'` (redundant with React 17+ JSX transform). Added `.storybook` to the `include` array in `tsconfig.json`. For the background, Claude's attempts using `parameters.backgrounds.default` and then `parameters.backgrounds.options` both failed — the correct Storybook 8+ fix was applied manually: `initialGlobals: { backgrounds: { value: theme.colors.backgroundPage } }` combined with `parameters.backgrounds.values` to register the option, and `a11y.test: 'error'` with `reviewOnFail: false` to enforce accessibility failures as errors. `tsc --noEmit` passes clean.
+
+**Verdict:** Modified
+**Commit hash (Step 4):** 28ecf87
+
+---
+
+## [2026-04-27] #025 — Fix: Extend ESLint, Prettier, and TypeScript to cover .storybook/
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** eslint.config.js, tsconfig.app.json, tsconfig.json, package.json, .storybook/main.ts
+
+**Prompt (Step 1):**
+`.storybook/` files were not covered by ESLint, Prettier, or TypeScript. Extend all three tools to include them.
+
+**Review critique (Step 2):**
+Multiple failed attempts before arriving at the correct fix. TypeScript silently ignores hidden directories (dot-prefixed) even when explicitly listed in `include` — `files` must be used instead. ESLint's `project: true` auto-detection failed to resolve the correct tsconfig; explicit paths were needed. `tsconfig.app.json` (not `tsconfig.json`) is the correct tsconfig for app and storybook files as it has `jsx`, `DOM` lib, and strict mode. The `previewHead` callback was simplified from `(head) => \`${head ?? ''}<style>...\`` to `() => \`<style>...\`` since no other content is injected into the preview head.
+
+**Resolution (Step 3):**
+Added `.storybook/main.ts` and `.storybook/preview.tsx` to `files` in `tsconfig.app.json`. Changed ESLint `parserOptions.project` from `true` to `['./tsconfig.app.json', './tsconfig.node.json']`. Expanded `lint` script to include `.storybook` and `format`/`format:check` scripts to include `.storybook/**/*.{ts,tsx}`. Simplified `previewHead` to drop the unused `head` parameter. `npm run lint` and `npm run format:check` both pass clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 28ecf87
+
+---
+
+## [2026-04-27] #026 — Fix: Install @openzeppelin/contracts to resolve EventTicket.sol imports
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** contracts/EventTicket.sol, package.json
+
+**Prompt (Step 1):**
+`EventTicket.sol` imports from `@openzeppelin/contracts` (ERC20, Ownable, ReentrancyGuard) but the package was not installed, causing all OZ symbols to be unresolved in the IDE and any Solidity tooling.
+
+**Review critique (Step 2):**
+Reactive fix — the package was simply missing. No Hardhat or Foundry config exists in the repo so `npm install` was the correct installation path.
+
+**Resolution (Step 3):**
+Ran `npm install @openzeppelin/contracts`, which added `@openzeppelin/contracts@^5.6.1` to `dependencies` in `package.json` and regenerated `package-lock.json`. All three import paths now resolve to `node_modules/@openzeppelin/contracts/`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 2ca3ef1
+
+---
+
+## [2026-04-27] #027 — Feat: Expand Playwright e2e test coverage across all pages and navbar
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** e2e/navbar.spec.ts, e2e/wallet.spec.ts, e2e/balance.spec.ts, e2e/buyTicket.spec.ts, e2e/redeemTicket.spec.ts
+
+**Prompt (Step 1):**
+Existing Playwright e2e tests were shallow — each page had 1-2 smoke tests only. Add more tests for better coverage across all pages and the navbar.
+
+**Review critique (Step 2):**
+The existing tests covered basic visibility but missed: navbar navigation behaviour, private key reveal/hide toggle, mnemonic display after wallet generation, page titles/subtitles, empty address submission on balance, and info labels on buy/redeem pages. All new tests operate without a connected wallet so no blockchain mocking is required.
+
+**Resolution (Step 3):**
+Created `e2e/navbar.spec.ts` (4 tests: brand visible, and navigation to each route via nav link). Added to `wallet.spec.ts`: reveal/hide private key toggle, page title/subtitle, mnemonic card visible after generation. Added to `balance.spec.ts`: empty submission validation, page title/subtitle. Added to `buyTicket.spec.ts`: page title/subtitle, tickets remaining label. Added to `redeemTicket.spec.ts`: page subtitle. Total new tests: 13. All hardcoded strings replaced with imports from `src/locales/en.json` so tests stay in sync with copy changes automatically.
+
+**Verdict:** Modified
+**Commit hash (Step 4):** a771a95
+
+---
+
+## [2026-04-27] #028 — Refactor: Extract route paths into src/routes.ts and use in app and e2e tests
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/routes.ts, src/App.tsx, src/components/Navbar/Navbar.tsx, e2e/*.spec.ts
+
+**Prompt (Step 1):**
+Route path strings were hardcoded in `App.tsx`, `Navbar.tsx`, and all Playwright specs. Extract them into a single `src/routes.ts` const object so route changes only need updating in one place.
+
+**Review critique (Step 2):**
+Straightforward refactor. The pattern mirrors `config.ts` and `en.json` — all configurable values in one file. TypeScript's `as const` ensures the values are narrow string literals, compatible with React Router's `to` prop and Playwright's `page.goto()`.
+
+**Resolution (Step 3):**
+Created `src/routes.ts` exporting a `routes` const with keys `root`, `createWallet`, `balance`, `buyTicket`, and `redeem`. Updated `App.tsx` and `Navbar.tsx` to import from `routes`. Updated all five e2e spec files to import and use `routes` for every `page.goto()` and `toHaveURL()` assertion. `tsc --noEmit` passes clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** e083d18
+
+---
+
+## [2026-04-27] #029 — Chore: Replace default Vite assets in public/ with project-appropriate files
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** public/favicon.svg, public/icons.svg
+
+**Prompt (Step 1):**
+`public/` contained two Vite scaffold files: `icons.svg` (social media icon sprites — Bluesky, Discord, GitHub, X etc.) with no references anywhere in the codebase, and `favicon.svg` (the default Vite lightning bolt). Replace them with something appropriate for the project.
+
+**Review critique (Step 2):**
+`icons.svg` was clearly unused scaffolding. `favicon.svg` was referenced in `index.html` and needed replacing, not deleting.
+
+**Resolution (Step 3):**
+Deleted `icons.svg`. Replaced `favicon.svg` with a minimal ticket icon: purple (`#6c63ff`) ticket body with perforation notches, a dashed tear line, and a checkmark detail using the app's theme colours (`#6c63ff`, `#0f1117`, `#f1f5f9`).
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 3201ef0
+
+---
+
+## [2026-04-27] #030 — Chore: Delete unused src/assets/ directory
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/assets/
+
+**Prompt (Step 1):**
+`src/assets/` contained `hero.png`, `react.svg`, and `vite.svg` — all Vite scaffold files with no references anywhere in the codebase.
+
+**Review critique (Step 2):**
+Confirmed zero references before deleting. `tsc --noEmit` and `npm run lint` both pass clean after removal.
+
+**Resolution (Step 3):**
+Deleted `src/assets/` and all three files within it.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7195dfa
+
+---
+
+## [2026-04-27] #031 — Refactor: Move MemoryRouter to global Storybook decorator, remove redundant a11y params
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .storybook/preview.tsx, src/components/Navbar/Navbar.stories.tsx, src/pages/CreateWallet/CreateWallet.stories.tsx
+
+**Prompt (Step 1):**
+`Navbar.stories.tsx` and `CreateWallet.stories.tsx` each had a local `MemoryRouter` decorator and `parameters: { a11y: { disable: false } }`. The router wrapper belongs in the global decorator since the whole app runs inside a router, and the a11y parameter is redundant as it just re-enables the already-enabled default.
+
+**Review critique (Step 2):**
+Only `Navbar` actively uses router APIs (`NavLink`), but adding `MemoryRouter` globally is correct — it matches the real app context and protects any future component that needs it. `a11y: { disable: false }` was genuinely redundant given the global `a11y.test: 'error'` config in preview.tsx.
+
+**Resolution (Step 3):**
+Added `MemoryRouter` wrapping `ThemeProvider` in the global decorator in `preview.tsx`. Removed the local `MemoryRouter` decorator and `a11y` parameter from both story files. Removed the `react-router-dom` imports from both story files.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7195dfa
+
+---
+
+## [2026-04-27] #032 — Refactor: Simplify story meta to inline export default satisfies pattern
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/**/*.stories.tsx (all 6 files)
+
+**Prompt (Step 1):**
+Story files used the verbose `const meta: Meta<typeof X> = { ... }; export default meta` pattern with explicit `title` fields. Simplify to `export default { component: X } satisfies Meta<typeof X>` and remove redundant `title` fields and `a11y: { disable: false }` parameters.
+
+**Review critique (Step 2):**
+Also extracted repeated inline connected wallet objects in `BuyTicket.stories.tsx` and `RedeemTicket.stories.tsx` into a shared `connectedWalletCtx` const, eliminating duplication across three stories each.
+
+**Resolution (Step 3):**
+Updated all 6 story files to use `export default { ... } satisfies Meta<typeof X>` and `type Story = StoryObj<typeof X>`. Removed `title`, `a11y: { disable: false }`, and the intermediate `meta` variable. Extracted `connectedWalletCtx` in BuyTicket and RedeemTicket stories. `tsc --noEmit` and `npm run lint` pass clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7195dfa
+
+---
+
+## [2026-04-27] #033 — Refactor: Replace story-level WalletContext decorators with args
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/context/WalletContext.tsx, src/**/*.stories.tsx (5 files)
+
+**Prompt (Step 1):**
+Story files for context-dependent components had repeated per-story `WalletContext.Provider` decorators. Replace with the idiomatic Storybook args pattern: a single meta-level decorator reads `args` and passes them to the provider; stories override only the args they need.
+
+**Review critique (Step 2):**
+`WalletContextValue` was not exported from `WalletContext.tsx`, blocking type-safe use in story files. The `args as WalletContextValue` cast I initially wrote was flagged as unnecessary by `@typescript-eslint/no-unnecessary-type-assertion` — removed after the linter confirmed args were already correctly typed.
+
+**Resolution (Step 3):**
+Exported `WalletContextValue` from `WalletContext.tsx`. Updated 5 story files to use `Meta<WalletContextValue>` with `args: base` at meta level and a single decorator reading `{ args }` from story context. Stories now override only changed args (e.g. `isConnected: true, address, signer`). Eliminated all per-story decorator arrays.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7195dfa
+
+---
+
+## [2026-04-27] #034 — Fix: Replace &.active with &[aria-current='page'] in Navbar.styles.ts
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/Navbar/Navbar.styles.ts
+
+**Prompt (Step 1):**
+The `&.active` selector in `NavLink` was flagged as never used. Fix it.
+
+**Review critique (Step 2):**
+React Router v6's `NavLink` sets `aria-current="page"` on the active link (and also adds a `.active` class). The `aria-current` attribute selector is more semantically correct and accessibility-friendly, and avoids the static analysis false positive.
+
+**Resolution (Step 3):**
+Replaced `&.active` with `&[aria-current='page']` in `NavLink`. Styles and behaviour are identical at runtime since React Router sets both, but the attribute selector is the correct and lint-clean approach.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** TBD

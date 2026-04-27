@@ -34,7 +34,7 @@ export const NavLink = styled(Link)`
     color: ${({ theme }) => theme.colors.textLink};
   }
 
-  &.active {
+  &[aria-current='page'] {
     color: ${({ theme }) => theme.colors.brandPrimary};
     font-weight: 600;
   }
