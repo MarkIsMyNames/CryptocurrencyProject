@@ -69,9 +69,16 @@ export function Balance() {
         <AddressInput
           placeholder={strings.balance.placeholder}
           value={inputAddress}
-          onChange={(e) => { setInputAddress(e.target.value) }}
+          onChange={(e) => {
+            setInputAddress(e.target.value)
+          }}
         />
-        <CheckButton onClick={() => { void handleCheck() }} disabled={loading}>
+        <CheckButton
+          onClick={() => {
+            void handleCheck()
+          }}
+          disabled={loading}
+        >
           {loading ? '...' : strings.balance.checkBtn}
         </CheckButton>
       </InputRow>

@@ -101,8 +101,7 @@ export const TicketBadge = styled.span<{ $valid: boolean }>`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   background: ${({ theme, $valid }) =>
     $valid ? theme.colors.statusSuccessSubtle : theme.colors.statusErrorSubtle};
-  color: ${({ theme, $valid }) =>
-    $valid ? theme.colors.statusSuccess : theme.colors.statusError};
+  color: ${({ theme, $valid }) => ($valid ? theme.colors.statusSuccess : theme.colors.statusError)};
 `
 
 export const ErrorMessage = styled.p`

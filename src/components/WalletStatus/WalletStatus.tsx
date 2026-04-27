@@ -13,9 +13,7 @@ export function WalletStatus() {
     <StatusWrapper>
       <StatusDot $connected={isConnected} />
       <StatusText>
-        {isConnected && address
-          ? truncateAddress(address)
-          : strings.walletStatus.disconnected}
+        {isConnected && address ? truncateAddress(address) : strings.walletStatus.disconnected}
       </StatusText>
     </StatusWrapper>
   )

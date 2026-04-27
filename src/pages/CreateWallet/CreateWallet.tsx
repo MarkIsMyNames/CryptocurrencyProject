@@ -38,12 +38,12 @@ export function CreateWallet() {
       <Title>{en.createWallet.title}</Title>
       <Subtitle>{en.createWallet.subtitle}</Subtitle>
       <ButtonRow>
-        <PrimaryButton onClick={handleGenerate}>
-          {en.createWallet.generateBtn}
-        </PrimaryButton>
+        <PrimaryButton onClick={handleGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
         <PrimaryButton
           disabled={isConnecting}
-          onClick={() => { void connect() }}
+          onClick={() => {
+            void connect()
+          }}
         >
           {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
         </PrimaryButton>
@@ -68,12 +68,20 @@ export function CreateWallet() {
             <CardValue>
               {keyRevealed ? generated.privateKey : '••••••••••••••••••••••••••••••••'}
             </CardValue>
-            <SecondaryButton onClick={() => { setKeyRevealed((v) => !v) }}>
+            <SecondaryButton
+              onClick={() => {
+                setKeyRevealed((v) => !v)
+              }}
+            >
               {keyRevealed ? en.createWallet.hideKey : en.createWallet.revealKey}
             </SecondaryButton>
           </Card>
 
-          <PrimaryButton onClick={() => { void handleDownload() }}>
+          <PrimaryButton
+            onClick={() => {
+              void handleDownload()
+            }}
+          >
             {en.createWallet.downloadBtn}
           </PrimaryButton>
         </>

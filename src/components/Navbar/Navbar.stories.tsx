@@ -5,7 +5,13 @@ import { Navbar } from './Navbar'
 const meta: Meta<typeof Navbar> = {
   title: 'Components/Navbar',
   component: Navbar,
-  decorators: [(Story) => <MemoryRouter><Story /></MemoryRouter>],
+  decorators: [
+    (Story) => (
+      <MemoryRouter>
+        <Story />
+      </MemoryRouter>
+    ),
+  ],
   parameters: { a11y: { disable: false } },
 }
 export default meta

@@ -24,5 +24,7 @@ export async function downloadKeystore(wallet: GeneratedWallet, password: string
   a.href = url
   a.download = `keystore-${wallet.address.slice(0, 8)}.json`
   a.click()
-  setTimeout(() => { URL.revokeObjectURL(url) }, 100)
+  setTimeout(() => {
+    URL.revokeObjectURL(url)
+  }, 100)
 }

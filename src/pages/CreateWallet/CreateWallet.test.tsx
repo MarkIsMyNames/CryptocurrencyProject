@@ -65,9 +65,7 @@ describe('CreateWallet', () => {
     renderPage()
     fireEvent.click(screen.getByText('Generate New Wallet'))
     await waitFor(() => {
-      expect(
-        screen.getByText(/Save your recovery phrase and private key/),
-      ).toBeInTheDocument()
+      expect(screen.getByText(/Save your recovery phrase and private key/)).toBeInTheDocument()
     })
   })
 })

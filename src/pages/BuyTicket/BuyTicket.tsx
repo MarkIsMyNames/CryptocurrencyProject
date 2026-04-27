@@ -29,13 +29,12 @@ export function BuyTicket() {
   useEffect(() => {
     if (!provider || !address) return
     const contract = getContract(provider)
-    void Promise.all([
-      contract.remainingTickets(),
-      contract.balanceOf(address),
-    ]).then(([rem, owned]) => {
-      setRemaining(BigInt(String(rem)))
-      setOwnedTickets(BigInt(String(owned)))
-    })
+    void Promise.all([contract.remainingTickets(), contract.balanceOf(address)]).then(
+      ([rem, owned]) => {
+        setRemaining(BigInt(String(rem)))
+        setOwnedTickets(BigInt(String(owned)))
+      },
+    )
   }, [provider, address])
 
   const isSoldOut = remaining !== null && remaining === BigInt(0)
@@ -50,7 +49,9 @@ export function BuyTicket() {
     setStatus('pending')
     setStatusMessage(strings.buyTicket.pending)
     try {
-      const tx = (await contract.buyTicket({ value: parseEther('0.01') })) as ContractTransactionResponse
+      const tx = (await contract.buyTicket({
+        value: parseEther('0.01'),
+      })) as ContractTransactionResponse
       await tx.wait()
       setStatus('success')
       setStatusMessage(strings.buyTicket.success)
@@ -87,7 +88,9 @@ export function BuyTicket() {
       </InfoCard>
       {isConnected ? (
         <BuyButton
-          onClick={() => { void handleBuy() }}
+          onClick={() => {
+            void handleBuy()
+          }}
           disabled={isDisabled}
         >
           {strings.buyTicket.buyBtn}
@@ -95,9 +98,7 @@ export function BuyTicket() {
       ) : (
         <ConnectPrompt>{strings.buyTicket.connectFirst}</ConnectPrompt>
       )}
-      {status !== null && (
-        <StatusMessage $type={status}>{statusMessage}</StatusMessage>
-      )}
+      {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
     </PageWrapper>
   )
 }

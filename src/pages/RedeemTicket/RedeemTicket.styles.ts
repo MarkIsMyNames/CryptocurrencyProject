@@ -52,13 +52,11 @@ export const TicketStatusBadge = styled.span<TicketStatusBadgeProps>`
   border-radius: ${({ theme }) => theme.borderRadius.sm};
   font-size: ${({ theme }) => theme.fontSizes.sm};
   font-weight: 600;
-  color: ${({ theme, $valid }) =>
-    $valid ? theme.colors.statusSuccess : theme.colors.statusError};
+  color: ${({ theme, $valid }) => ($valid ? theme.colors.statusSuccess : theme.colors.statusError)};
   background: ${({ theme, $valid }) =>
     $valid ? theme.colors.statusSuccessSubtle : theme.colors.statusErrorSubtle};
   border: 1px solid
-    ${({ theme, $valid }) =>
-      $valid ? theme.colors.statusSuccess : theme.colors.statusError};
+    ${({ theme, $valid }) => ($valid ? theme.colors.statusSuccess : theme.colors.statusError)};
 `
 
 export const RedeemButton = styled.button`

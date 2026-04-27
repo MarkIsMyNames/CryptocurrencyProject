@@ -76,14 +76,14 @@ export function RedeemTicket() {
             </TicketStatusBadge>
           </TicketCard>
           <RedeemButton
-            onClick={() => { void handleRedeem() }}
+            onClick={() => {
+              void handleRedeem()
+            }}
             disabled={isDisabled}
           >
             {strings.redeem.redeemBtn}
           </RedeemButton>
-          {status !== null && (
-            <StatusMessage $type={status}>{statusMessage}</StatusMessage>
-          )}
+          {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
         </>
       ) : (
         <ConnectPrompt>{strings.redeem.connectFirst}</ConnectPrompt>
