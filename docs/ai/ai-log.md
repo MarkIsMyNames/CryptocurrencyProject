@@ -243,3 +243,22 @@ Created src/globals.d.ts declaring Window.ethereum as Eip1193Provider intersecti
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 1499e8c
+
+---
+
+## [2026-04-27] #010 — Task 10: Navbar component
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/Navbar/
+
+**Prompt (Step 1 — proactive guidance):**
+"Create Navbar component with styled-components, routing links from en.json strings, NavBrand, NavLinks, NavLink (active state via .active class). Include Storybook stories with Default, HoverState (pseudo.hover), FocusState (pseudo.focus) and addon-a11y enabled."
+
+**Review critique (Step 2):**
+Two issues found: (1) Stories file imported from `@storybook/react` — ESLint storybook/no-renderer-packages rule requires the framework package `@storybook/react-vite` instead. (2) Test used `async` on a callback with no `await` — TypeScript strictTypeChecked flags this via @typescript-eslint/require-await.
+
+**Resolution (Step 3):**
+Changed stories import to `@storybook/react-vite`. Removed `async` keyword from the accessibility test callback since no await expression is used.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 995e195
