@@ -339,3 +339,22 @@ Removed `async` from the first test callback. Changed the error lookup variables
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 5c6af57
 
+
+---
+
+## [2026-04-27] #015 — Task 15: RedeemTicket page
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/RedeemTicket/
+
+**Prompt (Step 1 — proactive guidance):**
+"Create RedeemTicket page showing wallet address and ticket status badge (valid/none). Redeem at Door button calls contract.redeemTicket(), waits for tx, shows success message. Button disabled when no ticket, pending, or already redeemed. Error strings from en.json via decodeContractError. Storybook stories for Default (disconnected), HasTicket, ButtonHover, ButtonFocus."
+
+**Review critique (Step 2):**
+en.json already had redeem keys but with different values for yourAddress ("Your Wallet Address"), hasTicket ("Valid — 1 ETK"), and noTicket ("No ticket found"). Required updating to match specification. All component files followed BuyTicket pattern closely; no structural issues found.
+
+**Resolution (Step 3):**
+Updated three en.json values to match specification. Created RedeemTicket.styles.ts, RedeemTicket.tsx, RedeemTicket.stories.tsx, and RedeemTicket.test.tsx. All 3 tests pass, lint and tsc clean.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 2b8b88d

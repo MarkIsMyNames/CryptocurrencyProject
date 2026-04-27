@@ -58,10 +58,10 @@
   "redeem": {
     "title": "Redeem Ticket",
     "subtitle": "Present this page to the doorman to redeem your ticket for entry.",
-    "yourAddress": "Your Wallet Address",
+    "yourAddress": "Your Wallet",
     "ticketStatus": "Ticket Status",
-    "hasTicket": "Valid — 1 ETK",
-    "noTicket": "No ticket found",
+    "hasTicket": "Valid Ticket ✓",
+    "noTicket": "No Ticket",
     "redeemBtn": "Redeem at Door",
     "pending": "Redeeming...",
     "success": "Entry confirmed. Enjoy the event!",
