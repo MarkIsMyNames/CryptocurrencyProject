@@ -14,6 +14,8 @@ export default defineConfig({
     projects: [{
       extends: true,
       test: {
+        include: ['src/**/*.test.{ts,tsx}'],
+        exclude: ['e2e/**', '.worktrees/**'],
         environment: 'jsdom',
         setupFiles: ['./src/test-setup.ts'],
         globals: true

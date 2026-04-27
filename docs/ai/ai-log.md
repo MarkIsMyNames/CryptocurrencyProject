@@ -390,6 +390,23 @@ Updated three en.json values to match specification. Created RedeemTicket.styles
 
 ---
 
+## [2026-04-27] #020 — Fix: Vitest picking up Playwright e2e specs from worktrees
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** vite.config.ts test configuration
+
+**Prompt (Step 1):**
+The unit test suite (Vitest) is failing. The vitest `projects` config in `vite.config.ts` has no `include`/`exclude` on the jsdom project, so Vitest is picking up Playwright spec files from `.worktrees/*/e2e/` and `e2e/`. Constrain the jsdom project to `src/**/*.test.{ts,tsx}` only and exclude `e2e/**` and `.worktrees/**`. Also `node_modules` is missing — install with `--legacy-peer-deps` due to `eslint-plugin-jsx-a11y` peer dep conflict. After the fix, all 13 test files should pass. Log the change in `docs/ai/ai-log.md`.
+
+**Review critique (Step 2):**
+The prompt accurately diagnosed both issues upfront: missing `node_modules` and the missing `include`/`exclude` on the vitest jsdom project. No reactive guessing was needed.
+
+**Resolution (Step 3):**
+Ran `npm install --legacy-peer-deps`, then added `include: ['src/**/*.test.{ts,tsx}']` and `exclude: ['e2e/**', '.worktrees/**']` to the jsdom project in `vite.config.ts`. All 13 test files / 37 tests now pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** pending
+
 ## [2026-04-27] #016 — Task 16: App.tsx routing and main.tsx wiring
 
 **Tool:** Claude (claude-haiku-4-5)
