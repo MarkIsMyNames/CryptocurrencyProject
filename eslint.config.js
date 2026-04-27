@@ -9,11 +9,15 @@ import prettier from 'eslint-config-prettier'
 export default tseslint.config(
   { ignores: ['dist', 'storybook-static', 'playwright-report', 'coverage'] },
   {
-    extends: [js.configs.recommended, ...tseslint.configs.strict],
+    extends: [js.configs.recommended, ...tseslint.configs.strictTypeChecked],
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 'latest',
       globals: globals.browser,
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
     plugins: {
       'react-hooks': reactHooks,
@@ -37,6 +41,10 @@ export default tseslint.config(
         },
         {
           selector: "Literal[value=/^rgb/]",
+          message: 'Raw colour values are not allowed in styles files. Use theme.colors.* from src/theme.ts.',
+        },
+        {
+          selector: "Literal[value=/^hsl/]",
           message: 'Raw colour values are not allowed in styles files. Use theme.colors.* from src/theme.ts.',
         },
       ],
