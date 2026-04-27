@@ -224,3 +224,22 @@ No changes required.
 
 **Verdict:** Accepted as-is
 **Commit hash (Step 4):** 1cfe57c
+
+---
+
+## [2026-04-27] #009 — Task 9: WalletContext and utility files
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/context/WalletContext.tsx, src/utils/contract.ts, src/utils/wallet.ts
+
+**Prompt (Step 1 — proactive guidance):**
+"Create WalletContext with connect/disconnect/refreshBalances actions, MetaMask BrowserProvider integration, Sepolia chain ID check, and typed state (address, ethBalance, etkBalance, isConnected, isConnecting, error). Create contract.ts with ABI array and getContract/decodeContractError helpers. Create wallet.ts with generateWallet and downloadKeystore using ethers.js Wallet.createRandom and encrypt."
+
+**Review critique (Step 2):**
+Two issues found: (1) window.ethereum was untyped — TypeScript errors TS2339 on all three access sites. (2) ESLint react-refresh/only-export-components warning because useWallet hook is co-exported from the same file as WalletProvider component. Also @testing-library/dom was missing as a dependency causing the test runner to fail before the implementation existed.
+
+**Resolution (Step 3):**
+Created src/globals.d.ts declaring Window.ethereum as Eip1193Provider intersection with typed request method — resolved all TS errors. Added file-level eslint-disable comment for react-refresh/only-export-components with rationale (context files legitimately co-export hooks). Installed @testing-library/dom with --legacy-peer-deps to satisfy the missing peer dependency.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 1499e8c

@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint src --max-warnings 0",
+    "test": "vitest",
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\"",
     "preview": "vite preview",
@@ -14,6 +15,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@testing-library/dom": "^10.4.1",
     "ethers": "^6.16.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
