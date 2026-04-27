@@ -186,3 +186,22 @@ Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`,
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 54f187d
+
+---
+
+## [2026-04-27] #007 — Task 7: Playwright setup
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** playwright.config.ts + e2e/ skeleton specs
+
+**Prompt (Step 1 — proactive guidance):**
+"Set up Playwright with Chromium-only config, baseURL http://localhost:5173, webServer integration for Vite dev server. Create skeleton e2e specs for Wallet Creation, Balance Check, Buy Ticket, and Redeem Ticket flows — each with a single navigation test. Full e2e tests will be filled in after all pages are implemented."
+
+**Review critique (Step 2):**
+No issues found.
+
+**Resolution (Step 3):**
+No changes required.
+
+**Verdict:** Accepted as-is
+**Commit hash (Step 4):** cd54749
