@@ -29,3 +29,4 @@ test-results/
 
 # Docs (superpowers internal)
 docs/superpowers/
+.worktrees/
