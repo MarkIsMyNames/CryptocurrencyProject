@@ -30,7 +30,10 @@ vite.config.js
 *.ntvs*
 *.njsproj
 *.sln
-*.sw?
+*.sw
+.claude
+docs/superpowers
 
 *storybook.log
 storybook-static
+.worktrees
