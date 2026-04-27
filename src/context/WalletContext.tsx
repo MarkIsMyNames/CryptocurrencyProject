@@ -15,7 +15,7 @@ interface WalletState {
   error: string | null
 }
 
-interface WalletContextValue extends WalletState {
+export interface WalletContextValue extends WalletState {
   connect: () => Promise<void>
   disconnect: () => void
   refreshBalances: () => Promise<void>

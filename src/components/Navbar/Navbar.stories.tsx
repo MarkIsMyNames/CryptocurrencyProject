@@ -1,20 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
 import { Navbar } from './Navbar'
 
-const meta: Meta<typeof Navbar> = {
-  title: 'Components/Navbar',
-  component: Navbar,
-  decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <Story />
-      </MemoryRouter>
-    ),
-  ],
-  parameters: { a11y: { disable: false } },
-}
-export default meta
+export default { component: Navbar } satisfies Meta<typeof Navbar>
 
 type Story = StoryObj<typeof Navbar>
 

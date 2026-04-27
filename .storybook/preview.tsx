@@ -1,13 +1,16 @@
 import type { Preview } from '@storybook/react'
+import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { theme } from '../src/theme'
 
 export default {
   decorators: [
     (Story) => (
-      <ThemeProvider theme={theme}>
-        <Story />
-      </ThemeProvider>
+      <MemoryRouter>
+        <ThemeProvider theme={theme}>
+          <Story />
+        </ThemeProvider>
+      </MemoryRouter>
     ),
   ],
   parameters: {

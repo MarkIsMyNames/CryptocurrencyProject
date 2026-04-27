@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { WalletStatus } from './WalletStatus'
-import { WalletContext } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/WalletContext'
 
-const disconnectedState = {
+const base: WalletContextValue = {
   isConnected: false,
   address: null,
   ethBalance: null,
@@ -16,39 +16,27 @@ const disconnectedState = {
   refreshBalances: async () => {},
 }
 
-const connectedState = {
-  ...disconnectedState,
-  isConnected: true,
-  address: '0x1234567890abcdef1234567890abcdef12345678',
-  ethBalance: BigInt('1000000000000000000'),
-  etkBalance: BigInt(1),
-}
-
-const meta: Meta<typeof WalletStatus> = {
-  title: 'Components/WalletStatus',
+export default {
   component: WalletStatus,
-  parameters: { a11y: { disable: false } },
-}
-export default meta
-
-type Story = StoryObj<typeof WalletStatus>
-
-export const Disconnected: Story = {
+  args: base,
   decorators: [
-    (Story) => (
-      <WalletContext.Provider value={disconnectedState}>
+    (Story, { args }) => (
+      <WalletContext.Provider value={args}>
         <Story />
       </WalletContext.Provider>
     ),
   ],
-}
+} satisfies Meta<WalletContextValue>
+
+type Story = StoryObj<WalletContextValue>
+
+export const Disconnected: Story = {}
 
 export const Connected: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider value={connectedState}>
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
+  args: {
+    isConnected: true,
+    address: '0x1234567890abcdef1234567890abcdef12345678',
+    ethBalance: BigInt('1000000000000000000'),
+    etkBalance: BigInt(1),
+  },
 }
