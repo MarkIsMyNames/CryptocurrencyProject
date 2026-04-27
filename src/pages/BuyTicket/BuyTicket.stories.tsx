@@ -42,7 +42,7 @@ export const Connected: Story = {
           ...baseWalletCtx,
           isConnected: true,
           address: '0xabc123',
-          provider: {} as never,
+          provider: null,
           signer: {} as never,
         }}
       >
@@ -60,7 +60,7 @@ export const ButtonHover: Story = {
           ...baseWalletCtx,
           isConnected: true,
           address: '0xabc123',
-          provider: {} as never,
+          provider: null,
           signer: {} as never,
         }}
       >
@@ -79,7 +79,7 @@ export const ButtonFocus: Story = {
           ...baseWalletCtx,
           isConnected: true,
           address: '0xabc123',
-          provider: {} as never,
+          provider: null,
           signer: {} as never,
         }}
       >

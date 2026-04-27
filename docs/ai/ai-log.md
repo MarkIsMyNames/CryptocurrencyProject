@@ -358,3 +358,22 @@ Updated three en.json values to match specification. Created RedeemTicket.styles
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 2b8b88d
+
+---
+
+## [2026-04-27] #016 — Task 16: App.tsx routing and main.tsx wiring
+
+**Tool:** Claude (claude-haiku-4-5)
+**Feature:** src/App.tsx, src/main.tsx
+
+**Prompt (Step 1 — proactive guidance):**
+"Wire up main.tsx with BrowserRouter, ThemeProvider, and WalletProvider wrapping the App. Replace App.tsx with React Router v6 Routes for /, /create-wallet, /balance, /buy-ticket, /redeem. Add GlobalStyle for box-sizing reset and body background from theme. Navbar and WalletStatus in header. Use styled-components for header to avoid inline styles triggering lint warnings."
+
+**Review critique (Step 2):**
+No issues found. All files followed specification exactly. Lint and tsc both pass clean. The pre-existing test failures for Storybook and e2e tests are unrelated to the routing implementation (they were failing before these changes).
+
+**Resolution (Step 3):**
+Created main.tsx with BrowserRouter, ThemeProvider, and WalletProvider nesting, and StrictMode. Replaced App.tsx with Routes for all four pages (/, /create-wallet, /balance, /buy-ticket, /redeem) plus redirect from / to /create-wallet. Added GlobalStyle with box-sizing reset and theme-based body colors. Used styled-components (AppHeader and WalletStatusWrapper) to avoid inline styles. Both files are clean and lint/tsc pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** c71deab
