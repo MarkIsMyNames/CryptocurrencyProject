@@ -319,3 +319,23 @@ Changed `balance.title` in en.json from "Check Balance" to "Wallet Balance". Rem
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 695a3c0
+
+---
+
+## [2026-04-27] #014 — Task 14: BuyTicket page
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/BuyTicket/
+
+**Prompt (Step 1 — proactive guidance):**
+"Create BuyTicket page showing ticket price (from config.ticketPriceDisplay), remaining tickets, and user's current balance. Buy button calls contract.buyTicket({ value: parseEther('0.01') }), shows pending/success/error states. Disables button if already owns ticket, sold out, or transaction pending. All strings from en.json."
+
+**Review critique (Step 2):**
+Two issues found: (1) The first test was `async` with no `await` expression, triggering `@typescript-eslint/require-await`. Required removing the `async` keyword. (2) In BuyTicket.tsx the error message lookup used `Record<string, string>` which TypeScript treats as always returning `string`, making the `??` fallback chain an unnecessary condition. Required typing the lookup objects as `Partial<Record<string, string>>` so `undefined` is possible and the `??` chain is valid.
+
+**Resolution (Step 3):**
+Removed `async` from the first test callback. Changed the error lookup variables from `as Record<string, string>` casts to `Partial<Record<string, string>>` type annotations. All other files matched the specification exactly.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 5c6af57
+
