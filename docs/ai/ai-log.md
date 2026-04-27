@@ -62,3 +62,22 @@ AI produced a working scaffold but with several issues requiring correction:
 
 **Verdict:** Modified
 **Commit hash (Step 4):** e03102f
+
+---
+
+## [2026-04-27] #003 — Task 3: CLAUDE.md
+
+**Tool:** Claude (claude-haiku-4-5)
+**Feature:** CLAUDE.md
+
+**Prompt (Step 1 — proactive guidance):**
+"Create CLAUDE.md at the project root covering: project context, tech stack, file/folder conventions, code style, testing requirements, AI logging format, smart contract rules, and git/PR conventions. The AI logging section must specify the four-step format (prompt → critique → resolution → commit hash) and note that optimization passes must be separate entries tagged [OPTIMIZATION]."
+
+**Review critique (Step 2):**
+No issues found. The file was created with the exact content specified in the task requirements.
+
+**Resolution (Step 3):**
+Created CLAUDE.md at the project root with all sections as specified: project context (Block 8 submission), tech stack (React 19.2, Vite, TypeScript strict), file/folder conventions (component directory structure, styled-components theme usage, no raw colors except in src/theme.ts), code style (strict TypeScript, no comments unless necessary, Prettier enforced), testing requirements (Vitest + RTL + Storybook + Playwright), AI logging format (four-step process with optimization pass notation), smart contract rules (OpenZeppelin v5, ReentrancyGuard, custom errors), and git/PR conventions (feat/fix/chore/test/docs, feature/task-N branches, PR-based workflow). File committed successfully.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 32c3b68
