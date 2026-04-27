@@ -1,5 +1,5 @@
 {
-  "name": "scaffold-temp",
+  "name": "eventticket-dapp",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -25,7 +25,6 @@
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@types/styled-components": "^5.1.36",
     "@typescript-eslint/eslint-plugin": "^8.59.0",
     "@typescript-eslint/parser": "^8.59.0",
     "@vitejs/plugin-react": "^6.0.1",
