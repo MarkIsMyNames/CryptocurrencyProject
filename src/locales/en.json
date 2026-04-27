@@ -23,6 +23,7 @@
     "privateKeyLabel": "Private Key",
     "passwordPrompt": "Enter a password to encrypt your keystore",
     "warning": "Save your recovery phrase and private key somewhere safe. They cannot be recovered if lost.",
+    "connecting": "Connecting...",
     "metaMaskNotFound": "MetaMask not detected. Please install the MetaMask browser extension.",
     "metaMaskSuccess": "MetaMask connected successfully."
   },

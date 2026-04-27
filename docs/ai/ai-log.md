@@ -281,3 +281,22 @@ Added `export` keyword to `const WalletContext = createContext<WalletContextValu
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 1f4d469
+
+---
+
+## [2026-04-27] #012 — Task 12: CreateWallet page
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/
+
+**Prompt (Step 1 — proactive guidance):**
+"Create CreateWallet page with two paths: generate a new wallet (Wallet.createRandom) showing address, mnemonic, and toggle-revealed private key with keystore download; or connect MetaMask via useWallet().connect(). All strings from en.json, all styles via theme. Storybook stories for Default, Connecting state, and ButtonFocus."
+
+**Review critique (Step 2):**
+One issue found: the stories file used `async () => undefined` for noopAsync which TypeScript strictTypeChecked flags via @typescript-eslint/require-await (async function with no await expression). Required changing to `() => Promise.resolve()` instead.
+
+**Resolution (Step 3):**
+Changed `const noopAsync = async () => undefined` to `const noopAsync = () => Promise.resolve()` in CreateWallet.stories.tsx. All other files matched the specification exactly — no further changes required.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** bfc446f
