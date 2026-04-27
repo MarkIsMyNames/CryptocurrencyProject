@@ -469,4 +469,4 @@ acceptable — splitting into separate contexts would be premature optimisation.
 Documented the tradeoff rather than over-engineering.
 
 **Verdict:** No code changes — tradeoff accepted and documented.
-**Commit hash (Step 4):** [fill in after commit]
+**Commit hash (Step 4):** c1ff18a
