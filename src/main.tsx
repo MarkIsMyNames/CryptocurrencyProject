@@ -1,13 +1,22 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { ThemeProvider } from 'styled-components'
+import { BrowserRouter } from 'react-router-dom'
+import { theme } from './theme'
+import { WalletProvider } from './context/WalletContext'
+import App from './App'
 
-const rootElement = document.getElementById('root')
-if (!rootElement) throw new Error('Root element #root not found in document.')
+const root = document.getElementById('root')
+if (!root) throw new Error('Root element not found')
 
-createRoot(rootElement).render(
+createRoot(root).render(
   <StrictMode>
-    <App />
+    <BrowserRouter>
+      <ThemeProvider theme={theme}>
+        <WalletProvider>
+          <App />
+        </WalletProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   </StrictMode>,
 )
