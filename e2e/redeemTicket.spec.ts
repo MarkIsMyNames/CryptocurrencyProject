@@ -1,24 +1,20 @@
 import { test, expect } from '@playwright/test'
+import en from '../src/locales/en.json'
+import { routes } from '../src/routes'
 
 test.describe('Redeem Ticket', () => {
   test('shows connect prompt when no wallet connected', async ({ page }) => {
-    await page.goto('/redeem')
-    await expect(
-      page.getByText('Please connect your wallet to redeem.'),
-    ).toBeVisible()
+    await page.goto(routes.redeem)
+    await expect(page.getByText(en.redeem.connectFirst)).toBeVisible()
   })
 
   test('shows redeem page title', async ({ page }) => {
-    await page.goto('/redeem')
-    await expect(
-      page.getByRole('heading', { name: 'Redeem Ticket' }),
-    ).toBeVisible()
+    await page.goto(routes.redeem)
+    await expect(page.getByRole('heading', { name: en.redeem.title })).toBeVisible()
   })
 
   test('shows page subtitle', async ({ page }) => {
-    await page.goto('/redeem')
-    await expect(
-      page.getByText('Present this page to the doorman to redeem your ticket for entry.'),
-    ).toBeVisible()
+    await page.goto(routes.redeem)
+    await expect(page.getByText(en.redeem.subtitle)).toBeVisible()
   })
 })

@@ -1,57 +1,51 @@
 import { test, expect } from '@playwright/test'
+import en from '../src/locales/en.json'
+import { routes } from '../src/routes'
 
 test.describe('Wallet Creation', () => {
   test('navigates to create wallet page from root', async ({ page }) => {
-    await page.goto('/')
-    await expect(page).toHaveURL('/create-wallet')
+    await page.goto(routes.root)
+    await expect(page).toHaveURL(routes.createWallet)
   })
 
   test('shows generate and connect buttons', async ({ page }) => {
-    await page.goto('/create-wallet')
-    await expect(page.getByText('Generate New Wallet')).toBeVisible()
-    await expect(page.getByText('Connect MetaMask')).toBeVisible()
+    await page.goto(routes.createWallet)
+    await expect(page.getByText(en.createWallet.generateBtn)).toBeVisible()
+    await expect(page.getByText(en.createWallet.connectBtn)).toBeVisible()
   })
 
   test('displays wallet details after generation', async ({ page }) => {
-    await page.goto('/create-wallet')
-    await page.getByText('Generate New Wallet').click()
+    await page.goto(routes.createWallet)
+    await page.getByText(en.createWallet.generateBtn).click()
     await expect(page.getByText(/0x[0-9a-fA-F]+/)).toBeVisible()
-    await expect(page.getByText('Download Keystore')).toBeVisible()
-    await expect(
-      page.getByText(
-        'Save your recovery phrase and private key somewhere safe. They cannot be recovered if lost.',
-      ),
-    ).toBeVisible()
+    await expect(page.getByText(en.createWallet.downloadBtn)).toBeVisible()
+    await expect(page.getByText(en.createWallet.warning)).toBeVisible()
   })
 
   test('private key is hidden by default', async ({ page }) => {
-    await page.goto('/create-wallet')
-    await page.getByText('Generate New Wallet').click()
-    await expect(page.getByText('Reveal Private Key')).toBeVisible()
+    await page.goto(routes.createWallet)
+    await page.getByText(en.createWallet.generateBtn).click()
+    await expect(page.getByText(en.createWallet.revealKey)).toBeVisible()
   })
 
   test('reveals and hides private key on toggle', async ({ page }) => {
-    await page.goto('/create-wallet')
-    await page.getByText('Generate New Wallet').click()
-    await page.getByText('Reveal Private Key').click()
-    await expect(page.getByText('Hide Private Key')).toBeVisible()
-    await page.getByText('Hide Private Key').click()
-    await expect(page.getByText('Reveal Private Key')).toBeVisible()
+    await page.goto(routes.createWallet)
+    await page.getByText(en.createWallet.generateBtn).click()
+    await page.getByText(en.createWallet.revealKey).click()
+    await expect(page.getByText(en.createWallet.hideKey)).toBeVisible()
+    await page.getByText(en.createWallet.hideKey).click()
+    await expect(page.getByText(en.createWallet.revealKey)).toBeVisible()
   })
 
   test('shows page title and subtitle', async ({ page }) => {
-    await page.goto('/create-wallet')
-    await expect(
-      page.getByRole('heading', { name: 'Create or Connect Wallet' }),
-    ).toBeVisible()
-    await expect(
-      page.getByText('Generate a new Ethereum wallet or connect your existing MetaMask.'),
-    ).toBeVisible()
+    await page.goto(routes.createWallet)
+    await expect(page.getByRole('heading', { name: en.createWallet.title })).toBeVisible()
+    await expect(page.getByText(en.createWallet.subtitle)).toBeVisible()
   })
 
   test('shows mnemonic after wallet generation', async ({ page }) => {
-    await page.goto('/create-wallet')
-    await page.getByText('Generate New Wallet').click()
-    await expect(page.getByText('Recovery Phrase')).toBeVisible()
+    await page.goto(routes.createWallet)
+    await page.getByText(en.createWallet.generateBtn).click()
+    await expect(page.getByText(en.createWallet.mnemonicLabel)).toBeVisible()
   })
 })
