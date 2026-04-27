@@ -18,6 +18,7 @@ dist-ssr
 *.tsbuildinfo
 *.d.ts
 !src/styled.d.ts
+!src/globals.d.ts
 vite.config.js
 
 # Editor directories and files
