@@ -380,7 +380,7 @@ Created main.tsx with BrowserRouter, ThemeProvider, and WalletProvider nesting, 
 
 ---
 
-## [2026-04-27] [OPTIMIZATION] #002 — Smart Contract: Gas Efficiency Review
+## [2026-04-27] [OPTIMIZATION] #017 — Smart Contract: Gas Efficiency Review
 
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** contracts/EventTicket.sol — dedicated gas optimization pass
@@ -402,3 +402,22 @@ No further changes needed.
 
 **Verdict:** Accepted without modification — contract was already gas-optimised from the initial proactive prompt in entry #005.
 **Commit hash (Step 4):** [fill in after commit]
+
+---
+
+## [2026-04-27] #018 — Task 18: Full Playwright e2e tests
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** e2e/ — full flow tests for all four pages
+
+**Prompt (Step 1 — proactive guidance):**
+"Write full Playwright e2e tests for all four pages. wallet.spec: root redirect, generate wallet, wallet details visible, private key hidden. balance.spec: address input visible, invalid address error. buyTicket.spec: connect prompt, ticket price visible. redeemTicket.spec: connect prompt, page title. Use exact strings from en.json."
+
+**Review critique (Step 2):**
+The webServer config timed out on the first run because no dev server was running and the 60s timeout was insufficient in the test environment. Tests themselves needed no selector fixes — all matched the actual rendered output using en.json strings exactly.
+
+**Resolution (Step 3):**
+Started the dev server manually before running tests. All 10 tests passed without any changes to test files or app code.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 9336b96
