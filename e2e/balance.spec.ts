@@ -21,4 +21,20 @@ test.describe('Balance Check', () => {
       page.getByText('Please enter a valid Ethereum address.'),
     ).toBeVisible()
   })
+
+  test('shows invalid address error for empty submission', async ({ page }) => {
+    await page.goto('/balance')
+    await page.getByRole('button', { name: 'Check Balance' }).click()
+    await expect(
+      page.getByText('Please enter a valid Ethereum address.'),
+    ).toBeVisible()
+  })
+
+  test('shows page title and subtitle', async ({ page }) => {
+    await page.goto('/balance')
+    await expect(page.getByRole('heading', { name: 'Wallet Balance' })).toBeVisible()
+    await expect(
+      page.getByText('Look up any wallet to check its SETH and ticket balance.'),
+    ).toBeVisible()
+  })
 })

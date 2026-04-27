@@ -29,4 +29,29 @@ test.describe('Wallet Creation', () => {
     await page.getByText('Generate New Wallet').click()
     await expect(page.getByText('Reveal Private Key')).toBeVisible()
   })
+
+  test('reveals and hides private key on toggle', async ({ page }) => {
+    await page.goto('/create-wallet')
+    await page.getByText('Generate New Wallet').click()
+    await page.getByText('Reveal Private Key').click()
+    await expect(page.getByText('Hide Private Key')).toBeVisible()
+    await page.getByText('Hide Private Key').click()
+    await expect(page.getByText('Reveal Private Key')).toBeVisible()
+  })
+
+  test('shows page title and subtitle', async ({ page }) => {
+    await page.goto('/create-wallet')
+    await expect(
+      page.getByRole('heading', { name: 'Create or Connect Wallet' }),
+    ).toBeVisible()
+    await expect(
+      page.getByText('Generate a new Ethereum wallet or connect your existing MetaMask.'),
+    ).toBeVisible()
+  })
+
+  test('shows mnemonic after wallet generation', async ({ page }) => {
+    await page.goto('/create-wallet')
+    await page.getByText('Generate New Wallet').click()
+    await expect(page.getByText('Recovery Phrase')).toBeVisible()
+  })
 })
