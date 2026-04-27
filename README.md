@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# EventTicket DApp
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Web3 ticketing system on Ethereum Sepolia Testnet. ERC-20 tickets (ETK) purchased
+with SETH and burned on venue entry.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Node.js 20+
+- npm 10+
+- MetaMask browser extension
 
-## React Compiler
+## MetaMask Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Install MetaMask from https://metamask.io
+2. Create or import a wallet
+3. Add the Sepolia testnet:
+   - Network name: Sepolia
+   - RPC URL: https://rpc.sepolia.org
+   - Chain ID: 11155111
+   - Currency: ETH
+4. Get test SETH from a faucet:
+   - https://sepoliafaucet.com
+   - https://faucet.quicknode.com/ethereum/sepolia
 
-## Expanding the ESLint configuration
+## Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Environment Setup
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Copy `.env.example` to `.env` and fill in the deployed contract address:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cp .env.example .env
 ```
+
+Edit `.env`:
+```
+VITE_CONTRACT_ADDRESS=0xYourContractAddressHere
+```
+
+## Running the App
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173
+
+## Running Tests
+
+```bash
+# Unit tests
+npx vitest run
+
+# Unit tests with coverage
+npx vitest run --coverage
+
+# Storybook (component explorer + a11y)
+npm run storybook
+
+# E2E tests (requires dev server running)
+npx playwright test
+
+# Lint
+npm run lint
+
+# Format check
+npm run format:check
+```
+
+## Smart Contract
+
+- **Network:** Ethereum Sepolia Testnet
+- **Contract Address:** See `.env` / deployment docs
+- **Deployed via:** Remix IDE (https://remix.ethereum.org)
+
+## Project Structure
+
+See `docs/superpowers/specs/2026-04-27-eventticket-dapp-design.md` for full
+architecture documentation.
+
+## AI Declaration
+
+All AI interactions are logged in `docs/ai/ai-log.md` with full four-step
+traceability (prompt → critique → resolution → commit hash).

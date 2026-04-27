@@ -421,3 +421,22 @@ Started the dev server manually before running tests. All 10 tests passed withou
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 9336b96
+
+---
+
+## [2026-04-27] #019 — Task 19: README and submission documentation
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** README.md, docs/report/README.md
+
+**Prompt (Step 1 — proactive guidance):**
+"Create README.md with project description, prerequisites (Node.js 20+, npm 10+, MetaMask), MetaMask setup steps (Sepolia network config, faucet links), installation, environment setup (cp .env.example .env), running the app, test commands (vitest, storybook, playwright, lint, format:check), smart contract section, project structure pointer, and AI declaration section. Create docs/report/README.md as a placeholder listing the five sections the student must complete manually: Code Overview, Design Description, Transaction Links, Peer Review Reflection, Statement on use of Generative AI."
+
+**Review critique (Step 2):**
+No issues found. The files were created exactly as specified. The existing README.md was the Vite scaffold default and needed full replacement. Pre-existing lint/format warnings in src/ files are unrelated to this task's changes.
+
+**Resolution (Step 3):**
+Replaced the default Vite scaffold README.md with the project-specific content. Created docs/report/ directory with README.md placeholder listing the five manually-authored sections required for submission.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** [fill in after commit]
