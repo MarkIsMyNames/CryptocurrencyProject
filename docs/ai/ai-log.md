@@ -111,3 +111,54 @@ Additionally, `.d.ts` files are ignored by `.gitignore` (line 19: `*.d.ts`), pre
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 046513f
+
+---
+
+## [2026-04-27] #005 — Task 5: EventTicket.sol smart contract
+
+**Tool:** Claude (claude-haiku-4-5)
+**Feature:** contracts/EventTicket.sol
+
+**Prompt (Step 1 — proactive guidance):**
+"Generate a Solidity ERC-20 smart contract for an event ticketing system on Ethereum Sepolia.
+Requirements:
+- OpenZeppelin v5 base: ERC20, Ownable, ReentrancyGuard
+- decimals() overridden to 0 so 1 ETK = 1 ticket (no decimal places)
+- maxSupply and ticketPrice set as immutable in constructor (default 1000 tickets, 0.01 SETH)
+- buyTicket() payable: requires exact SETH payment, enforces one ticket per wallet, checks max supply, mints 1 token, emits TicketPurchased event
+- redeemTicket(): caller burns their own ticket (no privileged role), emits TicketRedeemed event
+- withdrawFunds() onlyOwner with ReentrancyGuard — transfers ETH to owner
+- remainingTickets() view: returns maxSupply minus totalSupply
+- Custom errors (not require strings) for gas efficiency — IncorrectPayment includes sent/required values
+- ReentrancyGuard on ALL functions that transfer ETH (buyTicket and withdrawFunds)"
+
+**Review critique (Step 2):**
+Initial design was reviewed for:
+- ReentrancyGuard coverage on both ETH-transferring functions ✓
+- Custom errors with informative parameters ✓
+- checks-effects-interactions pattern in buyTicket() ✓
+- decimals() marked pure not view ✓
+- immutable for gas savings on ticketPrice and maxSupply ✓
+No gaps found — contract followed all proactive requirements from the initial prompt.
+
+**Resolution (Step 3):**
+No changes needed. Contract accepted as designed.
+
+**Verdict:** Accepted without modification
+**Commit hash (Step 4):** e9a9090
+
+---
+
+**Security review fixes applied after initial acceptance (2026-04-26):**
+
+Three security issues were identified in a follow-up review and corrected:
+
+1. **Soulbound / non-transferable tickets** — ERC-20 `transfer` and `transferFrom` were inherited without restriction, allowing ticket trading between wallets. Fixed by overriding `_update` to revert with `TicketsAreNonTransferable()` on any call where `from != address(0)` and `to != address(0)`. Only minting (`_mint`) and burning (`_burn`) are now permitted.
+
+2. **NothingToWithdraw guard** — `withdrawFunds()` would previously call `owner().call{value: 0}("")` when the contract balance was zero, wasting gas and emitting a misleading success. Fixed by adding an early revert with `NothingToWithdraw()` when `address(this).balance == 0`.
+
+3. **Constructor zero-value validation** — A `maxSupply` of 0 would make the contract permanently unusable (every `buyTicket` call reverts with `SoldOut`). Fixed by adding `if (_maxSupply == 0) revert InvalidConfiguration();` at the top of the constructor.
+
+Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`, `InvalidConfiguration`.
+
+**Commit hash (security fixes):** ee02873
