@@ -409,7 +409,7 @@ Created main.tsx with BrowserRouter, ThemeProvider, and WalletProvider nesting, 
 
 ---
 
-## [2026-04-27] [OPTIMIZATION] #017 — Smart Contract: Gas Efficiency Review
+## [2026-04-27] [OPTIMIZATION] #002 — Smart Contract: Gas Efficiency Review
 
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** contracts/EventTicket.sol — dedicated gas optimization pass
