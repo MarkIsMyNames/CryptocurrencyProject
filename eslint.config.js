@@ -47,6 +47,19 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.{ts,tsx}'],
+    ignores: ['src/config.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "Literal[value=/^\\/[a-z][a-z-]*$/]",
+          message: 'Hardcoded route paths are not allowed. Use routes.* from src/config.ts instead.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.styles.ts'],
     rules: {
       'no-restricted-syntax': [

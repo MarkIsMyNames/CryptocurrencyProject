@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import en from '../src/locales/en.json'
-import { routes } from '../src/routes'
+import { routes } from '../src/config'
 
 test.describe('Buy Ticket', () => {
   test('shows connect prompt when no wallet connected', async ({ page }) => {

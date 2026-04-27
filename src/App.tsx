@@ -6,7 +6,7 @@ import { CreateWallet } from './pages/CreateWallet/CreateWallet'
 import { Balance } from './pages/Balance/Balance'
 import { BuyTicket } from './pages/BuyTicket/BuyTicket'
 import { RedeemTicket } from './pages/RedeemTicket/RedeemTicket'
-import { routes } from './routes'
+import { routes } from './config'
 
 export default function App() {
   return (

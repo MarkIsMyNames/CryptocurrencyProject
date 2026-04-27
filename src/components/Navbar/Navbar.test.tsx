@@ -4,6 +4,7 @@ import { ThemeProvider } from 'styled-components'
 import { describe, it, expect } from 'vitest'
 import { theme } from '../../theme'
 import en from '../../locales/en.json'
+import { routes } from '../../config'
 import { Navbar } from './Navbar'
 
 function renderNavbar() {
@@ -37,9 +38,9 @@ describe('Navbar', () => {
 
   it('nav links point to correct routes', () => {
     renderNavbar()
-    expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute('href', '/create-wallet')
-    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute('href', '/balance')
-    expect(screen.getByRole('link', { name: en.nav.buyTicket })).toHaveAttribute('href', '/buy-ticket')
-    expect(screen.getByRole('link', { name: en.nav.redeem })).toHaveAttribute('href', '/redeem')
+    expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute('href', routes.createWallet)
+    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute('href', routes.balance)
+    expect(screen.getByRole('link', { name: en.nav.buyTicket })).toHaveAttribute('href', routes.buyTicket)
+    expect(screen.getByRole('link', { name: en.nav.redeem })).toHaveAttribute('href', routes.redeem)
   })
 })

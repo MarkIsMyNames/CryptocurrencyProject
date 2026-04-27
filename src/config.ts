@@ -1,3 +1,11 @@
+export const routes = {
+  root: '/',
+  createWallet: '/create-wallet',
+  balance: '/balance',
+  buyTicket: '/buy-ticket',
+  redeem: '/redeem',
+} as const
+
 export const config = {
   contractAddress: (import.meta.env.VITE_CONTRACT_ADDRESS as string | undefined) ?? '',
   sepoliaChainId: 11155111,

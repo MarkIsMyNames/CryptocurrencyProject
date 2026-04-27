@@ -1,6 +1,6 @@
 import { NavLink as RouterNavLink } from 'react-router-dom'
 import strings from '../../locales/en.json'
-import { routes } from '../../routes'
+import { routes } from '../../config'
 import { Nav, NavBrand, NavLinks, NavLink } from './Navbar.styles'
 
 export function Navbar() {
