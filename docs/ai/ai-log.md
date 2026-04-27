@@ -377,3 +377,28 @@ Created main.tsx with BrowserRouter, ThemeProvider, and WalletProvider nesting, 
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** c71deab
+
+---
+
+## [2026-04-27] [OPTIMIZATION] #002 — Smart Contract: Gas Efficiency Review
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** contracts/EventTicket.sol — dedicated gas optimization pass
+
+**Prompt (Step 1):**
+"Review EventTicket.sol for gas inefficiencies. Specifically check:
+- Are all read-only state variables that never change marked immutable?
+- Does remainingTickets() avoid unnecessary storage reads?
+- Are custom errors used instead of require strings?
+- Is decimals() marked pure instead of view?
+- Are there any redundant storage reads inside functions?"
+
+**Review critique (Step 2):**
+AI confirmed ticketPrice and maxSupply were already immutable.
+AI confirmed custom errors were in place.
+AI confirmed remainingTickets() uses maxSupply - totalSupply() which avoids any soldCount SLOAD.
+AI confirmed decimals() is pure.
+No further changes needed.
+
+**Verdict:** Accepted without modification — contract was already gas-optimised from the initial proactive prompt in entry #005.
+**Commit hash (Step 4):** [fill in after commit]
