@@ -16,12 +16,9 @@ export const NavBrand = styled.span`
   color: ${({ theme }) => theme.colors.brandPrimary};
 `
 
-export const NavLinks = styled.ul`
+export const NavLinks = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.lg};
-  list-style: none;
-  margin: 0;
-  padding: 0;
 `
 
 export const NavLink = styled(Link)`

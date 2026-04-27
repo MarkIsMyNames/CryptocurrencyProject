@@ -10,7 +10,3 @@ export const Default: Story = {}
 export const HoverState: Story = {
   parameters: { pseudo: { hover: true } },
 }
-
-export const FocusState: Story = {
-  parameters: { pseudo: { focus: true } },
-}
