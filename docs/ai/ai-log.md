@@ -440,3 +440,33 @@ Replaced the default Vite scaffold README.md with the project-specific content. 
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 8ddda11
+
+---
+
+## [2026-04-27] [OPTIMIZATION] #003 — Frontend: Performance Review
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** React components — frontend performance pass
+
+**Prompt (Step 1):**
+"Review the React components in this project for performance issues. Specifically:
+- Are any expensive computations happening on every render without useMemo?
+- Are callbacks being recreated on every render unnecessarily without useCallback?
+- Are any blockchain calls being made without proper dependency arrays in useEffect?
+- Are there any unnecessary re-renders caused by context value reference changes?"
+
+**Review critique (Step 2):**
+AI identified that WalletContext was passing a new object reference on every render
+because the context value was constructed inline, causing all consumers to re-render
+on every state change even when their relevant slice hadn't changed.
+AI confirmed useCallback was already used for connect/disconnect/refreshBalances.
+AI confirmed useEffect dependency arrays in BuyTicket and RedeemTicket were correct.
+
+**Resolution (Step 3):**
+The WalletContext spreads state into the context value which still creates a new
+reference each render. For this project scope (small app, few consumers) this is
+acceptable — splitting into separate contexts would be premature optimisation.
+Documented the tradeoff rather than over-engineering.
+
+**Verdict:** No code changes — tradeoff accepted and documented.
+**Commit hash (Step 4):** [fill in after commit]
