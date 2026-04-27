@@ -6,7 +6,7 @@ import { Nav, NavBrand, NavLinks, NavLink } from './Navbar.styles'
 export function Navbar() {
   return (
     <Nav>
-      <NavBrand>EventTicket</NavBrand>
+      <NavBrand>{strings.brand}</NavBrand>
       <NavLinks>
         <li>
           <NavLink as={RouterNavLink} to={routes.createWallet}>

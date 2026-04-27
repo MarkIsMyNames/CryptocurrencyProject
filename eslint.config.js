@@ -34,6 +34,19 @@ export default tseslint.config(
     },
   },
   {
+    files: ['src/**/*.tsx'],
+    ignores: ['src/**/*.test.tsx', 'src/**/*.stories.tsx'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'JSXText[value=/\\S[A-Za-z]{2,}/]',
+          message: 'Hardcoded text in JSX is not allowed. Import strings from src/locales/en.json instead.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.styles.ts'],
     rules: {
       'no-restricted-syntax': [

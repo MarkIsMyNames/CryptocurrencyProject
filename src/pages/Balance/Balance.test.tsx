@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
 import { describe, it, expect, vi } from 'vitest'
 import { theme } from '../../theme'
+import en from '../../locales/en.json'
 import { Balance } from './Balance'
 
 vi.mock('../../context/WalletContext', () => ({
@@ -32,14 +33,19 @@ function renderPage() {
 describe('Balance', () => {
   it('renders the address input', () => {
     renderPage()
-    expect(screen.getByPlaceholderText(/Enter wallet address/)).toBeInTheDocument()
+    expect(screen.getByPlaceholderText(en.balance.placeholder)).toBeInTheDocument()
+  })
+
+  it('renders the check balance button', () => {
+    renderPage()
+    expect(screen.getByText(en.balance.checkBtn)).toBeInTheDocument()
   })
 
   it('shows SETH and ETK balances after checking', async () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/Enter wallet address/)
+    const input = screen.getByPlaceholderText(en.balance.placeholder)
     fireEvent.change(input, { target: { value: '0x1234567890abcdef1234567890abcdef12345678' } })
-    fireEvent.click(screen.getByText('Check Balance'))
+    fireEvent.click(screen.getByText(en.balance.checkBtn))
     await waitFor(() => {
       expect(screen.getByText(/1\.5/)).toBeInTheDocument()
     })
@@ -47,11 +53,11 @@ describe('Balance', () => {
 
   it('shows invalid address error for bad input', async () => {
     renderPage()
-    const input = screen.getByPlaceholderText(/Enter wallet address/)
+    const input = screen.getByPlaceholderText(en.balance.placeholder)
     fireEvent.change(input, { target: { value: 'notanaddress' } })
-    fireEvent.click(screen.getByText('Check Balance'))
+    fireEvent.click(screen.getByText(en.balance.checkBtn))
     await waitFor(() => {
-      expect(screen.getByText(/valid Ethereum address/)).toBeInTheDocument()
+      expect(screen.getByText(en.balance.invalidAddress)).toBeInTheDocument()
     })
   })
 })

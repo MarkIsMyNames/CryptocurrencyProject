@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
 import { describe, it, expect, vi } from 'vitest'
 import { theme } from '../../theme'
+import en from '../../locales/en.json'
 import { BuyTicket } from './BuyTicket'
 
 const mockBuyTicket = vi.fn()
@@ -37,27 +38,41 @@ function renderPage() {
 describe('BuyTicket', () => {
   it('renders ticket price and buy button', () => {
     renderPage()
-    expect(screen.getByText('Buy Ticket')).toBeInTheDocument()
+    expect(screen.getByText(en.buyTicket.buyBtn)).toBeInTheDocument()
     expect(screen.getByText(/0\.01 SETH/)).toBeInTheDocument()
   })
 
   it('shows pending state during transaction', async () => {
     mockBuyTicket.mockImplementation(() => new Promise(() => {}))
     renderPage()
-    await waitFor(() => screen.getByText('Buy Ticket'))
-    fireEvent.click(screen.getByText('Buy Ticket'))
+    await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
+    fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
-      expect(screen.getByText('Transaction pending...')).toBeInTheDocument()
+      expect(screen.getByText(en.buyTicket.pending)).toBeInTheDocument()
     })
   })
 
   it('shows success message after purchase', async () => {
     mockBuyTicket.mockResolvedValue({ wait: vi.fn().mockResolvedValue({}) })
     renderPage()
-    await waitFor(() => screen.getByText('Buy Ticket'))
-    fireEvent.click(screen.getByText('Buy Ticket'))
+    await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
+    fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
-      expect(screen.getByText('Ticket purchased successfully!')).toBeInTheDocument()
+      expect(screen.getByText(en.buyTicket.success)).toBeInTheDocument()
     })
+  })
+
+  it('shows connect prompt when wallet not connected', () => {
+    vi.doMock('../../context/WalletContext', () => ({
+      useWallet: () => ({
+        signer: null,
+        provider: null,
+        address: null,
+        isConnected: false,
+        refreshBalances: vi.fn(),
+      }),
+    }))
+    renderPage()
+    expect(screen.getByText(en.buyTicket.buyBtn)).toBeInTheDocument()
   })
 })

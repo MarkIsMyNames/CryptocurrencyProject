@@ -3,6 +3,7 @@ import { ThemeProvider } from 'styled-components'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { theme } from '../../theme'
+import en from '../../locales/en.json'
 import * as walletUtils from '../../utils/wallet'
 import { CreateWallet } from './CreateWallet'
 
@@ -41,13 +42,13 @@ describe('CreateWallet', () => {
 
   it('renders both action buttons', () => {
     renderPage()
-    expect(screen.getByText('Generate New Wallet')).toBeInTheDocument()
-    expect(screen.getByText('Connect MetaMask')).toBeInTheDocument()
+    expect(screen.getByText(en.createWallet.generateBtn)).toBeInTheDocument()
+    expect(screen.getByText(en.createWallet.connectBtn)).toBeInTheDocument()
   })
 
   it('displays wallet details after generation', async () => {
     renderPage()
-    fireEvent.click(screen.getByText('Generate New Wallet'))
+    fireEvent.click(screen.getByText(en.createWallet.generateBtn))
     await waitFor(() => {
       expect(screen.getByText('0xabc123')).toBeInTheDocument()
     })
@@ -55,17 +56,25 @@ describe('CreateWallet', () => {
 
   it('shows download keystore button after generation', async () => {
     renderPage()
-    fireEvent.click(screen.getByText('Generate New Wallet'))
+    fireEvent.click(screen.getByText(en.createWallet.generateBtn))
     await waitFor(() => {
-      expect(screen.getByText('Download Keystore')).toBeInTheDocument()
+      expect(screen.getByText(en.createWallet.downloadBtn)).toBeInTheDocument()
     })
   })
 
   it('shows security warning after generation', async () => {
     renderPage()
-    fireEvent.click(screen.getByText('Generate New Wallet'))
+    fireEvent.click(screen.getByText(en.createWallet.generateBtn))
     await waitFor(() => {
-      expect(screen.getByText(/Save your recovery phrase and private key/)).toBeInTheDocument()
+      expect(screen.getByText(en.createWallet.warning)).toBeInTheDocument()
     })
+  })
+
+  it('toggles private key visibility', async () => {
+    renderPage()
+    fireEvent.click(screen.getByText(en.createWallet.generateBtn))
+    await waitFor(() => screen.getByText(en.createWallet.revealKey))
+    fireEvent.click(screen.getByText(en.createWallet.revealKey))
+    expect(screen.getByText(en.createWallet.hideKey)).toBeInTheDocument()
   })
 })

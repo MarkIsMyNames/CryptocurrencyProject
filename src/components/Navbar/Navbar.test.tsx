@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { describe, it, expect } from 'vitest'
 import { theme } from '../../theme'
+import en from '../../locales/en.json'
 import { Navbar } from './Navbar'
 
 function renderNavbar() {
@@ -16,16 +17,29 @@ function renderNavbar() {
 }
 
 describe('Navbar', () => {
-  it('renders all navigation links', () => {
+  it('renders brand name', () => {
     renderNavbar()
-    expect(screen.getByText('Create Wallet')).toBeInTheDocument()
-    expect(screen.getByText('Check Balance')).toBeInTheDocument()
-    expect(screen.getByText('Buy Ticket')).toBeInTheDocument()
-    expect(screen.getByText('Redeem Ticket')).toBeInTheDocument()
+    expect(screen.getByText(en.brand)).toBeInTheDocument()
   })
 
-  it('has no accessibility violations', () => {
+  it('renders all navigation links', () => {
+    renderNavbar()
+    expect(screen.getByText(en.nav.createWallet)).toBeInTheDocument()
+    expect(screen.getByText(en.nav.balance)).toBeInTheDocument()
+    expect(screen.getByText(en.nav.buyTicket)).toBeInTheDocument()
+    expect(screen.getByText(en.nav.redeem)).toBeInTheDocument()
+  })
+
+  it('renders a nav element', () => {
     const { container } = renderNavbar()
     expect(container.querySelector('nav')).toBeInTheDocument()
+  })
+
+  it('nav links point to correct routes', () => {
+    renderNavbar()
+    expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute('href', '/create-wallet')
+    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute('href', '/balance')
+    expect(screen.getByRole('link', { name: en.nav.buyTicket })).toHaveAttribute('href', '/buy-ticket')
+    expect(screen.getByRole('link', { name: en.nav.redeem })).toHaveAttribute('href', '/redeem')
   })
 })

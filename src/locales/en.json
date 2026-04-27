@@ -1,4 +1,5 @@
 {
+  "brand": "EventTicket",
   "nav": {
     "createWallet": "Create Wallet",
     "balance": "Check Balance",

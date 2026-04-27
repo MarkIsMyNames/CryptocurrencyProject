@@ -89,7 +89,7 @@ export function Balance() {
         <BalanceGrid>
           <BalanceCard>
             <BalanceLabel>{strings.balance.sethLabel}</BalanceLabel>
-            <BalanceValue>{parseFloat(result.seth).toFixed(4)} SETH</BalanceValue>
+            <BalanceValue>{`${parseFloat(result.seth).toFixed(4)} SETH`}</BalanceValue>
           </BalanceCard>
 
           <BalanceCard>
