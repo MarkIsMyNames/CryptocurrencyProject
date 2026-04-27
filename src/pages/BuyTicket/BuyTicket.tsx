@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { parseEther } from 'ethers'
+import { parseEther, type ContractTransactionResponse } from 'ethers'
 import { useWallet } from '../../context/WalletContext'
 import { getContract, decodeContractError } from '../../utils/contract'
 import { config } from '../../config'
@@ -50,7 +50,7 @@ export function BuyTicket() {
     setStatus('pending')
     setStatusMessage(strings.buyTicket.pending)
     try {
-      const tx = await contract.buyTicket({ value: parseEther('0.01') }) as { wait: () => Promise<unknown> }
+      const tx = (await contract.buyTicket({ value: parseEther('0.01') })) as ContractTransactionResponse
       await tx.wait()
       setStatus('success')
       setStatusMessage(strings.buyTicket.success)
