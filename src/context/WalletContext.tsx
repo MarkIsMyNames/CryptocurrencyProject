@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 import { BrowserProvider, JsonRpcSigner } from 'ethers'
 import { config } from '../config'
+import { getContract } from '../utils/contract'
 
 interface WalletState {
   provider: BrowserProvider | null
@@ -83,8 +84,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const refreshBalances = useCallback(async () => {
     if (!state.provider || !state.address) return
-    const ethBalance = await state.provider.getBalance(state.address)
-    setState((prev) => ({ ...prev, ethBalance }))
+    const [ethBalance, etkBalance] = await Promise.all([
+      state.provider.getBalance(state.address),
+      getContract(state.provider).balanceOf(state.address) as Promise<bigint>,
+    ])
+    setState((prev) => ({ ...prev, ethBalance, etkBalance }))
   }, [state.provider, state.address])
 
   return (
