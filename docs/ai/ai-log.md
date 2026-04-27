@@ -405,7 +405,7 @@ The prompt accurately diagnosed both issues upfront: missing `node_modules` and 
 Ran `npm install --legacy-peer-deps`, then added `include: ['src/**/*.test.{ts,tsx}']` and `exclude: ['e2e/**', '.worktrees/**']` to the jsdom project in `vite.config.ts`. All 13 test files / 37 tests now pass.
 
 **Verdict:** Accepted
-**Commit hash (Step 4):** pending
+**Commit hash (Step 4):** dbed855
 
 ## [2026-04-27] #016 — Task 16: App.tsx routing and main.tsx wiring
 
