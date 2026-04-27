@@ -28,7 +28,7 @@
     "metaMaskSuccess": "MetaMask connected successfully."
   },
   "balance": {
-    "title": "Check Balance",
+    "title": "Wallet Balance",
     "subtitle": "Look up any wallet to check its SETH and ticket balance.",
     "placeholder": "Enter wallet address (0x...)",
     "checkBtn": "Check Balance",

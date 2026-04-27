@@ -300,3 +300,22 @@ Changed `const noopAsync = async () => undefined` to `const noopAsync = () => Pr
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** bfc446f
+
+---
+
+## [2026-04-27] #013 — Task 13: Balance page
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/Balance/
+
+**Prompt (Step 1 — proactive guidance):**
+"Create Balance page with an address input (pre-filled with connected wallet address), Check Balance button, and a grid showing SETH balance (formatted with formatEther), ETK ticket count, and remaining supply. Address validated with ethers isAddress(). Storybook stories for Default, InputFocus, ButtonHover."
+
+**Review critique (Step 2):**
+Two issues found: (1) `balance.title` in en.json was "Check Balance" — same string as `balance.checkBtn` — causing `getByText('Check Balance')` in tests to match two elements and fail. Required changing the title to "Wallet Balance". (2) ESLint flagged an unnecessary type assertion (`rawEth as bigint`) and a confusing void expression in an arrow function shorthand (`onChange`). Required removing the cast and adding braces to the onChange handler.
+
+**Resolution (Step 3):**
+Changed `balance.title` in en.json from "Check Balance" to "Wallet Balance". Removed `as bigint` cast on `formatEther(rawEth)` since `provider.getBalance()` already returns `bigint` in ethers v6. Added braces to the `onChange` arrow function to satisfy `@typescript-eslint/no-confusing-void-expression`. All other files matched the specification exactly.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 695a3c0
