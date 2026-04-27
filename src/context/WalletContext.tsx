@@ -42,24 +42,30 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
     setState((prev) => ({ ...prev, isConnecting: true, error: null }))
     try {
-      const provider = new BrowserProvider(window.ethereum)
+      let provider = new BrowserProvider(window.ethereum)
       const network = await provider.getNetwork()
       if (Number(network.chainId) !== config.sepoliaChainId) {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
           params: [{ chainId: config.sepoliaChainIdHex }],
         })
+        provider = new BrowserProvider(window.ethereum)
       }
       await provider.send('eth_requestAccounts', [])
       const signer = await provider.getSigner()
       const address = await signer.getAddress()
-      const ethBalance = await provider.getBalance(address)
+      const contract = getContract(signer)
+      const [ethBalance, rawEtkBalance] = await Promise.all([
+        provider.getBalance(address),
+        contract.balanceOf(address) as Promise<unknown>,
+      ])
+      const etkBalance = BigInt(String(rawEtkBalance))
       setState({
         provider,
         signer,
         address,
         ethBalance,
-        etkBalance: null,
+        etkBalance,
         isConnected: true,
         isConnecting: false,
         error: null,
@@ -84,10 +90,12 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const refreshBalances = useCallback(async () => {
     if (!state.provider || !state.address) return
-    const [ethBalance, etkBalance] = await Promise.all([
+    const contract = getContract(state.provider)
+    const [ethBalance, rawEtkBalance] = await Promise.all([
       state.provider.getBalance(state.address),
-      getContract(state.provider).balanceOf(state.address) as Promise<bigint>,
+      contract.balanceOf(state.address) as Promise<unknown>,
     ])
+    const etkBalance = BigInt(String(rawEtkBalance))
     setState((prev) => ({ ...prev, ethBalance, etkBalance }))
   }, [state.provider, state.address])
 
