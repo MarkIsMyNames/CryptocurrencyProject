@@ -10,6 +10,7 @@ vi.mock('../../context/WalletContext', () => ({
 }))
 
 import { useWallet } from '../../context/WalletContext'
+import * as React from "react";
 
 const base = {
   isConnected: false,
