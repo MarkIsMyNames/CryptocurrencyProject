@@ -1,0 +1,76 @@
+{
+  "nav": {
+    "createWallet": "Create Wallet",
+    "balance": "Check Balance",
+    "buyTicket": "Buy Ticket",
+    "redeem": "Redeem Ticket"
+  },
+  "walletStatus": {
+    "connected": "Connected",
+    "disconnected": "Not connected",
+    "address": "Address"
+  },
+  "createWallet": {
+    "title": "Create or Connect Wallet",
+    "subtitle": "Generate a new Ethereum wallet or connect your existing MetaMask.",
+    "generateBtn": "Generate New Wallet",
+    "connectBtn": "Connect MetaMask",
+    "downloadBtn": "Download Keystore",
+    "revealKey": "Reveal Private Key",
+    "hideKey": "Hide Private Key",
+    "addressLabel": "Address",
+    "mnemonicLabel": "Recovery Phrase",
+    "privateKeyLabel": "Private Key",
+    "passwordPrompt": "Enter a password to encrypt your keystore",
+    "warning": "Save your recovery phrase and private key somewhere safe. They cannot be recovered if lost.",
+    "metaMaskNotFound": "MetaMask not detected. Please install the MetaMask browser extension.",
+    "metaMaskSuccess": "MetaMask connected successfully."
+  },
+  "balance": {
+    "title": "Check Balance",
+    "subtitle": "Look up any wallet to check its SETH and ticket balance.",
+    "placeholder": "Enter wallet address (0x...)",
+    "checkBtn": "Check Balance",
+    "sethLabel": "SETH Balance",
+    "etkLabel": "ETK Tickets",
+    "supplyLabel": "Tickets Remaining",
+    "ticketValid": "Valid ticket",
+    "ticketNone": "No ticket",
+    "invalidAddress": "Please enter a valid Ethereum address."
+  },
+  "buyTicket": {
+    "title": "Buy a Ticket",
+    "subtitle": "Purchase one EventTicket (ETK) token for entry to the event.",
+    "priceLabel": "Ticket Price",
+    "remainingLabel": "Tickets Remaining",
+    "yourBalanceLabel": "Your Ticket Balance",
+    "buyBtn": "Buy Ticket",
+    "pending": "Transaction pending...",
+    "success": "Ticket purchased successfully!",
+    "alreadyOwned": "You already own a ticket.",
+    "soldOut": "Sorry, this event is sold out.",
+    "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
+    "cancelled": "Transaction cancelled.",
+    "wrongNetwork": "Please switch to the Sepolia testnet.",
+    "connectFirst": "Please connect your wallet first."
+  },
+  "redeem": {
+    "title": "Redeem Ticket",
+    "subtitle": "Present this page to the doorman to redeem your ticket for entry.",
+    "yourAddress": "Your Wallet Address",
+    "ticketStatus": "Ticket Status",
+    "hasTicket": "Valid — 1 ETK",
+    "noTicket": "No ticket found",
+    "redeemBtn": "Redeem at Door",
+    "pending": "Redeeming...",
+    "success": "Entry confirmed. Enjoy the event!",
+    "noTicketError": "No ticket found in this wallet.",
+    "cancelled": "Transaction cancelled.",
+    "connectFirst": "Please connect your wallet to redeem."
+  },
+  "errors": {
+    "connectWallet": "Please connect your wallet first.",
+    "unknownError": "An unexpected error occurred. Please try again.",
+    "networkError": "Network error. Please check your connection."
+  }
+}
