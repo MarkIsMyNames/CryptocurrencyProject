@@ -262,3 +262,22 @@ Changed stories import to `@storybook/react-vite`. Removed `async` keyword from 
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 995e195
+
+---
+
+## [2026-04-27] #011 — Task 11: WalletStatus component
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/WalletStatus/
+
+**Prompt (Step 1 — proactive guidance):**
+"Create WalletStatus component showing a coloured dot (green=connected, red=disconnected) and either a truncated wallet address (first 6 + last 4 chars) or the 'Not connected' string from en.json. Use theme.colors.statusSuccess/statusError for dot colour. Storybook stories for Disconnected and Connected states via WalletContext.Provider decorator."
+
+**Review critique (Step 2):**
+One issue found: WalletContext was not exported from WalletContext.tsx, which would prevent the stories file from importing it directly to use as a Provider wrapper. Required adding `export` to the `const WalletContext` declaration.
+
+**Resolution (Step 3):**
+Added `export` keyword to `const WalletContext = createContext<WalletContextValue | null>(null)` in WalletContext.tsx. All other files matched the specification exactly — no further changes required.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 1f4d469
