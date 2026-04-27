@@ -162,3 +162,27 @@ Three security issues were identified in a follow-up review and corrected:
 Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`, `InvalidConfiguration`.
 
 **Commit hash (security fixes):** ee02873
+
+---
+
+## [2026-04-27] #006 — Task 6: Storybook 10 setup
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** Storybook 10 with addon-a11y and storybook-addon-pseudo-states
+
+**Prompt (Step 1 — proactive guidance):**
+"Set up Storybook 10 with Vite builder, addon-a11y for WCAG 2.1 AA enforcement, and storybook-addon-pseudo-states for hover/focus state testing. Configure ThemeProvider decorator so all stories receive the styled-components theme."
+
+**Review critique (Step 2):**
+`npx storybook init` failed to install dependencies due to a peer dependency conflict with `eslint-plugin-jsx-a11y`. Required `--legacy-peer-deps` to resolve. The init also added `@storybook/addon-essentials` to main.ts but that package is not published for Storybook 10 (functionality split into individual addons); replaced with `@storybook/addon-docs` which was installed by init. Generated `src/stories/` directory with sample stories was deleted as it conflicts with the per-component story structure. `preview.ts` was replaced with `preview.tsx` to support JSX ThemeProvider decorator syntax.
+
+**Resolution (Step 3):**
+- Ran `npm install --legacy-peer-deps` to resolve peer dependency conflict.
+- Installed `storybook-addon-pseudo-states` separately with `--legacy-peer-deps`.
+- Replaced `.storybook/main.ts` with specified config using `@storybook/addon-docs` in place of unavailable `@storybook/addon-essentials`.
+- Deleted `preview.ts`, created `preview.tsx` with ThemeProvider decorator.
+- Removed auto-generated `src/stories/` directory.
+- Verified `npm run build-storybook` completes successfully with `storybook-static/` output.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 54f187d
