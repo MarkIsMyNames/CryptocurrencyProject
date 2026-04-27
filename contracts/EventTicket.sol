@@ -22,12 +22,16 @@ contract EventTicket is ERC20, Ownable, ReentrancyGuard {
     error SoldOut();
     error NoTicketToRedeem();
     error WithdrawFailed();
+    error TicketsAreNonTransferable();
+    error NothingToWithdraw();
+    error InvalidConfiguration();
 
     constructor(
         uint256 _maxSupply,
         uint256 _ticketPriceWei,
         address initialOwner
     ) ERC20("EventTicket", "ETK") Ownable(initialOwner) {
+        if (_maxSupply == 0) revert InvalidConfiguration();
         maxSupply = _maxSupply;
         ticketPrice = _ticketPriceWei;
     }
@@ -62,7 +66,16 @@ contract EventTicket is ERC20, Ownable, ReentrancyGuard {
     /// @notice Withdraw all collected SETH to the contract owner.
     function withdrawFunds() external onlyOwner nonReentrant {
         uint256 balance = address(this).balance;
+        if (balance == 0) revert NothingToWithdraw();
         (bool success, ) = owner().call{value: balance}("");
         if (!success) revert WithdrawFailed();
+    }
+
+    /// @notice Tickets are non-transferable. Only minting and burning are permitted.
+    function _update(address from, address to, uint256 value) internal override {
+        bool isMint = from == address(0);
+        bool isBurn = to == address(0);
+        if (!isMint && !isBurn) revert TicketsAreNonTransferable();
+        super._update(from, to, value);
     }
 }
