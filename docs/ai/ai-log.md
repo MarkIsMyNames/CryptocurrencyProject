@@ -40,3 +40,25 @@ AI produced a working scaffold but with several issues requiring correction:
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** b8b12f4
+
+---
+
+## [2026-04-26] #002 — Task 2: ESLint flat config and Prettier
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** eslint.config.js, .prettierrc, .prettierignore
+
+**Prompt (Step 1 — proactive guidance):**
+"Implement Task 2: ESLint + Prettier configuration for a Vite + React 19.2 + TypeScript project. ESLint 10 is installed (dropped legacy .eslintrc.cjs support). Use flat config format (eslint.config.js). The scaffold already generated a basic eslint.config.js — rewrite it completely. Install eslint-plugin-jsx-a11y and eslint-config-prettier, replace eslint.config.js with the provided flat config, create .prettierrc and .prettierignore, update lint and format scripts in package.json, confirm zero lint errors and passing format check, then commit."
+
+**Review critique (Step 2):**
+- node_modules was absent from the worktree — npm install was required before lint could run.
+- The standard Vite scaffold `src/main.tsx` uses a non-null assertion (`document.getElementById('root')!`) which is flagged as an error by `@typescript-eslint/no-non-null-assertion` (part of `tseslint.configs.strict`). This was not anticipated in the task spec.
+
+**Resolution (Step 3):**
+- Ran `npm install --legacy-peer-deps` to restore node_modules.
+- Added `// eslint-disable-next-line @typescript-eslint/no-non-null-assertion` above the `createRoot` call in `src/main.tsx`. This is the correct minimal fix: the non-null assertion is idiomatic for the root mount point and should not require changing the code structure.
+- All other files were created/rewritten exactly as specified.
+
+**Verdict:** Modified
+**Commit hash (Step 4):** e03102f
