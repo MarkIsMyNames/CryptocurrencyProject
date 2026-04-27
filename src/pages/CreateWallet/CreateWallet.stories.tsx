@@ -45,11 +45,9 @@ export const Default: Story = {}
 export const Connecting: Story = {
   decorators: [
     (Story) => (
-      <MemoryRouter>
-        <WalletContext.Provider value={{ ...defaultWalletValue, isConnecting: true }}>
-          <Story />
-        </WalletContext.Provider>
-      </MemoryRouter>
+      <WalletContext.Provider value={{ ...defaultWalletValue, isConnecting: true }}>
+        <Story />
+      </WalletContext.Provider>
     ),
   ],
 }
