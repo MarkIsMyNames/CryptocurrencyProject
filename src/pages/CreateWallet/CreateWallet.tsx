@@ -18,6 +18,8 @@ import {
   CardValue,
   StepLabel,
   ProgressDots,
+  PasswordWrapper,
+  PasswordToggle,
   Dot,
   Form,
   InputGroup,
@@ -54,6 +56,7 @@ export function CreateWallet() {
   const [step, setStep] = useState<Step>('idle')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const [wallet, setWallet] = useState<GeneratedWallet | null>(null)
   const [acknowledged, setAcknowledged] = useState(false)
@@ -151,29 +154,40 @@ export function CreateWallet() {
         <Form>
           <InputGroup>
             <Label htmlFor="pw">{en.createWallet.passwordLabel}</Label>
-            <TextInput
-              id="pw"
-              type="password"
-              placeholder={en.createWallet.passwordPlaceholder}
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-                setPasswordError(null)
-              }}
-            />
+            <PasswordWrapper>
+              <TextInput
+                id="pw"
+                type={showPassword ? 'text' : 'password'}
+                placeholder={en.createWallet.passwordPlaceholder}
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setPasswordError(null)
+                }}
+              />
+              <PasswordToggle
+                type="button"
+                aria-label={showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword}
+                onClick={() => { setShowPassword((v) => !v) }}
+              >
+                {showPassword ? '🙈' : '👁'}
+              </PasswordToggle>
+            </PasswordWrapper>
           </InputGroup>
           <InputGroup>
             <Label htmlFor="pw-confirm">{en.createWallet.confirmLabel}</Label>
-            <TextInput
-              id="pw-confirm"
-              type="password"
-              placeholder={en.createWallet.confirmPlaceholder}
-              value={confirm}
-              onChange={(e) => {
-                setConfirm(e.target.value)
-                setPasswordError(null)
-              }}
-            />
+            <PasswordWrapper>
+              <TextInput
+                id="pw-confirm"
+                type={showPassword ? 'text' : 'password'}
+                placeholder={en.createWallet.confirmPlaceholder}
+                value={confirm}
+                onChange={(e) => {
+                  setConfirm(e.target.value)
+                  setPasswordError(null)
+                }}
+              />
+            </PasswordWrapper>
           </InputGroup>
           {passwordError !== null && <ErrorText>{passwordError}</ErrorText>}
         </Form>

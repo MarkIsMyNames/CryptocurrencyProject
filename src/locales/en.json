@@ -46,6 +46,8 @@
     "wordPlaceholder": "Enter word",
     "wrongWords": "One or more words are incorrect. Please check your recovery phrase.",
     "walletCreated": "Wallet created and connected successfully.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "nextBtn": "Next",
     "backBtn": "Back",
     "verifyBtn": "Verify & Connect",

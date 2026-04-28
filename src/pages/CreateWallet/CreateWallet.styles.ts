@@ -55,11 +55,10 @@ export const SecondaryButton = styled.button`
   background: transparent;
   color: ${({ theme }) => theme.colors.textLink};
   border: 1px solid ${({ theme }) => theme.colors.borderDefault};
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};
+  font-size: ${({ theme }) => theme.fontSizes.md};
   cursor: pointer;
-  align-self: flex-start;
 
   &:hover {
     color: ${({ theme }) => theme.colors.textLinkHover};
@@ -69,6 +68,27 @@ export const SecondaryButton = styled.button`
   &:focus-visible {
     outline: 2px solid ${({ theme }) => theme.colors.borderFocus};
     outline-offset: 2px;
+  }
+`
+
+export const PasswordWrapper = styled.div`
+  position: relative;
+  display: flex;
+  align-items: center;
+`
+
+export const PasswordToggle = styled.button`
+  position: absolute;
+  right: ${({ theme }) => theme.spacing.sm};
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.textSecondary};
+  padding: 0;
+  line-height: 1;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.textPrimary};
   }
 `
 
