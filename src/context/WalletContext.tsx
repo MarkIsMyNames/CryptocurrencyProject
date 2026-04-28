@@ -1,12 +1,12 @@
 import { useState, useCallback, type ReactNode } from 'react'
-import { BrowserProvider } from 'ethers'
+import { BrowserProvider, JsonRpcProvider, Wallet } from 'ethers'
 import { config } from '../config'
 import strings from '../locales/en.json'
 import { balanceOf, decodeContractError } from '../utils/contract'
 import { WalletContext, type WalletContextValue } from './walletContext'
 
 interface WalletState {
-  provider: WalletContextValue['provider']
+  provider: BrowserProvider | JsonRpcProvider | null
   signer: WalletContextValue['signer']
   address: string | null
   ethBalance: bigint | null
@@ -66,6 +66,33 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
+  const connectWithWallet = useCallback(async (privateKey: string): Promise<boolean> => {
+    setState((prev) => ({ ...prev, isConnecting: true, error: null }))
+    try {
+      const provider = new JsonRpcProvider(config.sepoliaRpcUrl)
+      const signer = new Wallet(privateKey, provider)
+      const address = signer.address
+      const [ethBalance, etkBalance] = await Promise.all([
+        provider.getBalance(address),
+        config.contractAddress ? balanceOf(signer, address) : Promise.resolve(0n),
+      ])
+      setState({
+        provider,
+        signer,
+        address,
+        ethBalance,
+        etkBalance,
+        isConnected: true,
+        isConnecting: false,
+        error: null,
+      })
+      return true
+    } catch (err) {
+      setState((prev) => ({ ...prev, isConnecting: false, error: decodeContractError(err) }))
+      return false
+    }
+  }, [])
+
   const disconnect = useCallback(() => {
     setState({
       provider: null,
@@ -89,7 +116,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [state.provider, state.address])
 
   return (
-    <WalletContext.Provider value={{ ...state, connect, disconnect, refreshBalances }}>
+    <WalletContext.Provider value={{ ...state, connect, connectWithWallet, disconnect, refreshBalances }}>
       {children}
     </WalletContext.Provider>
   )

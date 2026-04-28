@@ -1,9 +1,4 @@
-import {
-  Contract,
-  type ContractTransactionResponse,
-  type JsonRpcSigner,
-  type BrowserProvider,
-} from 'ethers'
+import { Contract, type ContractRunner, type ContractTransactionResponse } from 'ethers'
 import { config } from '../config'
 import strings from '../locales/en.json'
 
@@ -24,7 +19,7 @@ interface EventTicketContract {
   redeemTicket(): Promise<ContractTransactionResponse>
 }
 
-function getContract(signerOrProvider: JsonRpcSigner | BrowserProvider): EventTicketContract {
+function getContract(signerOrProvider: ContractRunner): EventTicketContract {
   return new Contract(
     config.contractAddress,
     EVENT_TICKET_ABI,
@@ -33,24 +28,24 @@ function getContract(signerOrProvider: JsonRpcSigner | BrowserProvider): EventTi
 }
 
 export function balanceOf(
-  signerOrProvider: JsonRpcSigner | BrowserProvider,
+  signerOrProvider: ContractRunner,
   address: string,
 ): Promise<bigint> {
   return getContract(signerOrProvider).balanceOf(address)
 }
 
-export function remainingTickets(signerOrProvider: BrowserProvider): Promise<bigint> {
+export function remainingTickets(signerOrProvider: ContractRunner): Promise<bigint> {
   return getContract(signerOrProvider).remainingTickets()
 }
 
 export function buyTicket(
-  signer: JsonRpcSigner,
+  signer: ContractRunner,
   value: bigint,
 ): Promise<ContractTransactionResponse> {
   return getContract(signer).buyTicket({ value })
 }
 
-export function redeemTicket(signer: JsonRpcSigner): Promise<ContractTransactionResponse> {
+export function redeemTicket(signer: ContractRunner): Promise<ContractTransactionResponse> {
   return getContract(signer).redeemTicket()
 }
 

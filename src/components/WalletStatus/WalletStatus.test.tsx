@@ -22,6 +22,7 @@ const base = {
   signer: null,
   connect: vi.fn(),
   disconnect: vi.fn(),
+  connectWithWallet: vi.fn(),
   refreshBalances: vi.fn(),
 }
 

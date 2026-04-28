@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { WalletContext, type WalletContextValue } from '../../context/walletContext'
+import en from '../../locales/en.json'
 import { CreateWallet } from './CreateWallet'
 
 const base: WalletContextValue = {
@@ -12,6 +13,7 @@ const base: WalletContextValue = {
   isConnecting: false,
   error: null,
   connect: () => Promise.resolve(),
+  connectWithWallet: () => Promise.resolve(true),
   disconnect: () => {},
   refreshBalances: () => Promise.resolve(),
 }
@@ -34,4 +36,12 @@ export const Default: Story = {}
 
 export const Connecting: Story = {
   args: { isConnecting: true },
+}
+
+export const MetaMaskError: Story = {
+  args: { error: en.createWallet.metaMaskNotFound },
+}
+
+export const MetaMaskConnected: Story = {
+  args: { isConnected: true },
 }

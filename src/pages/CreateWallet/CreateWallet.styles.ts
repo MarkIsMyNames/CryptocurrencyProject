@@ -51,6 +51,27 @@ export const PrimaryButton = styled.button`
   }
 `
 
+export const SecondaryButton = styled.button`
+  background: transparent;
+  color: ${({ theme }) => theme.colors.textLink};
+  border: 1px solid ${({ theme }) => theme.colors.borderDefault};
+  border-radius: ${({ theme }) => theme.borderRadius.sm};
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  cursor: pointer;
+  align-self: flex-start;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.textLinkHover};
+    border-color: ${({ theme }) => theme.colors.borderFocus};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${({ theme }) => theme.colors.borderFocus};
+    outline-offset: 2px;
+  }
+`
+
 export const WarningBox = styled.div`
   background: ${({ theme }) => theme.colors.statusErrorSubtle};
   border: 1px solid ${({ theme }) => theme.colors.borderError};
@@ -81,23 +102,110 @@ export const CardValue = styled.span`
   word-break: break-all;
 `
 
-export const SecondaryButton = styled.button`
-  background: transparent;
-  color: ${({ theme }) => theme.colors.textLink};
-  border: 1px solid ${({ theme }) => theme.colors.borderDefault};
-  border-radius: ${({ theme }) => theme.borderRadius.sm};
-  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
-  font-size: ${({ theme }) => theme.fontSizes.sm};
-  cursor: pointer;
-  align-self: flex-start;
+/* ── Wizard chrome ── */
 
-  &:hover {
-    color: ${({ theme }) => theme.colors.textLinkHover};
+export const StepLabel = styled.p`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin: 0;
+`
+
+export const ProgressDots = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.sm};
+`
+
+export const Dot = styled.span<{ $active: boolean; $done: boolean }>`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: ${({ theme, $active, $done }) =>
+    $active || $done ? theme.colors.brandPrimary : theme.colors.borderDefault};
+  opacity: ${({ $active }) => ($active ? 1 : 0.5)};
+`
+
+/* ── Forms ── */
+
+export const Form = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.md};
+`
+
+export const InputGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xs};
+`
+
+export const Label = styled.label`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textSecondary};
+`
+
+export const TextInput = styled.input`
+  background: ${({ theme }) => theme.colors.backgroundCard};
+  border: 1px solid ${({ theme }) => theme.colors.borderDefault};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  width: 100%;
+
+  &:focus {
+    outline: none;
     border-color: ${({ theme }) => theme.colors.borderFocus};
   }
+`
 
-  &:focus-visible {
-    outline: 2px solid ${({ theme }) => theme.colors.borderFocus};
-    outline-offset: 2px;
-  }
+export const ErrorText = styled.p`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.statusError};
+  margin: 0;
+`
+
+/* ── Recovery phrase grid ── */
+
+export const PhraseGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: ${({ theme }) => theme.spacing.sm};
+`
+
+export const PhraseWord = styled.div`
+  background: ${({ theme }) => theme.colors.backgroundCard};
+  border: 1px solid ${({ theme }) => theme.colors.borderDefault};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  padding: ${({ theme }) => theme.spacing.sm};
+  display: flex;
+  gap: ${({ theme }) => theme.spacing.xs};
+  align-items: baseline;
+`
+
+export const WordIndex = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  min-width: 1.4em;
+`
+
+export const WordText = styled.span`
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textPrimary};
+`
+
+export const CheckboxRow = styled.label`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+  cursor: pointer;
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  color: ${({ theme }) => theme.colors.textPrimary};
+`
+
+/* ── Verify step ── */
+
+export const VerifyGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: ${({ theme }) => theme.spacing.md};
 `

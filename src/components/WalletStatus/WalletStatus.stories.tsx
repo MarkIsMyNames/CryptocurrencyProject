@@ -14,6 +14,7 @@ const base: WalletContextValue = {
   signer: null,
   connect: () => Promise.resolve(),
   disconnect: () => {},
+  connectWithWallet: () => Promise.resolve(true),
   refreshBalances: () => Promise.resolve(),
 }
 
