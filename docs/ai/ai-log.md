@@ -1170,3 +1170,97 @@ No issues. The identifiers are contract implementation details, not user-facing 
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 824a019
+
+## [2026-04-28] #053 — Fix: index.css font-family generic fallback and float px letter-spacing
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/index.css
+
+**Prompt (Step 1):**
+"Fix two CSS lint warnings in src/index.css: (1) font-family declarations using CSS custom properties have no generic fallback visible to the linter — add a concrete generic family after each var() reference so the fallback chain is explicit; (2) letter-spacing values are sub-pixel float px values that render inconsistently across browsers — convert them to relative em units so they scale correctly with font-size."
+
+**Review critique (Step 2):**
+- `font-family: var(--heading)` and `font-family: var(--mono)` lacked a generic fallback after the CSS variable — linters can't resolve variables so no generic family was visible.
+- The `font` shorthand `font: 18px/145% var(--sans)` had the same issue.
+- `letter-spacing` values `0.18px`, `-1.68px`, `-0.24px` are sub-pixel floats that can render inconsistently across browsers.
+
+**Resolution (Step 3):**
+- Added `, sans-serif` after `var(--heading)` and in the `font` shorthand; added `, monospace` after `var(--mono)`.
+- Converted float px letter-spacing to equivalent `em` values: `0.18px` → `0.01em`, `-1.68px` → `-0.03em`, `-0.24px` → `-0.01em`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** c822a67
+
+## [2026-04-28] #054 — Fix: index.html title sourced from en.json
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** index.html, src/main.tsx
+
+**Prompt (Step 1):**
+"The hardcoded string in index.html's <title> tag violates the CLAUDE.md rule that all user-facing strings must come from src/locales/en.json. Move it: source the page title from en.json at runtime. index.html is a static file so it cannot import JSON directly — find the correct mechanism for a Vite/React SPA."
+
+**Review critique (Step 2):**
+`index.html` is a static file — it cannot import JSON directly. The `<title>` tag needed to be sourced from `en.json` at runtime via JavaScript.
+
+**Resolution (Step 3):**
+- Emptied `<title>` in `index.html` (JS is required for this DApp anyway).
+- Added `document.title = strings.brand` in `main.tsx` before `createRoot`, sourcing the value from `src/locales/en.json`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** e27b3eb
+
+## [2026-04-28] #055 — [OPTIMIZATION] Full codebase simplification
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/styles/shared.styles.ts, src/pages/BuyTicket/, src/pages/RedeemTicket/, src/pages/Balance/, src/components/WalletStatus/, src/utils/wallet.ts
+
+**Prompt (Step 1):**
+"Run a full codebase simplification pass across src/. Use three parallel review agents (reuse, quality, efficiency). Look for: duplicated styled-components across page style files, magic numbers that should reference config.ts, inline utilities that belong in utils/, redundant RPC calls when the data already exists in context, and any object URL or memory management issues. Fix everything found and confirm all tests pass."
+
+**Review critique (Step 2):**
+Three parallel review agents identified seven issues:
+- `Title`/`Subtitle` styled-components copy-pasted identically across BuyTicket, RedeemTicket, and Balance style files.
+- `BuyButton`/`RedeemButton` were pixel-for-pixel identical styled-components.
+- `StatusType` union type duplicated in BuyTicket.tsx and RedeemTicket.tsx.
+- `parseEther('0.01')` magic number in BuyTicket.tsx instead of `config.ticketPriceWei` — direct CLAUDE.md violation.
+- `truncateAddress` defined inline in WalletStatus.tsx instead of utils/wallet.ts.
+- `downloadKeystore` used a 100ms setTimeout to revoke the object URL — a race condition that could fail on slow devices.
+- BuyTicket and RedeemTicket each made a redundant `balanceOf` RPC call on mount when `etkBalance` was already maintained in WalletContext.
+
+**Resolution (Step 3):**
+- Added `PageTitle`, `PageSubtitle`, `PrimaryActionButton`, and `StatusType` to `shared.styles.ts`.
+- Replaced local `Title`/`Subtitle`/`BuyButton`/`RedeemButton` definitions in BuyTicket, RedeemTicket, and Balance styles with re-exports from shared.
+- Exported `StatusType` from shared and imported it in both pages (removed local type declarations).
+- Fixed `parseEther('0.01')` → `BigInt(config.ticketPriceWei)` in BuyTicket.tsx.
+- Moved `truncateAddress` to `utils/wallet.ts`; updated WalletStatus import.
+- Fixed `downloadKeystore` to `appendChild`/`click`/`removeChild`/`revokeObjectURL` synchronously.
+- Removed `balanceOf` useEffect from BuyTicket and RedeemTicket; both now read `etkBalance` directly from `useWallet()`. Updated tests accordingly.
+- All 48 tests pass, build and lint clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** b89b825
+
+## [2026-04-28] #056 — [OPTIMIZATION] Remove as-casting from imports, exports, and contract utils
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/styles/shared.styles.ts, src/pages/BuyTicket/, src/pages/RedeemTicket/, src/pages/Balance/, src/utils/contract.ts
+
+**Prompt (Step 1):**
+"Remove all unnecessary TypeScript as-casting from the codebase, with priority on imports and exports. Specifically: re-export aliases (PageTitle as Title, PrimaryActionButton as BuyButton) should be eliminated by renaming the shared components correctly; import aliases that exist only to avoid non-existent name conflicts should be removed; per-function as-casts in contract.ts should be replaced with a single typed interface on getContract; and test mock wrappers using as unknown should be replaced with properly typed vi.hoisted mocks."
+
+**Review critique (Step 2):**
+- `PageTitle as Title`, `PageSubtitle as Subtitle` re-export aliases across three .styles.ts files — unnecessary indirection from poor naming in shared.styles.ts.
+- `PrimaryActionButton as BuyButton` / `PrimaryActionButton as RedeemButton` — aliases forcing JSX to use a different name than the real component.
+- `buyTicket as contractBuyTicket` / `redeemTicket as contractRedeemTicket` — no naming conflict existed; aliases were unnecessary.
+- Four `as Promise<X>` casts spread across contract.ts public functions — should be centralised behind a typed interface on `getContract`.
+- Test mocks used `(...args) => mockFn(...args) as unknown` wrapper to suppress unsafe-return; `mockFn` could be directly assigned if declared with `vi.hoisted`.
+
+**Resolution (Step 3):**
+- Renamed `PageTitle` → `Title`, `PageSubtitle` → `Subtitle` in shared.styles.ts; removed all `as X` re-export aliases.
+- Exported `PrimaryActionButton` directly; updated BuyTicket.tsx and RedeemTicket.tsx JSX to use `PrimaryActionButton`.
+- Removed `buyTicket as contractBuyTicket` and `redeemTicket as contractRedeemTicket` import aliases.
+- Introduced `EventTicketContract` interface in contract.ts; `getContract` now returns the typed interface (single `as unknown as EventTicketContract` cast), removing all per-function casts.
+- Replaced test mock wrappers with `vi.hoisted(() => vi.fn())` and direct assignment in `vi.mock` factory, eliminating `as unknown`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** b89b825
