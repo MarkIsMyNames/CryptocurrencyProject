@@ -13,7 +13,7 @@ export const Nav = styled.nav`
 export const NavBrand = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.lg};
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.brandPrimary};
+  color: ${({ theme }) => theme.colors.textLink};
 `
 
 export const NavLinks = styled.div`
@@ -32,7 +32,7 @@ export const NavLink = styled(Link)`
   }
 
   &[aria-current='page'] {
-    color: ${({ theme }) => theme.colors.brandPrimary};
+    color: ${({ theme }) => theme.colors.textLink};
     font-weight: 600;
   }
 `
