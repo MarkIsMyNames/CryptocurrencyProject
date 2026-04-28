@@ -30,10 +30,15 @@ export default {
 
 type Story = StoryObj<WalletContextValue>
 
-export const Default: Story = {}
+export const Disconnected: Story = {}
 
-export const InputFocus: Story = {
-  parameters: { pseudo: { focus: 'input' } },
+export const ConnectedWallet: Story = {
+  args: {
+    isConnected: true,
+    address: '0x1234567890abcdef1234567890abcdef12345678',
+    ethBalance: BigInt('1500000000000000000'),
+    etkBalance: BigInt(1),
+  },
 }
 
 export const ButtonHover: Story = {

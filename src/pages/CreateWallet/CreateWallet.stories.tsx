@@ -36,6 +36,3 @@ export const Connecting: Story = {
   args: { isConnecting: true },
 }
 
-export const ButtonFocus: Story = {
-  parameters: { pseudo: { focus: true } },
-}

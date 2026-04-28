@@ -7,20 +7,24 @@ import { Balance } from './Balance'
 
 vi.mock('../../context/useWallet', () => ({
   useWallet: () => ({
-    provider: {
-      getBalance: vi.fn().mockResolvedValue(BigInt('1500000000000000000')),
-    },
+    provider: { getBalance: mockGetBalance },
     address: '0xabc123',
     isConnected: true,
   }),
 }))
 
 vi.mock('../../utils/contract', () => ({
-  getContract: () => ({
-    balanceOf: vi.fn().mockResolvedValue(BigInt(1)),
-    remainingTickets: vi.fn().mockResolvedValue(BigInt(999)),
-  }),
+  balanceOf: vi.fn().mockResolvedValue(BigInt(1)),
+  remainingTickets: vi.fn().mockResolvedValue(BigInt(999)),
 }))
+
+import { balanceOf, remainingTickets } from '../../utils/contract'
+
+const mockBalanceOf = vi.mocked(balanceOf)
+const mockRemainingTickets = vi.mocked(remainingTickets)
+const mockGetBalance = vi.fn().mockResolvedValue(BigInt('1500000000000000000'))
+
+const VALID_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678'
 
 function renderPage() {
   return render(
@@ -30,34 +34,74 @@ function renderPage() {
   )
 }
 
+function checkAddress(address: string) {
+  const input = screen.getByPlaceholderText(en.balance.placeholder)
+  fireEvent.change(input, { target: { value: address } })
+  fireEvent.click(screen.getByText(en.balance.checkBtn))
+}
+
 describe('Balance', () => {
-  it('renders the address input', () => {
+  it('renders title and subtitle', () => {
     renderPage()
-    expect(screen.getByPlaceholderText(en.balance.placeholder)).toBeInTheDocument()
+    expect(screen.getByText(en.balance.title)).toBeInTheDocument()
+    expect(screen.getByText(en.balance.subtitle)).toBeInTheDocument()
   })
 
-  it('renders the check balance button', () => {
+  it('renders the address input and check button', () => {
     renderPage()
+    expect(screen.getByPlaceholderText(en.balance.placeholder)).toBeInTheDocument()
     expect(screen.getByText(en.balance.checkBtn)).toBeInTheDocument()
   })
 
-  it('shows SETH and ETK balances after checking', async () => {
+  it('shows invalid address error for bad input', async () => {
     renderPage()
-    const input = screen.getByPlaceholderText(en.balance.placeholder)
-    fireEvent.change(input, { target: { value: '0x1234567890abcdef1234567890abcdef12345678' } })
-    fireEvent.click(screen.getByText(en.balance.checkBtn))
+    checkAddress('notanaddress')
+    await waitFor(() => {
+      expect(screen.getByText(en.balance.invalidAddress)).toBeInTheDocument()
+    })
+  })
+
+  it('shows SETH balance after checking', async () => {
+    renderPage()
+    checkAddress(VALID_ADDRESS)
     await waitFor(() => {
       expect(screen.getByText(/1\.5/)).toBeInTheDocument()
     })
   })
 
-  it('shows invalid address error for bad input', async () => {
+  it('shows valid ticket badge when ETK > 0', async () => {
+    mockBalanceOf.mockResolvedValue(BigInt(1))
     renderPage()
-    const input = screen.getByPlaceholderText(en.balance.placeholder)
-    fireEvent.change(input, { target: { value: 'notanaddress' } })
-    fireEvent.click(screen.getByText(en.balance.checkBtn))
+    checkAddress(VALID_ADDRESS)
     await waitFor(() => {
-      expect(screen.getByText(en.balance.invalidAddress)).toBeInTheDocument()
+      expect(screen.getByText(en.balance.ticketValid)).toBeInTheDocument()
+    })
+  })
+
+  it('shows no ticket badge when ETK = 0', async () => {
+    mockBalanceOf.mockResolvedValue(BigInt(0))
+    renderPage()
+    checkAddress(VALID_ADDRESS)
+    await waitFor(() => {
+      expect(screen.getByText(en.balance.ticketNone)).toBeInTheDocument()
+    })
+  })
+
+  it('shows remaining supply after checking', async () => {
+    mockRemainingTickets.mockResolvedValue(BigInt(999))
+    renderPage()
+    checkAddress(VALID_ADDRESS)
+    await waitFor(() => {
+      expect(screen.getByText(/999/)).toBeInTheDocument()
+    })
+  })
+
+  it('shows unknown error on network failure', async () => {
+    mockGetBalance.mockRejectedValueOnce(new Error('network'))
+    renderPage()
+    checkAddress(VALID_ADDRESS)
+    await waitFor(() => {
+      expect(screen.getByText(en.errors.unknownError)).toBeInTheDocument()
     })
   })
 })

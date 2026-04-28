@@ -41,7 +41,3 @@ export const ButtonHover: Story = {
   parameters: { pseudo: { hover: 'button' } },
 }
 
-export const ButtonFocus: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as never },
-  parameters: { pseudo: { focus: 'button' } },
-}
