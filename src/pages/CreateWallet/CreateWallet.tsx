@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useWallet } from '../../context/useWallet'
 import { generateWallet, downloadKeystore } from '../../utils/wallet'
 import type { GeneratedWallet } from '../../utils/wallet'
+import { Status } from '../../config'
 import en from '../../locales/en.json'
+import { StatusMessage } from '../../styles/shared.styles'
 import {
   PageWrapper,
   Title,
@@ -17,7 +19,7 @@ import {
 } from './CreateWallet.styles'
 
 export function CreateWallet() {
-  const { connect, isConnecting } = useWallet()
+  const { connect, isConnecting, isConnected, error } = useWallet()
   const [generated, setGenerated] = useState<GeneratedWallet | null>(null)
   const [keyRevealed, setKeyRevealed] = useState(false)
 
@@ -40,7 +42,7 @@ export function CreateWallet() {
       <ButtonRow>
         <PrimaryButton onClick={handleGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
         <PrimaryButton
-          disabled={isConnecting}
+          disabled={isConnecting || isConnected}
           onClick={() => {
             void connect()
           }}
@@ -48,6 +50,12 @@ export function CreateWallet() {
           {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
         </PrimaryButton>
       </ButtonRow>
+      {isConnected && (
+        <StatusMessage $type={Status.success}>{en.createWallet.metaMaskSuccess}</StatusMessage>
+      )}
+      {error !== null && !isConnected && (
+        <StatusMessage $type={Status.error}>{error}</StatusMessage>
+      )}
 
       {generated !== null && (
         <>
