@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import strings from '../../locales/en.json'
 import { WalletStatus } from './WalletStatus'
-import { WalletContext, type WalletContextValue } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/walletContext'
 
 const base: WalletContextValue = {
   isConnected: false,
@@ -12,9 +12,9 @@ const base: WalletContextValue = {
   error: null,
   provider: null,
   signer: null,
-  connect: async () => {},
+  connect: () => Promise.resolve(),
   disconnect: () => {},
-  refreshBalances: async () => {},
+  refreshBalances: () => Promise.resolve(),
 }
 
 export default {

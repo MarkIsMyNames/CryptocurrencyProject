@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import type { ContractTransactionResponse } from 'ethers'
-import { useWallet } from '../../context/WalletContext'
-import { getContract, decodeContractError } from '../../utils/contract'
+import { useWallet } from '../../context/useWallet'
+import { balanceOf, redeemTicket as contractRedeemTicket, decodeContractError } from '../../utils/contract'
 import strings from '../../locales/en.json'
 import {
   PageWrapper,
@@ -26,9 +25,8 @@ export function RedeemTicket() {
 
   useEffect(() => {
     if (!provider || !address) return
-    const contract = getContract(provider)
-    void contract.balanceOf(address).then((bal) => {
-      setTicketBalance(BigInt(String(bal)))
+    void balanceOf(provider, address).then((bal) => {
+      setTicketBalance(bal)
     })
   }, [provider, address])
 
@@ -39,11 +37,10 @@ export function RedeemTicket() {
 
   async function handleRedeem() {
     if (!signer) return
-    const contract = getContract(signer)
     setStatus('pending')
     setStatusMessage(strings.redeem.pending)
     try {
-      const tx = (await contract.redeemTicket()) as ContractTransactionResponse
+      const tx = await contractRedeemTicket(signer)
       await tx.wait()
       setStatus('success')
       setStatusMessage(strings.redeem.success)

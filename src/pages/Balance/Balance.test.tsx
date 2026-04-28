@@ -5,7 +5,7 @@ import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { Balance } from './Balance'
 
-vi.mock('../../context/WalletContext', () => ({
+vi.mock('../../context/useWallet', () => ({
   useWallet: () => ({
     provider: {
       getBalance: vi.fn().mockResolvedValue(BigInt('1500000000000000000')),

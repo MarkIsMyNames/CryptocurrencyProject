@@ -15,7 +15,7 @@ vi.mock('../../utils/contract', () => ({
   decodeContractError: vi.fn().mockReturnValue('noTicketError'),
 }))
 
-vi.mock('../../context/WalletContext', () => ({
+vi.mock('../../context/useWallet', () => ({
   useWallet: () => ({
     signer: {},
     provider: {},

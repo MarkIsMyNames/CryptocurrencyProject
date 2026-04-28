@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext, type WalletContextValue } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/walletContext'
 import { RedeemTicket } from './RedeemTicket'
 
 const base: WalletContextValue = {

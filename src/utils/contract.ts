@@ -11,8 +11,24 @@ export const EVENT_TICKET_ABI = [
   'event TicketRedeemed(address indexed holder)',
 ] as const
 
-export function getContract(signerOrProvider: JsonRpcSigner | BrowserProvider) {
+function getContract(signerOrProvider: JsonRpcSigner | BrowserProvider) {
   return new Contract(config.contractAddress, EVENT_TICKET_ABI, signerOrProvider)
+}
+
+export function balanceOf(signerOrProvider: JsonRpcSigner | BrowserProvider, address: string): Promise<bigint> {
+  return getContract(signerOrProvider).balanceOf(address) as Promise<bigint>
+}
+
+export function remainingTickets(signerOrProvider: BrowserProvider): Promise<bigint> {
+  return getContract(signerOrProvider).remainingTickets() as Promise<bigint>
+}
+
+export function buyTicket(signer: JsonRpcSigner, value: bigint): Promise<{ wait: () => Promise<unknown> }> {
+  return getContract(signer).buyTicket({ value }) as Promise<{ wait: () => Promise<unknown> }>
+}
+
+export function redeemTicket(signer: JsonRpcSigner): Promise<{ wait: () => Promise<unknown> }> {
+  return getContract(signer).redeemTicket() as Promise<{ wait: () => Promise<unknown> }>
 }
 
 export function decodeContractError(error: unknown): string {

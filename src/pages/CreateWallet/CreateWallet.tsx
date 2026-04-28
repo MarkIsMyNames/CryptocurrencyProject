@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useWallet } from '../../context/WalletContext'
+import { useWallet } from '../../context/useWallet'
 import { generateWallet, downloadKeystore } from '../../utils/wallet'
 import type { GeneratedWallet } from '../../utils/wallet'
 import en from '../../locales/en.json'

@@ -17,7 +17,7 @@ vi.mock('../../utils/contract', () => ({
   decodeContractError: vi.fn().mockReturnValue('unknownError'),
 }))
 
-vi.mock('../../context/WalletContext', () => ({
+vi.mock('../../context/useWallet', () => ({
   useWallet: () => ({
     signer: {},
     provider: {},

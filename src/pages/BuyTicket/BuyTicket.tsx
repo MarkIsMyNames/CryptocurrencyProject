@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
-import { parseEther, type ContractTransactionResponse } from 'ethers'
-import { useWallet } from '../../context/WalletContext'
-import { getContract, decodeContractError } from '../../utils/contract'
+import { parseEther } from 'ethers'
+import { useWallet } from '../../context/useWallet'
+import { balanceOf, remainingTickets, buyTicket as contractBuyTicket, decodeContractError } from '../../utils/contract'
 import { config } from '../../config'
 import strings from '../../locales/en.json'
 import {
@@ -28,11 +28,10 @@ export function BuyTicket() {
 
   useEffect(() => {
     if (!provider || !address) return
-    const contract = getContract(provider)
-    void Promise.all([contract.remainingTickets(), contract.balanceOf(address)]).then(
+    void Promise.all([remainingTickets(provider), balanceOf(provider, address)]).then(
       ([rem, owned]) => {
-        setRemaining(BigInt(String(rem)))
-        setOwnedTickets(BigInt(String(owned)))
+        setRemaining(rem)
+        setOwnedTickets(owned)
       },
     )
   }, [provider, address])
@@ -45,13 +44,10 @@ export function BuyTicket() {
 
   async function handleBuy() {
     if (!signer) return
-    const contract = getContract(signer)
     setStatus('pending')
     setStatusMessage(strings.buyTicket.pending)
     try {
-      const tx = (await contract.buyTicket({
-        value: parseEther('0.01'),
-      })) as ContractTransactionResponse
+      const tx = await contractBuyTicket(signer, parseEther('0.01'))
       await tx.wait()
       setStatus('success')
       setStatusMessage(strings.buyTicket.success)

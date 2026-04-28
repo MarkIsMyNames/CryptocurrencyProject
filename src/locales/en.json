@@ -73,6 +73,7 @@
   "errors": {
     "connectWallet": "Please connect your wallet first.",
     "unknownError": "An unexpected error occurred. Please try again.",
-    "networkError": "Network error. Please check your connection."
+    "networkError": "Network error. Please check your connection.",
+    "hookOutsideProvider": "useWallet must be used inside WalletProvider"
   }
 }

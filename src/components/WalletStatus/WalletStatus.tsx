@@ -1,4 +1,4 @@
-import { useWallet } from '../../context/WalletContext'
+import { useWallet } from '../../context/useWallet'
 import strings from '../../locales/en.json'
 import { StatusWrapper, StatusDot, StatusText } from './WalletStatus.styles'
 

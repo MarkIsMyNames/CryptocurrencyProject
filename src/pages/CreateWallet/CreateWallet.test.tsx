@@ -7,7 +7,7 @@ import en from '../../locales/en.json'
 import * as walletUtils from '../../utils/wallet'
 import { CreateWallet } from './CreateWallet'
 
-vi.mock('../../context/WalletContext', () => ({
+vi.mock('../../context/useWallet', () => ({
   useWallet: () => ({
     connect: vi.fn(),
     isConnected: false,

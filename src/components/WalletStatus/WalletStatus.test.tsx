@@ -5,12 +5,11 @@ import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { WalletStatus } from './WalletStatus'
 
-vi.mock('../../context/WalletContext', () => ({
+vi.mock('../../context/useWallet', () => ({
   useWallet: vi.fn(),
 }))
 
-import { useWallet } from '../../context/WalletContext'
-import * as React from "react";
+import { useWallet } from '../../context/useWallet'
 
 const base = {
   isConnected: false,
