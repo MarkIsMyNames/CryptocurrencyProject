@@ -32,15 +32,21 @@ export function redeemTicket(signer: JsonRpcSigner): Promise<{ wait: () => Promi
   return getContract(signer).redeemTicket() as Promise<{ wait: () => Promise<unknown> }>
 }
 
+const CONTRACT_ERRORS: Array<[string[], string]> = [
+  [['IncorrectPayment'], strings.errors.incorrectAmount],
+  [['AlreadyOwnsTicket'], strings.errors.alreadyOwned],
+  [['SoldOut'], strings.errors.soldOut],
+  [['NoTicketToRedeem'], strings.errors.noTicket],
+  [['user rejected'], strings.errors.cancelled],
+  [['network changed', 'chain'], strings.errors.wrongNetwork],
+]
+
 export function decodeContractError(error: unknown): string {
   if (error instanceof Error) {
     const msg = error.message
-    if (msg.includes('IncorrectPayment')) return strings.errors.incorrectAmount
-    if (msg.includes('AlreadyOwnsTicket')) return strings.errors.alreadyOwned
-    if (msg.includes('SoldOut')) return strings.errors.soldOut
-    if (msg.includes('NoTicketToRedeem')) return strings.errors.noTicket
-    if (msg.includes('user rejected')) return strings.errors.cancelled
-    if (msg.includes('network changed') || msg.includes('chain')) return strings.errors.wrongNetwork
+    for (const [patterns, message] of CONTRACT_ERRORS) {
+      if (patterns.some((p) => msg.includes(p))) return message
+    }
   }
   return strings.errors.unknownError
 }

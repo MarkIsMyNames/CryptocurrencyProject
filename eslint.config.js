@@ -34,6 +34,7 @@ export default tseslint.config(
       'react-hooks/incompatible-library': 'error',
       'react-hooks/unsupported-syntax': 'error',
       'react-refresh/only-export-components': ['error', { allowConstantExport: true }],
+      '@typescript-eslint/no-empty-object-type': ['error', { allowInterfaces: 'with-single-extends' }],
     },
   },
   {
@@ -80,6 +81,12 @@ export default tseslint.config(
           message: 'Raw colour values are not allowed in styles files. Use theme.colors.* from src/theme.ts.',
         },
       ],
+    },
+  },
+  {
+    files: ['**/*.d.ts'],
+    rules: {
+      '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
   prettier,
