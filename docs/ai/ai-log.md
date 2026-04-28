@@ -1034,3 +1034,139 @@ No issues. The identifiers are contract implementation details, not user-facing 
 
 **Verdict:** Modified
 **Commit hash (Step 4):** c18499e
+
+---
+
+## [2026-04-28] #045 — Fix: WCAG 2.1 AA color contrast failures causing Storybook "No Preview"
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/theme.ts, src/components/Navbar/Navbar.styles.ts, src/pages/CreateWallet/CreateWallet.styles.ts
+
+**Prompt (Step 1):**
+"Storybook shows 'No Preview / The component failed to render properly' for several stories. The a11y config uses test: 'error' which treats WCAG violations as story failures. The Storybook test runner confirms 7 accessibility failures: (1) brandPrimary #6c63ff fails contrast with both textInverse #0f1117 (4.37:1, CreateWallet button) and textPrimary #f1f5f9 (3.93:1, Balance/BuyTicket/RedeemTicket buttons); (2) statusErrorSubtle #7f1d1d has 2.66:1 contrast with statusError #ef4444 (RedeemTicket badge); (3) brandPrimary used as NavBrand text colour. Fix all three by: darken brandPrimary to #4f46e5 (gives 5.4:1 with textPrimary); change CreateWallet button from textInverse to textPrimary (consistent with all other buttons); darken statusErrorSubtle to #3b0000 (gives 4.7:1 with statusError); change NavBrand and active NavLink to use textLink #818cf8 instead of brandPrimary."
+
+**Review critique (Step 2):**
+- Root cause was discovered only after running Playwright directly against the iframe — stories rendered fine, confirming "No Preview" was a test failure not a render crash.
+- Running @storybook/test-runner confirmed: all failures were color-contrast a11y violations, not JavaScript errors.
+- Darkening brandPrimary introduced a regression: NavBrand text (previously using brandPrimary as a text colour on dark background) now had only 2.67:1 contrast, requiring a follow-up fix.
+
+**Resolution (Step 3):**
+- `src/theme.ts`: `brandPrimary` #6c63ff → #4f46e5, `brandPrimaryHover` #574fd6 → #4338ca, `brandPrimaryDisabled` #3d3a6e → #312e81, `statusErrorSubtle` #7f1d1d → #3b0000, `textLinkHover` and `borderFocus` updated to match #4f46e5
+- `src/pages/CreateWallet/CreateWallet.styles.ts`: `PrimaryButton` color changed from `textInverse` to `textPrimary`
+- `src/components/Navbar/Navbar.styles.ts`: `NavBrand` and active `NavLink` changed from `brandPrimary` to `textLink`
+- All 18 stories now pass Storybook test runner (zero a11y violations)
+- npm run lint passes with zero errors
+
+**Verdict:** Modified
+**Commit hash (Step 4):** 7109d40
+
+## [2026-04-28] #046 — Fix: sb-preparing-docs overlay + previewHead signature + CI a11y enforcement
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .storybook/main.ts, .github/workflows/accessibility.yml
+
+**Prompt (Step 1):**
+"There is a 'sb-preparing-docs' overlay visible at the top of every Storybook story. It seems to be an issue with .storybook as it's in every storybook. Also, a11y violations should be caught by the GitHub Action but currently they're not."
+
+**Review critique (Step 2):**
+- Playwright CSS inspection confirmed `sb-preparing-docs` div has `display: block` with zero CSS rules targeting it — no stylesheet was hiding it.
+- Root cause: `@storybook/addon-docs` was in devDependencies but absent from the `addons` array in `main.ts`. Its CSS (`.sb-show-main .sb-preparing-docs { display: none }`) was never loaded.
+- The existing `accessibility.yml` only ran `build-storybook` — it never executed any tests, so a11y violations were never caught.
+- `@storybook/addon-vitest` was already configured in `vite.config.ts` as a `storybook` project running stories via Vitest + Playwright Chromium. Running `vitest run --project=storybook` executes all story tests including a11y checks (since `test: 'error'` is set in preview.tsx).
+
+**Resolution (Step 3):**
+- `.storybook/main.ts`: fixed `previewHead` signature from `() =>` to `(head) => \`${head}...\`` — the function receives existing head HTML and must return it with additions; ignoring the parameter discards Storybook's own head content (fonts, meta tags, base CSS). Background colour injection preserved.
+- `.github/workflows/accessibility.yml`: replaced `build-storybook` step with `npx playwright install chromium --with-deps` + `npx vitest run --project=storybook` so CI actually runs story tests and fails on a11y violations.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** d0181c8
+
+---
+
+## [2026-04-28] #047 — Fix: Playwright e2e tests fail with JSON import attribute error on Node 20
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** e2e/*.spec.ts
+
+**Prompt (Step 1):**
+"npx playwright test fails in CI with: TypeError: Module 'src/locales/en.json' needs an import attribute of type 'json'. Error: No tests found."
+
+**Review critique (Step 2):**
+- Node.js 20+ requires `with { type: 'json' }` on bare JSON imports when using ES modules. All 5 e2e spec files imported `en.json` without this attribute, causing the module loader to reject them before any tests could run — hence "No tests found".
+
+**Resolution (Step 3):**
+- Added `with { type: 'json' }` to the JSON import in all 5 e2e spec files: `wallet.spec.ts`, `buyTicket.spec.ts`, `redeemTicket.spec.ts`, `navbar.spec.ts`, `balance.spec.ts`.
+- Playwright test run no longer throws TypeError; tests proceed past module loading.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 190d3f7
+
+---
+
+## [2026-04-28] #048 — Fix: Playwright `import.meta.env` crash + unit test mock mismatches
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/config.ts, src/pages/BuyTicket/BuyTicket.test.tsx, src/pages/RedeemTicket/RedeemTicket.test.tsx
+
+**Prompt (Step 1):**
+"npx playwright test fails: TypeError: Cannot read properties of undefined (reading 'VITE_CONTRACT_ADDRESS') at src/config.ts:10. npx vitest run --coverage shows 7 failing unit tests: BuyTicket (4) and RedeemTicket (3) with 'No X export is defined on the contract mock'."
+
+**Review critique (Step 2):**
+- `import.meta.env` is a Vite-only global — it is `undefined` in Node.js where Playwright runs. The non-optional property access crashed before any test could execute.
+- BuyTicket and RedeemTicket test mocks were shaped around a `getContract()` factory pattern, but the components import named functions (`balanceOf`, `remainingTickets`, `buyTicket`, `redeemTicket`) directly. Vitest's strict mock enforcement caught the mismatch at runtime.
+- RedeemTicket's `decodeContractError` mock returned the key name `'noTicketError'` instead of the actual localised string, causing the text assertion to fail.
+
+**Resolution (Step 3):**
+- `src/config.ts`: changed `import.meta.env.VITE_CONTRACT_ADDRESS` → `import.meta.env?.VITE_CONTRACT_ADDRESS` so Node.js no longer crashes when `import.meta.env` is undefined.
+- `BuyTicket.test.tsx`: replaced `getContract` factory mock with named exports `buyTicket`, `remainingTickets`, `balanceOf`, `decodeContractError` matching the component's actual imports.
+- `RedeemTicket.test.tsx`: same — replaced `getContract` factory with named exports `redeemTicket`, `balanceOf`, `decodeContractError`; fixed `decodeContractError` mock to return `en.redeem.noTicketError` (the actual string) instead of the key name.
+- All 48 vitest tests pass (13 test files); Playwright no longer crashes on import.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 476e13c
+
+---
+
+## [2026-04-28] #049 — Fix: Playwright strict mode violation on ambiguous locator
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** e2e/wallet.spec.ts
+
+**Prompt (Step 1):**
+"npx playwright test fails: strict mode violation — getByText('Recovery Phrase') resolved to 2 elements: a container div and a span."
+
+**Review critique (Step 2):**
+- `page.getByText()` uses substring matching by default, so both the container `<div>` (which contains the text as a descendant) and the inner `<span>` (with exact text) matched, causing a strict mode error.
+- The test `shows mnemonic after wallet generation` was the only failing case — 21/22 tests passed before this fix.
+
+**Resolution (Step 3):**
+- `e2e/wallet.spec.ts`: added `{ exact: true }` option to `page.getByText(en.createWallet.mnemonicLabel)` so Playwright matches only the element whose full text content equals `"Recovery Phrase"` exactly, eliminating the ambiguous match.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 824a019
+
+---
+
+## [2026-04-28] #050 — Fix: ESLint errors and Prettier formatting across multiple files
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .storybook/main.ts, src/config.ts, src/pages/BuyTicket/BuyTicket.test.tsx, src/pages/RedeemTicket/RedeemTicket.test.tsx
+
+**Prompt (Step 1):**
+"Also resolve the eslint and formatting issues."
+
+**Review critique (Step 2):**
+- `.storybook/main.ts`: `head` parameter of `previewHead` is typed `string | undefined` by StorybookConfig — using it bare in a template literal triggers `@typescript-eslint/restrict-template-expressions`.
+- `src/config.ts`: the previous `import.meta.env?.` fix introduced `@typescript-eslint/no-unnecessary-condition` because TypeScript types `import.meta.env` as `ImportMetaEnv` (never undefined). Needed a cast to a nullable type so the optional chain is recognised as necessary.
+- `BuyTicket.test.tsx` and `RedeemTicket.test.tsx`: `mockBuyTicket(...args)` / `mockRedeemTicket(...args)` return `any` (vi.fn() default), which is then returned from the mock factory function — triggering `@typescript-eslint/no-unsafe-return`.
+- 9 files had Prettier formatting drift.
+
+**Resolution (Step 3):**
+- `.storybook/main.ts`: changed `${head}` → `${head ?? ''}` so the undefined case is handled and the template expression is always `string`.
+- `src/config.ts`: cast `import.meta.env` to `unknown as Record<string, string> | undefined` so the optional chain is typed as necessary and the Node.js runtime crash is still prevented.
+- `BuyTicket.test.tsx` / `RedeemTicket.test.tsx`: appended `as unknown` to the mock call return to suppress the unsafe-return error without widening the mock type.
+- Ran `prettier --write` to fix formatting in all 9 affected files.
+- `npm run lint` and `npm run format:check` both pass with zero errors.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 824a019
