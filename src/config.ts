@@ -1,5 +1,14 @@
+export const routes = {
+  root: '/',
+  createWallet: '/create-wallet',
+  balance: '/balance',
+  buyTicket: '/buy-ticket',
+  redeem: '/redeem',
+} as const
+
 export const config = {
-  contractAddress: (import.meta.env.VITE_CONTRACT_ADDRESS as string | undefined) ?? '',
+  contractAddress:
+    (import.meta.env as unknown as Record<string, string> | undefined)?.VITE_CONTRACT_ADDRESS ?? '',
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
   sepoliaRpcUrl: 'https://rpc.sepolia.org',

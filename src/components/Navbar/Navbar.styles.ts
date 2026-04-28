@@ -13,15 +13,12 @@ export const Nav = styled.nav`
 export const NavBrand = styled.span`
   font-size: ${({ theme }) => theme.fontSizes.lg};
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.brandPrimary};
+  color: ${({ theme }) => theme.colors.textLink};
 `
 
-export const NavLinks = styled.ul`
+export const NavLinks = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.lg};
-  list-style: none;
-  margin: 0;
-  padding: 0;
 `
 
 export const NavLink = styled(Link)`
@@ -34,8 +31,8 @@ export const NavLink = styled(Link)`
     color: ${({ theme }) => theme.colors.textLink};
   }
 
-  &.active {
-    color: ${({ theme }) => theme.colors.brandPrimary};
+  &[aria-current='page'] {
+    color: ${({ theme }) => theme.colors.textLink};
     font-weight: 600;
   }
 `

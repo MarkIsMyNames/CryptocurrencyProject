@@ -1,5 +1,6 @@
 import { Contract, type JsonRpcSigner, type BrowserProvider } from 'ethers'
 import { config } from '../config'
+import strings from '../locales/en.json'
 
 export const EVENT_TICKET_ABI = [
   'function buyTicket() payable',
@@ -11,19 +12,47 @@ export const EVENT_TICKET_ABI = [
   'event TicketRedeemed(address indexed holder)',
 ] as const
 
-export function getContract(signerOrProvider: JsonRpcSigner | BrowserProvider) {
+function getContract(signerOrProvider: JsonRpcSigner | BrowserProvider) {
   return new Contract(config.contractAddress, EVENT_TICKET_ABI, signerOrProvider)
 }
+
+export function balanceOf(
+  signerOrProvider: JsonRpcSigner | BrowserProvider,
+  address: string,
+): Promise<bigint> {
+  return getContract(signerOrProvider).balanceOf(address) as Promise<bigint>
+}
+
+export function remainingTickets(signerOrProvider: BrowserProvider): Promise<bigint> {
+  return getContract(signerOrProvider).remainingTickets() as Promise<bigint>
+}
+
+export function buyTicket(
+  signer: JsonRpcSigner,
+  value: bigint,
+): Promise<{ wait: () => Promise<unknown> }> {
+  return getContract(signer).buyTicket({ value }) as Promise<{ wait: () => Promise<unknown> }>
+}
+
+export function redeemTicket(signer: JsonRpcSigner): Promise<{ wait: () => Promise<unknown> }> {
+  return getContract(signer).redeemTicket() as Promise<{ wait: () => Promise<unknown> }>
+}
+
+const CONTRACT_ERRORS: Array<[string[], string]> = [
+  [['IncorrectPayment'], strings.errors.incorrectAmount],
+  [['AlreadyOwnsTicket'], strings.errors.alreadyOwned],
+  [['SoldOut'], strings.errors.soldOut],
+  [['NoTicketToRedeem'], strings.errors.noTicket],
+  [['user rejected'], strings.errors.cancelled],
+  [['network changed', 'chain'], strings.errors.wrongNetwork],
+]
 
 export function decodeContractError(error: unknown): string {
   if (error instanceof Error) {
     const msg = error.message
-    if (msg.includes('IncorrectPayment')) return 'incorrectAmount'
-    if (msg.includes('AlreadyOwnsTicket')) return 'alreadyOwned'
-    if (msg.includes('SoldOut')) return 'soldOut'
-    if (msg.includes('NoTicketToRedeem')) return 'noTicketError'
-    if (msg.includes('user rejected')) return 'cancelled'
-    if (msg.includes('network changed') || msg.includes('chain')) return 'wrongNetwork'
+    for (const [patterns, message] of CONTRACT_ERRORS) {
+      if (patterns.some((p) => msg.includes(p))) return message
+    }
   }
-  return 'unknownError'
+  return strings.errors.unknownError
 }

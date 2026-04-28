@@ -1,24 +1,30 @@
-import React from 'react'
 import type { Preview } from '@storybook/react'
+import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { theme } from '../src/theme'
 
-const preview: Preview = {
-  parameters: {
-    a11y: {
-      config: {
-        rules: [{ id: 'color-contrast', enabled: true }],
-      },
-    },
-    controls: { matchers: { color: /(background|color)$/i, date: /Date$/i } },
-  },
+export default {
   decorators: [
     (Story) => (
-      <ThemeProvider theme={theme}>
-        <Story />
-      </ThemeProvider>
+      <MemoryRouter>
+        <ThemeProvider theme={theme}>
+          <Story />
+        </ThemeProvider>
+      </MemoryRouter>
     ),
   ],
-}
-
-export default preview
+  parameters: {
+    a11y: {
+      test: 'error',
+      config: {
+        rules: [{ id: 'color-contrast', reviewOnFail: false }],
+      },
+    },
+    backgrounds: {
+      values: [{ name: 'dark', value: theme.colors.backgroundPage }],
+    },
+  },
+  initialGlobals: {
+    backgrounds: { value: theme.colors.backgroundPage },
+  },
+} satisfies Preview

@@ -1,4 +1,5 @@
 {
+  "brand": "EventTicket",
   "nav": {
     "createWallet": "Create Wallet",
     "balance": "Check Balance",
@@ -72,6 +73,13 @@
   "errors": {
     "connectWallet": "Please connect your wallet first.",
     "unknownError": "An unexpected error occurred. Please try again.",
-    "networkError": "Network error. Please check your connection."
+    "networkError": "Network error. Please check your connection.",
+    "hookOutsideProvider": "useWallet must be used inside WalletProvider",
+    "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
+    "alreadyOwned": "You already own a ticket.",
+    "soldOut": "Sorry, this event is sold out.",
+    "noTicket": "No ticket found in this wallet.",
+    "cancelled": "Transaction cancelled.",
+    "wrongNetwork": "Please switch to the Sepolia testnet."
   }
 }

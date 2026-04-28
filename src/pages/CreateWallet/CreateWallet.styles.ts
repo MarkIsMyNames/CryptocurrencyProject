@@ -29,7 +29,7 @@ export const ButtonRow = styled.div`
 
 export const PrimaryButton = styled.button`
   background: ${({ theme }) => theme.colors.brandPrimary};
-  color: ${({ theme }) => theme.colors.textInverse};
+  color: ${({ theme }) => theme.colors.textPrimary};
   border: none;
   border-radius: ${({ theme }) => theme.borderRadius.md};
   padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.lg};

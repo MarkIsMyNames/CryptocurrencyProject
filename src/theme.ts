@@ -5,14 +5,14 @@ export const theme = {
     backgroundInput: '#23273a',
     backgroundOverlay: 'rgba(0, 0, 0, 0.6)',
 
-    brandPrimary: '#6c63ff',
-    brandPrimaryHover: '#574fd6',
-    brandPrimaryDisabled: '#3d3a6e',
+    brandPrimary: '#4f46e5',
+    brandPrimaryHover: '#4338ca',
+    brandPrimaryDisabled: '#312e81',
 
     statusSuccess: '#22c55e',
     statusSuccessSubtle: '#14532d',
     statusError: '#ef4444',
-    statusErrorSubtle: '#7f1d1d',
+    statusErrorSubtle: '#3b0000',
     statusWarning: '#f59e0b',
     statusPending: '#3b82f6',
 
@@ -21,10 +21,10 @@ export const theme = {
     textDisabled: '#475569',
     textInverse: '#0f1117',
     textLink: '#818cf8',
-    textLinkHover: '#6c63ff',
+    textLinkHover: '#4f46e5',
 
     borderDefault: '#2e3250',
-    borderFocus: '#6c63ff',
+    borderFocus: '#4f46e5',
     borderError: '#ef4444',
   },
   spacing: {

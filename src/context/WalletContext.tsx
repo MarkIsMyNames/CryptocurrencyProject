@@ -1,12 +1,13 @@
-/* eslint-disable react-refresh/only-export-components -- context files always co-export hooks with the provider */
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
-import { BrowserProvider, JsonRpcSigner } from 'ethers'
+import { useState, useCallback, type ReactNode } from 'react'
+import { BrowserProvider } from 'ethers'
 import { config } from '../config'
-import { getContract } from '../utils/contract'
+import strings from '../locales/en.json'
+import { balanceOf } from '../utils/contract'
+import { WalletContext, type WalletContextValue } from './walletContext'
 
 interface WalletState {
-  provider: BrowserProvider | null
-  signer: JsonRpcSigner | null
+  provider: WalletContextValue['provider']
+  signer: WalletContextValue['signer']
   address: string | null
   ethBalance: bigint | null
   etkBalance: bigint | null
@@ -14,14 +15,6 @@ interface WalletState {
   isConnecting: boolean
   error: string | null
 }
-
-interface WalletContextValue extends WalletState {
-  connect: () => Promise<void>
-  disconnect: () => void
-  refreshBalances: () => Promise<void>
-}
-
-export const WalletContext = createContext<WalletContextValue | null>(null)
 
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>({
@@ -37,7 +30,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const connect = useCallback(async () => {
     if (!window.ethereum) {
-      setState((prev) => ({ ...prev, error: 'MetaMask not detected' }))
+      setState((prev) => ({ ...prev, error: strings.createWallet.metaMaskNotFound }))
       return
     }
     setState((prev) => ({ ...prev, isConnecting: true, error: null }))
@@ -54,12 +47,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       await provider.send('eth_requestAccounts', [])
       const signer = await provider.getSigner()
       const address = await signer.getAddress()
-      const contract = getContract(signer)
-      const [ethBalance, rawEtkBalance] = await Promise.all([
+      const [ethBalance, etkBalance] = await Promise.all([
         provider.getBalance(address),
-        contract.balanceOf(address) as Promise<unknown>,
+        balanceOf(signer, address),
       ])
-      const etkBalance = BigInt(String(rawEtkBalance))
       setState({
         provider,
         signer,
@@ -71,7 +62,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         error: null,
       })
     } catch {
-      setState((prev) => ({ ...prev, isConnecting: false, error: 'Connection failed' }))
+      setState((prev) => ({ ...prev, isConnecting: false, error: strings.errors.unknownError }))
     }
   }, [])
 
@@ -90,12 +81,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const refreshBalances = useCallback(async () => {
     if (!state.provider || !state.address) return
-    const contract = getContract(state.provider)
-    const [ethBalance, rawEtkBalance] = await Promise.all([
+    const [ethBalance, etkBalance] = await Promise.all([
       state.provider.getBalance(state.address),
-      contract.balanceOf(state.address) as Promise<unknown>,
+      balanceOf(state.provider, state.address),
     ])
-    const etkBalance = BigInt(String(rawEtkBalance))
     setState((prev) => ({ ...prev, ethBalance, etkBalance }))
   }, [state.provider, state.address])
 
@@ -104,10 +93,4 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       {children}
     </WalletContext.Provider>
   )
-}
-
-export function useWallet(): WalletContextValue {
-  const ctx = useContext(WalletContext)
-  if (!ctx) throw new Error('useWallet must be used inside WalletProvider')
-  return ctx
 }

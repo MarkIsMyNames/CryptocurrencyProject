@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { isAddress, formatEther } from 'ethers'
-import { useWallet } from '../../context/WalletContext'
-import { getContract } from '../../utils/contract'
+import { useWallet } from '../../context/useWallet'
+import { balanceOf, remainingTickets } from '../../utils/contract'
 import { config } from '../../config'
 import strings from '../../locales/en.json'
 import {
@@ -44,14 +44,15 @@ export function Balance() {
     }
     setLoading(true)
     try {
-      const contract = getContract(provider)
-      const rawEth = await provider.getBalance(inputAddress)
-      const rawEtk: unknown = await contract.balanceOf(inputAddress)
-      const rawRemaining: unknown = await contract.remainingTickets()
+      const [rawEth, etk, remaining] = await Promise.all([
+        provider.getBalance(inputAddress),
+        balanceOf(provider, inputAddress),
+        remainingTickets(provider),
+      ])
       setResult({
         seth: formatEther(rawEth),
-        etk: BigInt(String(rawEtk)),
-        remaining: BigInt(String(rawRemaining)),
+        etk,
+        remaining,
       })
     } catch {
       setError(strings.errors.unknownError)
@@ -69,9 +70,16 @@ export function Balance() {
         <AddressInput
           placeholder={strings.balance.placeholder}
           value={inputAddress}
-          onChange={(e) => { setInputAddress(e.target.value) }}
+          onChange={(e) => {
+            setInputAddress(e.target.value)
+          }}
         />
-        <CheckButton onClick={() => { void handleCheck() }} disabled={loading}>
+        <CheckButton
+          onClick={() => {
+            void handleCheck()
+          }}
+          disabled={loading}
+        >
           {loading ? '...' : strings.balance.checkBtn}
         </CheckButton>
       </InputRow>
@@ -82,7 +90,7 @@ export function Balance() {
         <BalanceGrid>
           <BalanceCard>
             <BalanceLabel>{strings.balance.sethLabel}</BalanceLabel>
-            <BalanceValue>{parseFloat(result.seth).toFixed(4)} SETH</BalanceValue>
+            <BalanceValue>{`${parseFloat(result.seth).toFixed(4)} SETH`}</BalanceValue>
           </BalanceCard>
 
           <BalanceCard>

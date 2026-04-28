@@ -1,12 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { MemoryRouter } from 'react-router-dom'
-import { WalletContext } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/walletContext'
 import { CreateWallet } from './CreateWallet'
 
-const noop = () => undefined
-const noopAsync = () => Promise.resolve()
-
-const defaultWalletValue = {
+const base: WalletContextValue = {
   provider: null,
   signer: null,
   address: null,
@@ -15,45 +11,27 @@ const defaultWalletValue = {
   isConnected: false,
   isConnecting: false,
   error: null,
-  connect: noopAsync,
-  disconnect: noop,
-  refreshBalances: noopAsync,
+  connect: () => Promise.resolve(),
+  disconnect: () => {},
+  refreshBalances: () => Promise.resolve(),
 }
 
-const meta: Meta<typeof CreateWallet> = {
-  title: 'Pages/CreateWallet',
+export default {
   component: CreateWallet,
+  args: base,
   decorators: [
-    (Story) => (
-      <MemoryRouter>
-        <WalletContext.Provider value={defaultWalletValue}>
-          <Story />
-        </WalletContext.Provider>
-      </MemoryRouter>
-    ),
-  ],
-  parameters: {
-    a11y: { disable: false },
-  },
-}
-
-export default meta
-type Story = StoryObj<typeof CreateWallet>
-
-export const Default: Story = {}
-
-export const Connecting: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider value={{ ...defaultWalletValue, isConnecting: true }}>
+    (Story, { args }) => (
+      <WalletContext.Provider value={args}>
         <Story />
       </WalletContext.Provider>
     ),
   ],
-}
+} satisfies Meta<WalletContextValue>
 
-export const ButtonFocus: Story = {
-  parameters: {
-    pseudo: { focus: true },
-  },
+type Story = StoryObj<WalletContextValue>
+
+export const Default: Story = {}
+
+export const Connecting: Story = {
+  args: { isConnecting: true },
 }

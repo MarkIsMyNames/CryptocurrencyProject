@@ -16,4 +16,5 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - run: npm run build-storybook
+      - run: npx playwright install chromium --with-deps
+      - run: npx vitest run --project=storybook

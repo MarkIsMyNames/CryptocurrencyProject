@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/walletContext'
 import { Balance } from './Balance'
 
-const walletCtx = {
+const base: WalletContextValue = {
   isConnected: false,
   address: null,
   ethBalance: null,
@@ -16,26 +16,29 @@ const walletCtx = {
   refreshBalances: () => Promise.resolve(),
 }
 
-const meta: Meta<typeof Balance> = {
-  title: 'Pages/Balance',
+export default {
   component: Balance,
+  args: base,
   decorators: [
-    (Story) => (
-      <WalletContext.Provider value={walletCtx}>
+    (Story, { args }) => (
+      <WalletContext.Provider value={args}>
         <Story />
       </WalletContext.Provider>
     ),
   ],
-  parameters: { a11y: { disable: false } },
-}
-export default meta
+} satisfies Meta<WalletContextValue>
 
-type Story = StoryObj<typeof Balance>
+type Story = StoryObj<WalletContextValue>
 
-export const Default: Story = {}
+export const Disconnected: Story = {}
 
-export const InputFocus: Story = {
-  parameters: { pseudo: { focus: 'input' } },
+export const ConnectedWallet: Story = {
+  args: {
+    isConnected: true,
+    address: '0x1234567890abcdef1234567890abcdef12345678',
+    ethBalance: BigInt('1500000000000000000'),
+    etkBalance: BigInt(1),
+  },
 }
 
 export const ButtonHover: Story = {

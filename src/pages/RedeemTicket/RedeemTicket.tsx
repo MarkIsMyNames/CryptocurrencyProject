@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
-import type { ContractTransactionResponse } from 'ethers'
-import { useWallet } from '../../context/WalletContext'
-import { getContract, decodeContractError } from '../../utils/contract'
+import { useWallet } from '../../context/useWallet'
+import {
+  balanceOf,
+  redeemTicket as contractRedeemTicket,
+  decodeContractError,
+} from '../../utils/contract'
 import strings from '../../locales/en.json'
 import {
   PageWrapper,
@@ -26,9 +29,8 @@ export function RedeemTicket() {
 
   useEffect(() => {
     if (!provider || !address) return
-    const contract = getContract(provider)
-    void contract.balanceOf(address).then((bal) => {
-      setTicketBalance(BigInt(String(bal)))
+    void balanceOf(provider, address).then((bal) => {
+      setTicketBalance(bal)
     })
   }, [provider, address])
 
@@ -39,23 +41,18 @@ export function RedeemTicket() {
 
   async function handleRedeem() {
     if (!signer) return
-    const contract = getContract(signer)
     setStatus('pending')
     setStatusMessage(strings.redeem.pending)
     try {
-      const tx = (await contract.redeemTicket()) as ContractTransactionResponse
+      const tx = await contractRedeemTicket(signer)
       await tx.wait()
       setStatus('success')
       setStatusMessage(strings.redeem.success)
       setTicketBalance(0n)
       await refreshBalances()
     } catch (err) {
-      const key = decodeContractError(err)
-      const redeemStrings: Partial<Record<string, string>> = strings.redeem
-      const errorsStrings: Partial<Record<string, string>> = strings.errors
-      const message = redeemStrings[key] ?? errorsStrings[key] ?? strings.errors.unknownError
       setStatus('error')
-      setStatusMessage(message)
+      setStatusMessage(decodeContractError(err))
     }
   }
 
@@ -76,14 +73,14 @@ export function RedeemTicket() {
             </TicketStatusBadge>
           </TicketCard>
           <RedeemButton
-            onClick={() => { void handleRedeem() }}
+            onClick={() => {
+              void handleRedeem()
+            }}
             disabled={isDisabled}
           >
             {strings.redeem.redeemBtn}
           </RedeemButton>
-          {status !== null && (
-            <StatusMessage $type={status}>{statusMessage}</StatusMessage>
-          )}
+          {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
         </>
       ) : (
         <ConnectPrompt>{strings.redeem.connectFirst}</ConnectPrompt>

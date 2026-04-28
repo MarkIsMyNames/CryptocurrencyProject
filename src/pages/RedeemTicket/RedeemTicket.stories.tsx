@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/walletContext'
 import { RedeemTicket } from './RedeemTicket'
 
-const baseWalletCtx = {
+const base: WalletContextValue = {
   isConnected: false,
   address: null,
   ethBalance: null,
@@ -16,76 +16,27 @@ const baseWalletCtx = {
   refreshBalances: () => Promise.resolve(),
 }
 
-const meta: Meta<typeof RedeemTicket> = {
-  title: 'Pages/RedeemTicket',
+export default {
   component: RedeemTicket,
+  args: base,
   decorators: [
-    (Story) => (
-      <WalletContext.Provider value={baseWalletCtx}>
+    (Story, { args }) => (
+      <WalletContext.Provider value={args}>
         <Story />
       </WalletContext.Provider>
     ),
   ],
-  parameters: { a11y: { disable: false } },
-}
-export default meta
+} satisfies Meta<WalletContextValue>
 
-type Story = StoryObj<typeof RedeemTicket>
+type Story = StoryObj<WalletContextValue>
 
 export const Default: Story = {}
 
 export const HasTicket: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider
-        value={{
-          ...baseWalletCtx,
-          isConnected: true,
-          address: '0xabc123def456',
-          provider: null,
-          signer: {} as never,
-        }}
-      >
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
+  args: { isConnected: true, address: '0xabc123def456', signer: {} as never },
 }
 
 export const ButtonHover: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider
-        value={{
-          ...baseWalletCtx,
-          isConnected: true,
-          address: '0xabc123def456',
-          provider: null,
-          signer: {} as never,
-        }}
-      >
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
+  args: { isConnected: true, address: '0xabc123def456', signer: {} as never },
   parameters: { pseudo: { hover: 'button' } },
-}
-
-export const ButtonFocus: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider
-        value={{
-          ...baseWalletCtx,
-          isConnected: true,
-          address: '0xabc123def456',
-          provider: null,
-          signer: {} as never,
-        }}
-      >
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
-  parameters: { pseudo: { focus: 'button' } },
 }

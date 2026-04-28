@@ -1,15 +1,13 @@
 import type { StorybookConfig } from '@storybook/react-vite'
+import { theme } from '../src/theme.ts'
 
-const config: StorybookConfig = {
+export default {
   stories: ['../src/**/*.stories.@(ts|tsx)'],
-  addons: [
-    '@storybook/addon-a11y',
-    'storybook-addon-pseudo-states',
-  ],
-  framework: {
-    name: '@storybook/react-vite',
-    options: {},
+  core: {
+    disableTelemetry: true,
   },
-}
-
-export default config
+  addons: ['@storybook/addon-a11y', 'storybook-addon-pseudo-states'],
+  framework: '@storybook/react-vite',
+  previewHead: (head) =>
+    `${head ?? ''}<style>html,body,#storybook-root{background-color:${theme.colors.backgroundPage}}</style>`,
+} satisfies StorybookConfig

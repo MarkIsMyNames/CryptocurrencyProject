@@ -37,3 +37,6 @@ docs/superpowers
 *storybook.log
 storybook-static
 .worktrees
+test-results
+playwright-report
+coverage

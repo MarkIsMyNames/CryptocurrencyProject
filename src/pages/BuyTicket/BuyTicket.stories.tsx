@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext } from '../../context/WalletContext'
+import { WalletContext, type WalletContextValue } from '../../context/walletContext'
 import { BuyTicket } from './BuyTicket'
 
-const baseWalletCtx = {
+const base: WalletContextValue = {
   isConnected: false,
   address: null,
   ethBalance: null,
@@ -16,76 +16,27 @@ const baseWalletCtx = {
   refreshBalances: () => Promise.resolve(),
 }
 
-const meta: Meta<typeof BuyTicket> = {
-  title: 'Pages/BuyTicket',
+export default {
   component: BuyTicket,
+  args: base,
   decorators: [
-    (Story) => (
-      <WalletContext.Provider value={baseWalletCtx}>
+    (Story, { args }) => (
+      <WalletContext.Provider value={args}>
         <Story />
       </WalletContext.Provider>
     ),
   ],
-  parameters: { a11y: { disable: false } },
-}
-export default meta
+} satisfies Meta<WalletContextValue>
 
-type Story = StoryObj<typeof BuyTicket>
+type Story = StoryObj<WalletContextValue>
 
 export const Default: Story = {}
 
 export const Connected: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider
-        value={{
-          ...baseWalletCtx,
-          isConnected: true,
-          address: '0xabc123',
-          provider: null,
-          signer: {} as never,
-        }}
-      >
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
+  args: { isConnected: true, address: '0xabc123', signer: {} as never },
 }
 
 export const ButtonHover: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider
-        value={{
-          ...baseWalletCtx,
-          isConnected: true,
-          address: '0xabc123',
-          provider: null,
-          signer: {} as never,
-        }}
-      >
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
+  args: { isConnected: true, address: '0xabc123', signer: {} as never },
   parameters: { pseudo: { hover: 'button' } },
-}
-
-export const ButtonFocus: Story = {
-  decorators: [
-    (Story) => (
-      <WalletContext.Provider
-        value={{
-          ...baseWalletCtx,
-          isConnected: true,
-          address: '0xabc123',
-          provider: null,
-          signer: {} as never,
-        }}
-      >
-        <Story />
-      </WalletContext.Provider>
-    ),
-  ],
-  parameters: { pseudo: { focus: 'button' } },
 }
