@@ -8,6 +8,6 @@ export default {
   },
   addons: ['@storybook/addon-a11y', 'storybook-addon-pseudo-states'],
   framework: '@storybook/react-vite',
-  previewHead: () =>
-    `<style>html,body,#storybook-root{background-color:${theme.colors.backgroundPage}}</style>`,
+  previewHead: (head) =>
+    `${head}<style>html,body,#storybook-root{background-color:${theme.colors.backgroundPage}}</style>`,
 } satisfies StorybookConfig
