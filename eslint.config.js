@@ -60,6 +60,10 @@ export default tseslint.config(
           selector: "Literal[value=/^\\/[a-z][a-z-]*$/]",
           message: 'Hardcoded route paths are not allowed. Use routes.* from src/config.ts instead.',
         },
+        {
+          selector: "Literal[value='success'], Literal[value='error'], Literal[value='pending']",
+          message: 'Use Status.success, Status.error, or Status.pending from src/config.ts instead of raw status strings.',
+        },
       ],
     },
   },

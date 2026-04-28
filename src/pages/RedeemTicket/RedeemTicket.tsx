@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useWallet } from '../../context/useWallet'
 import { redeemTicket, decodeContractError } from '../../utils/contract'
+import { Status } from '../../config'
 import strings from '../../locales/en.json'
 import { type StatusType } from '../../styles/shared.styles'
 import {
@@ -22,22 +23,22 @@ export function RedeemTicket() {
   const [statusMessage, setStatusMessage] = useState('')
 
   const hasTicket = etkBalance !== null && etkBalance > 0n
-  const isPending = status === 'pending'
-  const isSuccess = status === 'success'
+  const isPending = status === Status.pending
+  const isSuccess = status === Status.success
   const isDisabled = isPending || !hasTicket || isSuccess
 
   async function handleRedeem() {
     if (!signer) return
-    setStatus('pending')
+    setStatus(Status.pending)
     setStatusMessage(strings.redeem.pending)
     try {
       const tx = await redeemTicket(signer)
       await tx.wait()
-      setStatus('success')
+      setStatus(Status.success)
       setStatusMessage(strings.redeem.success)
       await refreshBalances()
     } catch (err) {
-      setStatus('error')
+      setStatus(Status.error)
       setStatusMessage(decodeContractError(err))
     }
   }

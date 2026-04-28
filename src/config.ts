@@ -6,6 +6,12 @@ export const routes = {
   redeem: '/redeem',
 } as const
 
+export const Status = {
+  pending: 'pending',
+  success: 'success',
+  error: 'error',
+} as const
+
 export const config = {
   contractAddress:
     (import.meta.env as unknown as Record<string, string> | undefined)?.VITE_CONTRACT_ADDRESS ?? '',

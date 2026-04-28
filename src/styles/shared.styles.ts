@@ -1,9 +1,10 @@
 import styled from 'styled-components'
+import { Status } from '../config'
 
-export type StatusType = 'success' | 'error' | 'pending' | null
+export type StatusType = (typeof Status)[keyof typeof Status] | null
 
 interface StatusMessageProps {
-  $type: 'success' | 'error' | 'pending'
+  $type: (typeof Status)[keyof typeof Status]
 }
 
 export const Title = styled.h1`
@@ -48,19 +49,19 @@ export const StatusMessage = styled.p<StatusMessageProps>`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   text-align: center;
   color: ${({ theme, $type }) => {
-    if ($type === 'success') return theme.colors.statusSuccess
-    if ($type === 'error') return theme.colors.statusError
+    if ($type === Status.success) return theme.colors.statusSuccess
+    if ($type === Status.error) return theme.colors.statusError
     return theme.colors.statusPending
   }};
   background: ${({ theme, $type }) => {
-    if ($type === 'success') return theme.colors.statusSuccessSubtle
-    if ($type === 'error') return theme.colors.statusErrorSubtle
+    if ($type === Status.success) return theme.colors.statusSuccessSubtle
+    if ($type === Status.error) return theme.colors.statusErrorSubtle
     return theme.colors.backgroundCard
   }};
   border: 1px solid
     ${({ theme, $type }) => {
-      if ($type === 'success') return theme.colors.statusSuccess
-      if ($type === 'error') return theme.colors.statusError
+      if ($type === Status.success) return theme.colors.statusSuccess
+      if ($type === Status.error) return theme.colors.statusError
       return theme.colors.statusPending
     }};
 `

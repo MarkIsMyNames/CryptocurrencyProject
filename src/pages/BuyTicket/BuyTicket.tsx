@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useWallet } from '../../context/useWallet'
 import { remainingTickets, buyTicket, decodeContractError } from '../../utils/contract'
-import { config } from '../../config'
+import { config, Status } from '../../config'
 import strings from '../../locales/en.json'
 import { type StatusType } from '../../styles/shared.styles'
 import {
@@ -30,22 +30,22 @@ export function BuyTicket() {
 
   const isSoldOut = remaining !== null && remaining === 0n
   const alreadyOwned = etkBalance !== null && etkBalance > 0n
-  const isPending = status === 'pending'
-  const isSuccess = status === 'success'
+  const isPending = status === Status.pending
+  const isSuccess = status === Status.success
   const isDisabled = isPending || alreadyOwned || isSoldOut || isSuccess
 
   async function handleBuy() {
     if (!signer) return
-    setStatus('pending')
+    setStatus(Status.pending)
     setStatusMessage(strings.buyTicket.pending)
     try {
       const tx = await buyTicket(signer, BigInt(config.ticketPriceWei))
       await tx.wait()
-      setStatus('success')
+      setStatus(Status.success)
       setStatusMessage(strings.buyTicket.success)
       await refreshBalances()
     } catch (err) {
-      setStatus('error')
+      setStatus(Status.error)
       setStatusMessage(decodeContractError(err))
     }
   }
