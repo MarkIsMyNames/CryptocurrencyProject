@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react'
-import { parseEther } from 'ethers'
 import { useWallet } from '../../context/useWallet'
-import {
-  balanceOf,
-  remainingTickets,
-  buyTicket as contractBuyTicket,
-  decodeContractError,
-} from '../../utils/contract'
+import { remainingTickets, buyTicket, decodeContractError } from '../../utils/contract'
 import { config } from '../../config'
 import strings from '../../locales/en.json'
+import { type StatusType } from '../../styles/shared.styles'
 import {
   PageWrapper,
   Title,
@@ -17,32 +12,24 @@ import {
   InfoRow,
   InfoLabel,
   InfoValue,
-  BuyButton,
+  PrimaryActionButton,
   StatusMessage,
   ConnectPrompt,
 } from './BuyTicket.styles'
 
-type StatusType = 'success' | 'error' | 'pending' | null
-
 export function BuyTicket() {
-  const { signer, provider, address, isConnected, refreshBalances } = useWallet()
+  const { signer, provider, isConnected, etkBalance, refreshBalances } = useWallet()
   const [remaining, setRemaining] = useState<bigint | null>(null)
-  const [ownedTickets, setOwnedTickets] = useState<bigint | null>(null)
   const [status, setStatus] = useState<StatusType>(null)
   const [statusMessage, setStatusMessage] = useState('')
 
   useEffect(() => {
-    if (!provider || !address) return
-    void Promise.all([remainingTickets(provider), balanceOf(provider, address)]).then(
-      ([rem, owned]) => {
-        setRemaining(rem)
-        setOwnedTickets(owned)
-      },
-    )
-  }, [provider, address])
+    if (!provider) return
+    void remainingTickets(provider).then(setRemaining)
+  }, [provider])
 
-  const isSoldOut = remaining !== null && remaining === BigInt(0)
-  const alreadyOwned = ownedTickets !== null && ownedTickets > BigInt(0)
+  const isSoldOut = remaining !== null && remaining === 0n
+  const alreadyOwned = etkBalance !== null && etkBalance > 0n
   const isPending = status === 'pending'
   const isSuccess = status === 'success'
   const isDisabled = isPending || alreadyOwned || isSoldOut || isSuccess
@@ -52,7 +39,7 @@ export function BuyTicket() {
     setStatus('pending')
     setStatusMessage(strings.buyTicket.pending)
     try {
-      const tx = await contractBuyTicket(signer, parseEther('0.01'))
+      const tx = await buyTicket(signer, BigInt(config.ticketPriceWei))
       await tx.wait()
       setStatus('success')
       setStatusMessage(strings.buyTicket.success)
@@ -79,19 +66,19 @@ export function BuyTicket() {
         {isConnected && (
           <InfoRow>
             <InfoLabel>{strings.buyTicket.yourBalanceLabel}</InfoLabel>
-            <InfoValue>{ownedTickets !== null ? String(ownedTickets) : '—'}</InfoValue>
+            <InfoValue>{etkBalance !== null ? String(etkBalance) : '—'}</InfoValue>
           </InfoRow>
         )}
       </InfoCard>
       {isConnected ? (
-        <BuyButton
+        <PrimaryActionButton
           onClick={() => {
             void handleBuy()
           }}
           disabled={isDisabled}
         >
           {strings.buyTicket.buyBtn}
-        </BuyButton>
+        </PrimaryActionButton>
       ) : (
         <ConnectPrompt>{strings.buyTicket.connectFirst}</ConnectPrompt>
       )}

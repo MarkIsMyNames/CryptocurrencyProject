@@ -23,8 +23,12 @@ export async function downloadKeystore(wallet: GeneratedWallet, password: string
   const a = document.createElement('a')
   a.href = url
   a.download = `keystore-${wallet.address.slice(0, 8)}.json`
+  document.body.appendChild(a)
   a.click()
-  setTimeout(() => {
-    URL.revokeObjectURL(url)
-  }, 100)
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+export function truncateAddress(address: string): string {
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
 }

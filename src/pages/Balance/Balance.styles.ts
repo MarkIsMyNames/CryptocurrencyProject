@@ -6,17 +6,7 @@ export const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.xl};
 `
 
-export const Title = styled.h1`
-  font-size: ${({ theme }) => theme.fontSizes.xxl};
-  color: ${({ theme }) => theme.colors.textPrimary};
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
-`
-
-export const Subtitle = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.md};
-  color: ${({ theme }) => theme.colors.textSecondary};
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-`
+export { Title, Subtitle } from '../../styles/shared.styles'
 
 export const InputRow = styled.div`
   display: flex;

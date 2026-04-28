@@ -1,10 +1,7 @@
 import { useWallet } from '../../context/useWallet'
 import strings from '../../locales/en.json'
+import { truncateAddress } from '../../utils/wallet'
 import { StatusWrapper, StatusDot, StatusText } from './WalletStatus.styles'
-
-function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
-}
 
 export function WalletStatus() {
   const { isConnected, address } = useWallet()

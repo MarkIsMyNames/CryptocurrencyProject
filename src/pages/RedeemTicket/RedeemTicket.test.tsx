@@ -5,11 +5,10 @@ import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { RedeemTicket } from './RedeemTicket'
 
-const mockRedeemTicket = vi.fn()
+const mockRedeemTicket = vi.hoisted(() => vi.fn())
 
 vi.mock('../../utils/contract', () => ({
-  redeemTicket: (...args: unknown[]) => mockRedeemTicket(...args) as unknown,
-  balanceOf: vi.fn().mockResolvedValue(BigInt(1)),
+  redeemTicket: mockRedeemTicket,
   decodeContractError: vi.fn().mockReturnValue(en.redeem.noTicketError),
 }))
 
@@ -19,6 +18,7 @@ vi.mock('../../context/useWallet', () => ({
     provider: {},
     address: '0xabc123',
     isConnected: true,
+    etkBalance: BigInt(1),
     refreshBalances: vi.fn(),
   }),
 }))
