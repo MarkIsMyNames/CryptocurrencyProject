@@ -1,4 +1,9 @@
-import { Contract, type ContractTransactionResponse, type JsonRpcSigner, type BrowserProvider } from 'ethers'
+import {
+  Contract,
+  type ContractTransactionResponse,
+  type JsonRpcSigner,
+  type BrowserProvider,
+} from 'ethers'
 import { config } from '../config'
 import strings from '../locales/en.json'
 
