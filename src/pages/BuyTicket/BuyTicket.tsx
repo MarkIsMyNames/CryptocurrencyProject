@@ -53,12 +53,8 @@ export function BuyTicket() {
       setStatusMessage(strings.buyTicket.success)
       await refreshBalances()
     } catch (err) {
-      const key = decodeContractError(err)
-      const buyTicketStrings: Partial<Record<string, string>> = strings.buyTicket
-      const errorsStrings: Partial<Record<string, string>> = strings.errors
-      const message = buyTicketStrings[key] ?? errorsStrings[key] ?? strings.errors.unknownError
       setStatus('error')
-      setStatusMessage(message)
+      setStatusMessage(decodeContractError(err))
     }
   }
 

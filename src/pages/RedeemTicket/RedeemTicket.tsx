@@ -47,12 +47,8 @@ export function RedeemTicket() {
       setTicketBalance(0n)
       await refreshBalances()
     } catch (err) {
-      const key = decodeContractError(err)
-      const redeemStrings: Partial<Record<string, string>> = strings.redeem
-      const errorsStrings: Partial<Record<string, string>> = strings.errors
-      const message = redeemStrings[key] ?? errorsStrings[key] ?? strings.errors.unknownError
       setStatus('error')
-      setStatusMessage(message)
+      setStatusMessage(decodeContractError(err))
     }
   }
 

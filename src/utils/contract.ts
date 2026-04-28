@@ -1,5 +1,6 @@
 import { Contract, type JsonRpcSigner, type BrowserProvider } from 'ethers'
 import { config } from '../config'
+import strings from '../locales/en.json'
 
 export const EVENT_TICKET_ABI = [
   'function buyTicket() payable',
@@ -34,12 +35,12 @@ export function redeemTicket(signer: JsonRpcSigner): Promise<{ wait: () => Promi
 export function decodeContractError(error: unknown): string {
   if (error instanceof Error) {
     const msg = error.message
-    if (msg.includes('IncorrectPayment')) return 'incorrectAmount'
-    if (msg.includes('AlreadyOwnsTicket')) return 'alreadyOwned'
-    if (msg.includes('SoldOut')) return 'soldOut'
-    if (msg.includes('NoTicketToRedeem')) return 'noTicketError'
-    if (msg.includes('user rejected')) return 'cancelled'
-    if (msg.includes('network changed') || msg.includes('chain')) return 'wrongNetwork'
+    if (msg.includes('IncorrectPayment')) return strings.errors.incorrectAmount
+    if (msg.includes('AlreadyOwnsTicket')) return strings.errors.alreadyOwned
+    if (msg.includes('SoldOut')) return strings.errors.soldOut
+    if (msg.includes('NoTicketToRedeem')) return strings.errors.noTicket
+    if (msg.includes('user rejected')) return strings.errors.cancelled
+    if (msg.includes('network changed') || msg.includes('chain')) return strings.errors.wrongNetwork
   }
-  return 'unknownError'
+  return strings.errors.unknownError
 }
