@@ -6,14 +6,11 @@ import en from '../../locales/en.json'
 import { BuyTicket } from './BuyTicket'
 
 const mockBuyTicket = vi.fn()
-const mockGetContract = vi.fn(() => ({
-  buyTicket: mockBuyTicket,
-  remainingTickets: vi.fn().mockResolvedValue(BigInt(950)),
-  balanceOf: vi.fn().mockResolvedValue(BigInt(0)),
-}))
 
 vi.mock('../../utils/contract', () => ({
-  getContract: () => mockGetContract(),
+  buyTicket: (...args: unknown[]) => mockBuyTicket(...args),
+  remainingTickets: vi.fn().mockResolvedValue(BigInt(950)),
+  balanceOf: vi.fn().mockResolvedValue(BigInt(0)),
   decodeContractError: vi.fn().mockReturnValue('unknownError'),
 }))
 

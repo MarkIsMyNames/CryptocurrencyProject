@@ -39,3 +39,4 @@ storybook-static
 .worktrees
 test-results
 playwright-report
+.coverage

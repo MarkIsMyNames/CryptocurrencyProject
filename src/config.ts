@@ -7,7 +7,7 @@ export const routes = {
 } as const
 
 export const config = {
-  contractAddress: (import.meta.env.VITE_CONTRACT_ADDRESS as string | undefined) ?? '',
+  contractAddress: (import.meta.env?.VITE_CONTRACT_ADDRESS as string | undefined) ?? '',
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
   sepoliaRpcUrl: 'https://rpc.sepolia.org',
