@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useWallet } from '../../context/useWallet'
-import { balanceOf, redeemTicket as contractRedeemTicket, decodeContractError } from '../../utils/contract'
+import {
+  balanceOf,
+  redeemTicket as contractRedeemTicket,
+  decodeContractError,
+} from '../../utils/contract'
 import strings from '../../locales/en.json'
 import {
   PageWrapper,

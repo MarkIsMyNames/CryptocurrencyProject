@@ -46,6 +46,6 @@ test.describe('Wallet Creation', () => {
   test('shows mnemonic after wallet generation', async ({ page }) => {
     await page.goto(routes.createWallet)
     await page.getByText(en.createWallet.generateBtn).click()
-    await expect(page.getByText(en.createWallet.mnemonicLabel)).toBeVisible()
+    await expect(page.getByText(en.createWallet.mnemonicLabel, { exact: true })).toBeVisible()
   })
 })

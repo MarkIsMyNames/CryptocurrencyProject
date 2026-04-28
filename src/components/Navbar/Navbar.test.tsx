@@ -38,9 +38,18 @@ describe('Navbar', () => {
 
   it('nav links point to correct routes', () => {
     renderNavbar()
-    expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute('href', routes.createWallet)
-    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute('href', routes.balance)
-    expect(screen.getByRole('link', { name: en.nav.buyTicket })).toHaveAttribute('href', routes.buyTicket)
+    expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute(
+      'href',
+      routes.createWallet,
+    )
+    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute(
+      'href',
+      routes.balance,
+    )
+    expect(screen.getByRole('link', { name: en.nav.buyTicket })).toHaveAttribute(
+      'href',
+      routes.buyTicket,
+    )
     expect(screen.getByRole('link', { name: en.nav.redeem })).toHaveAttribute('href', routes.redeem)
   })
 })

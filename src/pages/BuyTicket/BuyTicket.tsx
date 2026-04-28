@@ -1,7 +1,12 @@
 import { useState, useEffect } from 'react'
 import { parseEther } from 'ethers'
 import { useWallet } from '../../context/useWallet'
-import { balanceOf, remainingTickets, buyTicket as contractBuyTicket, decodeContractError } from '../../utils/contract'
+import {
+  balanceOf,
+  remainingTickets,
+  buyTicket as contractBuyTicket,
+  decodeContractError,
+} from '../../utils/contract'
 import { config } from '../../config'
 import strings from '../../locales/en.json'
 import {

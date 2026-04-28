@@ -8,7 +8,7 @@ import { RedeemTicket } from './RedeemTicket'
 const mockRedeemTicket = vi.fn()
 
 vi.mock('../../utils/contract', () => ({
-  redeemTicket: (...args: unknown[]) => mockRedeemTicket(...args),
+  redeemTicket: (...args: unknown[]) => mockRedeemTicket(...args) as unknown,
   balanceOf: vi.fn().mockResolvedValue(BigInt(1)),
   decodeContractError: vi.fn().mockReturnValue(en.redeem.noTicketError),
 }))

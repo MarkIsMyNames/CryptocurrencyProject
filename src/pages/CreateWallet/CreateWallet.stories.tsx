@@ -35,4 +35,3 @@ export const Default: Story = {}
 export const Connecting: Story = {
   args: { isConnecting: true },
 }
-

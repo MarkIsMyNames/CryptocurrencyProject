@@ -8,7 +8,7 @@ import { BuyTicket } from './BuyTicket'
 const mockBuyTicket = vi.fn()
 
 vi.mock('../../utils/contract', () => ({
-  buyTicket: (...args: unknown[]) => mockBuyTicket(...args),
+  buyTicket: (...args: unknown[]) => mockBuyTicket(...args) as unknown,
   remainingTickets: vi.fn().mockResolvedValue(BigInt(950)),
   balanceOf: vi.fn().mockResolvedValue(BigInt(0)),
   decodeContractError: vi.fn().mockReturnValue('unknownError'),

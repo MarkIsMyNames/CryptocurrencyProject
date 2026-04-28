@@ -40,4 +40,3 @@ export const ButtonHover: Story = {
   args: { isConnected: true, address: '0xabc123def456', signer: {} as never },
   parameters: { pseudo: { hover: 'button' } },
 }
-
