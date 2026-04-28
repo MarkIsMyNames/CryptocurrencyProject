@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import en from '../src/locales/en.json'
+import en from '../src/locales/en.json' with { type: 'json' }
 import { routes } from '../src/config'
 
 test.describe('Navbar', () => {
