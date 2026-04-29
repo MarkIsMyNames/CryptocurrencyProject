@@ -36,6 +36,24 @@ describe('Navbar', () => {
     expect(container.querySelector('nav')).toBeInTheDocument()
   })
 
+  it('active link has aria-current=page', () => {
+    render(
+      <MemoryRouter initialEntries={[routes.balance]}>
+        <ThemeProvider theme={theme}>
+          <Navbar />
+        </ThemeProvider>
+      </MemoryRouter>,
+    )
+    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(screen.getByRole('link', { name: en.nav.createWallet })).not.toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+  })
+
   it('nav links point to correct routes', () => {
     renderNavbar()
     expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute(

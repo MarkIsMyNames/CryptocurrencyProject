@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/react'
 import { MemoryRouter } from 'react-router-dom'
 import { ThemeProvider } from 'styled-components'
 import { theme } from '../src/theme'
+import { Status } from '../src/config'
 
 export default {
   decorators: [
@@ -15,7 +16,7 @@ export default {
   ],
   parameters: {
     a11y: {
-      test: 'error',
+      test: Status.error,
       config: {
         rules: [{ id: 'color-contrast', reviewOnFail: false }],
       },

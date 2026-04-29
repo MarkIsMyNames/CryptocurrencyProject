@@ -5,6 +5,9 @@ import { BrowserRouter } from 'react-router-dom'
 import { theme } from './theme'
 import { WalletProvider } from './context/WalletContext'
 import App from './App'
+import strings from './locales/en.json'
+
+document.title = strings.brand
 
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element not found')

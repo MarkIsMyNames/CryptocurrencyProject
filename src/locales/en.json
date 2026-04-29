@@ -26,7 +26,32 @@
     "warning": "Save your recovery phrase and private key somewhere safe. They cannot be recovered if lost.",
     "connecting": "Connecting...",
     "metaMaskNotFound": "MetaMask not detected. Please install the MetaMask browser extension.",
-    "metaMaskSuccess": "MetaMask connected successfully."
+    "metaMaskSuccess": "MetaMask connected successfully.",
+    "steps": {
+      "password": "Set Password",
+      "phrase": "Recovery Phrase",
+      "verify": "Verify Phrase",
+      "complete": "Wallet Ready"
+    },
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "confirmLabel": "Confirm Password",
+    "confirmPlaceholder": "Repeat your password",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordMismatch": "Passwords do not match",
+    "phraseInstruction": "Write down these 12 words in order and store them safely. They cannot be recovered if lost.",
+    "phraseAcknowledge": "I have written down my recovery phrase",
+    "verifyInstruction": "Enter the words at the positions shown to confirm you have saved your recovery phrase.",
+    "wordPosition": "Word #{{n}}",
+    "wordPlaceholder": "Enter word",
+    "wrongWords": "One or more words are incorrect. Please check your recovery phrase.",
+    "walletCreated": "Wallet created and connected successfully.",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "nextBtn": "Next",
+    "backBtn": "Back",
+    "verifyBtn": "Verify & Connect",
+    "goToBalance": "View My Wallet"
   },
   "balance": {
     "title": "Wallet Balance",

@@ -1,8 +1,46 @@
 import styled from 'styled-components'
+import { Status } from '../config'
+
+export type StatusType = (typeof Status)[keyof typeof Status] | null
 
 interface StatusMessageProps {
-  $type: 'success' | 'error' | 'pending'
+  $type: (typeof Status)[keyof typeof Status]
 }
+
+export const Title = styled.h1`
+  font-size: ${({ theme }) => theme.fontSizes.xxl};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`
+
+export const Subtitle = styled.p`
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  color: ${({ theme }) => theme.colors.textSecondary};
+  margin-bottom: ${({ theme }) => theme.spacing.xl};
+`
+
+export const PrimaryActionButton = styled.button`
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  background: ${({ theme }) => theme.colors.brandPrimary};
+  color: ${({ theme }) => theme.colors.textPrimary};
+  border: none;
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: ${({ theme }) => theme.fontSizes.md};
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => theme.colors.brandPrimaryHover};
+  }
+
+  &:disabled {
+    background: ${({ theme }) => theme.colors.brandPrimaryDisabled};
+    color: ${({ theme }) => theme.colors.textDisabled};
+    cursor: not-allowed;
+  }
+`
 
 export const StatusMessage = styled.p<StatusMessageProps>`
   margin-top: ${({ theme }) => theme.spacing.md};
@@ -11,19 +49,19 @@ export const StatusMessage = styled.p<StatusMessageProps>`
   font-size: ${({ theme }) => theme.fontSizes.sm};
   text-align: center;
   color: ${({ theme, $type }) => {
-    if ($type === 'success') return theme.colors.statusSuccess
-    if ($type === 'error') return theme.colors.statusError
+    if ($type === Status.success) return theme.colors.statusSuccess
+    if ($type === Status.error) return theme.colors.statusError
     return theme.colors.statusPending
   }};
   background: ${({ theme, $type }) => {
-    if ($type === 'success') return theme.colors.statusSuccessSubtle
-    if ($type === 'error') return theme.colors.statusErrorSubtle
+    if ($type === Status.success) return theme.colors.statusSuccessSubtle
+    if ($type === Status.error) return theme.colors.statusErrorSubtle
     return theme.colors.backgroundCard
   }};
   border: 1px solid
     ${({ theme, $type }) => {
-      if ($type === 'success') return theme.colors.statusSuccess
-      if ($type === 'error') return theme.colors.statusError
+      if ($type === Status.success) return theme.colors.statusSuccess
+      if ($type === Status.error) return theme.colors.statusError
       return theme.colors.statusPending
     }};
 `

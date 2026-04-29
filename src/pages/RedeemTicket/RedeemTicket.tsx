@@ -1,11 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useWallet } from '../../context/useWallet'
-import {
-  balanceOf,
-  redeemTicket as contractRedeemTicket,
-  decodeContractError,
-} from '../../utils/contract'
+import { redeemTicket, decodeContractError } from '../../utils/contract'
+import { Status } from '../../config'
 import strings from '../../locales/en.json'
+import { type StatusType } from '../../styles/shared.styles'
 import {
   PageWrapper,
   Title,
@@ -14,44 +12,33 @@ import {
   FieldLabel,
   FieldValue,
   TicketStatusBadge,
-  RedeemButton,
+  PrimaryActionButton,
   StatusMessage,
   ConnectPrompt,
 } from './RedeemTicket.styles'
 
-type StatusType = 'success' | 'error' | 'pending' | null
-
 export function RedeemTicket() {
-  const { signer, provider, address, isConnected, refreshBalances } = useWallet()
-  const [ticketBalance, setTicketBalance] = useState<bigint | null>(null)
+  const { signer, address, isConnected, etkBalance, refreshBalances } = useWallet()
   const [status, setStatus] = useState<StatusType>(null)
   const [statusMessage, setStatusMessage] = useState('')
 
-  useEffect(() => {
-    if (!provider || !address) return
-    void balanceOf(provider, address).then((bal) => {
-      setTicketBalance(bal)
-    })
-  }, [provider, address])
-
-  const hasTicket = ticketBalance !== null && ticketBalance > 0n
-  const isPending = status === 'pending'
-  const isSuccess = status === 'success'
+  const hasTicket = etkBalance !== null && etkBalance > 0n
+  const isPending = status === Status.pending
+  const isSuccess = status === Status.success
   const isDisabled = isPending || !hasTicket || isSuccess
 
   async function handleRedeem() {
     if (!signer) return
-    setStatus('pending')
+    setStatus(Status.pending)
     setStatusMessage(strings.redeem.pending)
     try {
-      const tx = await contractRedeemTicket(signer)
+      const tx = await redeemTicket(signer)
       await tx.wait()
-      setStatus('success')
+      setStatus(Status.success)
       setStatusMessage(strings.redeem.success)
-      setTicketBalance(0n)
       await refreshBalances()
     } catch (err) {
-      setStatus('error')
+      setStatus(Status.error)
       setStatusMessage(decodeContractError(err))
     }
   }
@@ -72,14 +59,14 @@ export function RedeemTicket() {
               {hasTicket ? strings.redeem.hasTicket : strings.redeem.noTicket}
             </TicketStatusBadge>
           </TicketCard>
-          <RedeemButton
+          <PrimaryActionButton
             onClick={() => {
               void handleRedeem()
             }}
             disabled={isDisabled}
           >
             {strings.redeem.redeemBtn}
-          </RedeemButton>
+          </PrimaryActionButton>
           {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
         </>
       ) : (

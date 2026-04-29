@@ -15,6 +15,12 @@ export const AppHeader = styled.header`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: ${({ theme }) => theme.colors.backgroundCard};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.borderDefault};
 `
 
 export const WalletStatusWrapper = styled.div`

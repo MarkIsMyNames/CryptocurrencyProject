@@ -5,9 +5,8 @@ export const Nav = styled.nav`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 1;
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.xl};
-  background-color: ${({ theme }) => theme.colors.backgroundCard};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.borderDefault};
 `
 
 export const NavBrand = styled.span`

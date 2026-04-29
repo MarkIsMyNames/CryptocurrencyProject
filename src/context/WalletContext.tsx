@@ -1,12 +1,12 @@
 import { useState, useCallback, type ReactNode } from 'react'
-import { BrowserProvider } from 'ethers'
+import { BrowserProvider, JsonRpcProvider, Wallet } from 'ethers'
 import { config } from '../config'
 import strings from '../locales/en.json'
-import { balanceOf } from '../utils/contract'
+import { balanceOf, decodeContractError } from '../utils/contract'
 import { WalletContext, type WalletContextValue } from './walletContext'
 
 interface WalletState {
-  provider: WalletContextValue['provider']
+  provider: BrowserProvider | JsonRpcProvider | null
   signer: WalletContextValue['signer']
   address: string | null
   ethBalance: bigint | null
@@ -49,7 +49,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const address = await signer.getAddress()
       const [ethBalance, etkBalance] = await Promise.all([
         provider.getBalance(address),
-        balanceOf(signer, address),
+        config.contractAddress ? balanceOf(signer, address) : Promise.resolve(0n),
       ])
       setState({
         provider,
@@ -61,9 +61,41 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isConnecting: false,
         error: null,
       })
-    } catch {
-      setState((prev) => ({ ...prev, isConnecting: false, error: strings.errors.unknownError }))
+    } catch (err) {
+      setState((prev) => ({ ...prev, isConnecting: false, error: decodeContractError(err) }))
     }
+  }, [])
+
+  const connectWithWallet = useCallback(async (privateKey: string): Promise<boolean> => {
+    setState((prev) => ({ ...prev, isConnecting: true, error: null }))
+    let connected = false
+    try {
+      const provider = new JsonRpcProvider(config.sepoliaRpcUrl)
+      const signer = new Wallet(privateKey, provider)
+      const address = signer.address
+      setState({
+        provider,
+        signer,
+        address,
+        ethBalance: null,
+        etkBalance: null,
+        isConnected: true,
+        isConnecting: false,
+        error: null,
+      })
+      connected = true
+      // Best-effort balance fetch — RPC may be unreachable on first connect
+      const [ethBalance, etkBalance] = await Promise.all([
+        provider.getBalance(address),
+        config.contractAddress ? balanceOf(signer, address) : Promise.resolve(0n),
+      ])
+      setState((prev) => ({ ...prev, ethBalance, etkBalance }))
+    } catch {
+      if (!connected) {
+        setState((prev) => ({ ...prev, isConnecting: false, error: strings.errors.unknownError }))
+      }
+    }
+    return connected
   }, [])
 
   const disconnect = useCallback(() => {
@@ -83,13 +115,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     if (!state.provider || !state.address) return
     const [ethBalance, etkBalance] = await Promise.all([
       state.provider.getBalance(state.address),
-      balanceOf(state.provider, state.address),
+      config.contractAddress ? balanceOf(state.provider, state.address) : Promise.resolve(0n),
     ])
     setState((prev) => ({ ...prev, ethBalance, etkBalance }))
   }, [state.provider, state.address])
 
   return (
-    <WalletContext.Provider value={{ ...state, connect, disconnect, refreshBalances }}>
+    <WalletContext.Provider
+      value={{ ...state, connect, connectWithWallet, disconnect, refreshBalances }}
+    >
       {children}
     </WalletContext.Provider>
   )
