@@ -1442,3 +1442,72 @@ The original flow generated a wallet and immediately showed all details with no 
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** ea6b1bd
+
+## [2026-04-29] #065 — Fix: Balance page crashes with generic error when contract address is not configured
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/Balance/Balance.tsx
+
+**Prompt (Step 1):**
+"The check balance page always shows 'An unexpected error occurred. Please try again.' — diagnose the root cause and fix it. Update the AI log with a properly described prompt entry."
+
+**Review critique (Step 2):**
+- `Balance.tsx` called `balanceOf(provider, inputAddress)` and `remainingTickets(provider)` unconditionally, even when `config.contractAddress` is an empty string (no `.env` file present).
+- `ethers` `Contract` constructor throws when passed an empty string as the address, which was silently caught and mapped to `strings.errors.unknownError`.
+- `WalletContext.tsx` already applied the correct guard (`config.contractAddress ? balanceOf(...) : Promise.resolve(0n)`) but `Balance.tsx` did not.
+
+**Resolution (Step 3):**
+- Added the same `config.contractAddress` guard to both `balanceOf` and `remainingTickets` calls in `Balance.tsx`, falling back to `0n` when no contract address is configured. This matches the pattern already used in `WalletContext.tsx` and allows the SETH balance lookup to succeed independently of the contract.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 059476e
+
+## [2026-04-29] #066 — Test: Expand Balance page test coverage to catch the no-contract-address regression
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/Balance/Balance.test.tsx, e2e/balance.spec.ts
+
+**Prompt (Step 1):**
+"The tests should have caught the balance page crash and the Playwright tests too — update them so they have almost complete coverage and would catch issues like this in future."
+
+**Review critique (Step 2):**
+- The existing unit tests mocked `config` with a non-empty contract address but never tested the empty-address path that caused the real bug.
+- Two tests (`shows valid ticket badge when ETK > 0`, `shows remaining supply after checking`) were already failing because the `config` mock wasn't applied, so `balanceOf`/`remainingTickets` mocks were bypassed by the empty-address guard added in #065.
+- No test covered the `provider === null` path (connect wallet error).
+- No test covered loading state (button disabled, shows `...`).
+- No test verified that the connected address pre-fills the input.
+- No test verified error clearing on a subsequent successful check.
+- No test verified individual error paths for `balanceOf` and `remainingTickets` failing independently.
+- Playwright only had 4 tests — all validation/structure, none covering navigation, result card absence, or the no-provider error path.
+
+**Resolution (Step 3):**
+- Refactored `Balance.test.tsx` to use a mutable `mockConfig` object (via `vi.hoisted`) and a mutable `mockWallet` object, both reset in `beforeEach` with `vi.clearAllMocks()`, enabling per-test overrides without `vi.doMock`.
+- Added 10 new unit tests: loading state, ETK count display, result card labels, error clearing, `balanceOf` reject, `remainingTickets` reject, no-provider path, and the empty-contract-address regression path (verifies mocks not called and `ticketNone` badge shown).
+- Expanded `balance.spec.ts` to 10 Playwright tests across 5 describe blocks: page structure (3), validation (4), no-wallet (1), result card absence (1), navbar navigation (1).
+- All 18 unit tests and 10 Playwright tests pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 82ff8d2
+
+## [2026-04-29] #067 — Docs: Rewrite README with full setup and usage instructions
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** README.md
+
+**Prompt (Step 1):**
+"Update the README with specific instructions on how to set up and use the project."
+
+**Review critique (Step 2):**
+- The original README had the right sections but was too thin to actually follow: MetaMask setup had no constructor argument values, the contract deployment section said "see Remix IDE" with no steps, there was no explanation of what each page does or the expected user flow, and the project structure was a pointer to a spec doc rather than an inline tree.
+- No mention of how to install the OpenZeppelin dependency inside Remix, which is a required step that is not obvious.
+- Constructor arguments (`_maxSupply`, `_ticketPrice`) were undocumented; a new developer would not know what values to pass.
+
+**Resolution (Step 3):**
+- Rewrote README into 8 numbered sections: Prerequisites, MetaMask Setup, Deploy the Smart Contract, Project Setup, Running the App, Development Commands, Testing, Project Structure, Smart Contract Reference.
+- Added step-by-step Remix IDE deployment instructions including OpenZeppelin install, compiler version, constructor argument values (1000 and 10000000000000000 wei), and where to copy the deployed address from.
+- Added a page reference table and typical user flow walkthrough.
+- Inlined the project directory tree instead of pointing to a spec doc.
+- Added a smart contract reference table (token name, symbol, decimals, price, max supply, base contracts).
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 50b74cb
