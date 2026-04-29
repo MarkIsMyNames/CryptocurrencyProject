@@ -45,3 +45,8 @@ export const MetaMaskError: Story = {
 export const MetaMaskConnected: Story = {
   args: { isConnected: true },
 }
+
+export const ButtonHover: Story = {
+  parameters: { pseudo: { hover: true } },
+}
+

@@ -64,3 +64,14 @@ export const WithError: Story = {
     error: strings.createWallet.metaMaskNotFound,
   },
 }
+
+export const ConnectedHover: Story = {
+  args: {
+    isConnected: true,
+    address: '0x1234567890abcdef1234567890abcdef12345678',
+    ethBalance: BigInt('1000000000000000000'),
+    etkBalance: BigInt(1),
+  },
+  parameters: { pseudo: { hover: true } },
+}
+

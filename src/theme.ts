@@ -10,7 +10,7 @@ export const theme = {
     brandPrimaryDisabled: '#312e81',
 
     statusSuccess: '#22c55e',
-    statusSuccessSubtle: '#14532d',
+    statusSuccessSubtle: '#0a2e18',
     statusError: '#ef4444',
     statusErrorSubtle: '#3b0000',
     statusWarning: '#f59e0b',

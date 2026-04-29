@@ -1,11 +1,12 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { ThemeProvider } from 'styled-components'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { BuyTicket } from './BuyTicket'
 
 const mockBuyTicket = vi.hoisted(() => vi.fn())
+const mockUseWallet = vi.hoisted(() => vi.fn())
 
 vi.mock('../../utils/contract', () => ({
   buyTicket: mockBuyTicket,
@@ -14,14 +15,27 @@ vi.mock('../../utils/contract', () => ({
 }))
 
 vi.mock('../../context/useWallet', () => ({
-  useWallet: () => ({
-    signer: {},
-    provider: {},
-    isConnected: true,
-    etkBalance: BigInt(0),
-    refreshBalances: vi.fn(),
-  }),
+  useWallet: mockUseWallet,
 }))
+
+const connectedWallet = {
+  signer: {},
+  provider: {},
+  address: '0xabc',
+  isConnected: true,
+  isConnecting: false,
+  ethBalance: null,
+  etkBalance: BigInt(0),
+  error: null,
+  connect: vi.fn(),
+  disconnect: vi.fn(),
+  connectWithWallet: vi.fn(),
+  refreshBalances: vi.fn(),
+}
+
+beforeEach(() => {
+  mockUseWallet.mockReturnValue(connectedWallet)
+})
 
 function renderPage() {
   return render(
@@ -36,6 +50,12 @@ describe('BuyTicket', () => {
     renderPage()
     expect(screen.getByText(en.buyTicket.buyBtn)).toBeInTheDocument()
     expect(screen.getByText(/0\.01 SETH/)).toBeInTheDocument()
+  })
+
+  it('shows connect prompt when wallet not connected', () => {
+    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, isConnected: false, signer: null, provider: null })
+    renderPage()
+    expect(screen.getByText(en.buyTicket.connectFirst)).toBeInTheDocument()
   })
 
   it('shows pending state during transaction', async () => {
@@ -58,17 +78,19 @@ describe('BuyTicket', () => {
     })
   })
 
-  it('shows connect prompt when wallet not connected', () => {
-    vi.doMock('../../context/WalletContext', () => ({
-      useWallet: () => ({
-        signer: null,
-        provider: null,
-        address: null,
-        isConnected: false,
-        refreshBalances: vi.fn(),
-      }),
-    }))
+  it('shows error message on failed purchase', async () => {
+    mockBuyTicket.mockRejectedValue(new Error('tx failed'))
     renderPage()
-    expect(screen.getByText(en.buyTicket.buyBtn)).toBeInTheDocument()
+    await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
+    fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
+    await waitFor(() => {
+      expect(screen.getByText('unknownError')).toBeInTheDocument()
+    })
+  })
+
+  it('disables buy button when already owns a ticket', () => {
+    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(1) })
+    renderPage()
+    expect(screen.getByText(en.buyTicket.buyBtn)).toBeDisabled()
   })
 })
