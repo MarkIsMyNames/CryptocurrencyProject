@@ -75,6 +75,6 @@ export const TxHash = styled.p`
 
 export const TxLink = styled.a`
   font-size: ${({ theme }) => theme.fontSizes.sm};
-  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.textLink};
   text-decoration: underline;
 `

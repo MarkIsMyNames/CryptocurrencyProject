@@ -26,11 +26,7 @@ export function TxReceipt({ hash }: { hash: string }) {
     <TxCard>
       <TxLabel>{strings.redeem.txHashLabel}</TxLabel>
       <TxHash>{hash}</TxHash>
-      <TxLink
-        href={`https://sepolia.etherscan.io/tx/${hash}`}
-        target="_blank"
-        rel="noreferrer"
-      >
+      <TxLink href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noreferrer">
         {strings.redeem.viewOnEtherscan}
       </TxLink>
     </TxCard>
