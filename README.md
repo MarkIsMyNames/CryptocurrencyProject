@@ -14,13 +14,15 @@ with SETH and burned on venue entry.
 1. Install MetaMask from https://metamask.io
 2. Create or import a wallet
 3. Add the Sepolia testnet:
+   - Click the network dropdown → "Add a custom network"
    - Network name: Sepolia
-   - RPC URL: https://rpc.sepolia.org
+   - RPC URL: https://ethereum-sepolia-rpc.publicnode.com
    - Chain ID: 11155111
    - Currency: ETH
-4. Get test SETH from a faucet:
-   - https://sepoliafaucet.com
-   - https://faucet.quicknode.com/ethereum/sepolia
+4. Get test SETH from a faucet (no initial ETH required):
+   - https://cloud.google.com/application/web3/faucet/ethereum/sepolia (Google account)
+   - https://www.alchemy.com/faucets/ethereum-sepolia (free Alchemy account)
+   - https://sepolia-faucet.pk910.de (no account — mines in browser)
 
 ## Installation
 
