@@ -15,13 +15,34 @@ import {
   PrimaryActionButton,
   StatusMessage,
   ConnectPrompt,
+  TxCard,
+  TxLabel,
+  TxHash,
+  TxLink,
 } from './BuyTicket.styles'
+
+export function TxReceipt({ hash }: { hash: string }) {
+  return (
+    <TxCard>
+      <TxLabel>{strings.buyTicket.txHashLabel}</TxLabel>
+      <TxHash>{hash}</TxHash>
+      <TxLink
+        href={`https://sepolia.etherscan.io/tx/${hash}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {strings.buyTicket.viewOnEtherscan}
+      </TxLink>
+    </TxCard>
+  )
+}
 
 export function BuyTicket() {
   const { signer, provider, isConnected, etkBalance, refreshBalances } = useWallet()
   const [remaining, setRemaining] = useState<bigint | null>(null)
   const [status, setStatus] = useState<StatusType>(null)
   const [statusMessage, setStatusMessage] = useState('')
+  const [txHash, setTxHash] = useState<string | null>(null)
 
   useEffect(() => {
     if (!provider) return
@@ -40,6 +61,7 @@ export function BuyTicket() {
     setStatusMessage(strings.buyTicket.pending)
     try {
       const tx = await buyTicket(signer, BigInt(config.ticketPriceWei))
+      setTxHash(tx.hash)
       await tx.wait()
       setStatus(Status.success)
       setStatusMessage(strings.buyTicket.success)
@@ -83,6 +105,7 @@ export function BuyTicket() {
         <ConnectPrompt>{strings.buyTicket.connectFirst}</ConnectPrompt>
       )}
       {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
+      {txHash !== null && <TxReceipt hash={txHash} />}
     </PageWrapper>
   )
 }
