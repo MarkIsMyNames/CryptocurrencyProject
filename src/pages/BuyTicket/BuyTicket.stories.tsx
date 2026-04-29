@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { WalletContext, type WalletContextValue } from '../../context/walletContext'
-import { BuyTicket, TxReceipt } from './BuyTicket'
+import { BuyTicket } from './BuyTicket'
+import { TxReceipt } from '../../components/TxReceipt/TxReceipt'
 
 const base: WalletContextValue = {
   isConnected: false,

@@ -4,6 +4,7 @@ import { remainingTickets, buyTicket, decodeContractError } from '../../utils/co
 import { config, Status } from '../../config'
 import strings from '../../locales/en.json'
 import { type StatusType } from '../../styles/shared.styles'
+import { TxReceipt } from '../../components/TxReceipt/TxReceipt'
 import {
   PageWrapper,
   Title,
@@ -15,23 +16,7 @@ import {
   PrimaryActionButton,
   StatusMessage,
   ConnectPrompt,
-  TxCard,
-  TxLabel,
-  TxHash,
-  TxLink,
 } from './BuyTicket.styles'
-
-export function TxReceipt({ hash }: { hash: string }) {
-  return (
-    <TxCard>
-      <TxLabel>{strings.buyTicket.txHashLabel}</TxLabel>
-      <TxHash>{hash}</TxHash>
-      <TxLink href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noreferrer">
-        {strings.buyTicket.viewOnEtherscan}
-      </TxLink>
-    </TxCard>
-  )
-}
 
 export function BuyTicket() {
   const { signer, provider, isConnected, etkBalance, refreshBalances } = useWallet()
