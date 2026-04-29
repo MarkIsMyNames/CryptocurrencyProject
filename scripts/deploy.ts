@@ -1,6 +1,7 @@
+import '@nomicfoundation/hardhat-ethers'
 import { network } from 'hardhat'
-import { writeFileSync, readFileSync } from 'fs'
-import { join } from 'path'
+import { writeFileSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 
 const MAX_SUPPLY = 1000
 const TICKET_PRICE_WEI = 10_000_000_000_000_000n // 0.01 ETH
