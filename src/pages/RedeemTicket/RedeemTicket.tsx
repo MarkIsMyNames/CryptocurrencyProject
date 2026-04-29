@@ -15,12 +15,33 @@ import {
   PrimaryActionButton,
   StatusMessage,
   ConnectPrompt,
+  TxCard,
+  TxLabel,
+  TxHash,
+  TxLink,
 } from './RedeemTicket.styles'
+
+export function TxReceipt({ hash }: { hash: string }) {
+  return (
+    <TxCard>
+      <TxLabel>{strings.redeem.txHashLabel}</TxLabel>
+      <TxHash>{hash}</TxHash>
+      <TxLink
+        href={`https://sepolia.etherscan.io/tx/${hash}`}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {strings.redeem.viewOnEtherscan}
+      </TxLink>
+    </TxCard>
+  )
+}
 
 export function RedeemTicket() {
   const { signer, address, isConnected, etkBalance, refreshBalances } = useWallet()
   const [status, setStatus] = useState<StatusType>(null)
   const [statusMessage, setStatusMessage] = useState('')
+  const [txHash, setTxHash] = useState<string | null>(null)
 
   const hasTicket = etkBalance !== null && etkBalance > 0n
   const isPending = status === Status.pending
@@ -33,6 +54,7 @@ export function RedeemTicket() {
     setStatusMessage(strings.redeem.pending)
     try {
       const tx = await redeemTicket(signer)
+      setTxHash(tx.hash)
       await tx.wait()
       setStatus(Status.success)
       setStatusMessage(strings.redeem.success)
@@ -68,6 +90,7 @@ export function RedeemTicket() {
             {strings.redeem.redeemBtn}
           </PrimaryActionButton>
           {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
+          {txHash !== null && <TxReceipt hash={txHash} />}
         </>
       ) : (
         <ConnectPrompt>{strings.redeem.connectFirst}</ConnectPrompt>

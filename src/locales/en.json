@@ -74,6 +74,8 @@
     "buyBtn": "Buy Ticket",
     "pending": "Transaction pending...",
     "success": "Ticket purchased successfully!",
+    "txHashLabel": "Transaction ID",
+    "viewOnEtherscan": "View on Etherscan",
     "alreadyOwned": "You already own a ticket.",
     "soldOut": "Sorry, this event is sold out.",
     "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
@@ -93,7 +95,9 @@
     "success": "Entry confirmed. Enjoy the event!",
     "noTicketError": "No ticket found in this wallet.",
     "cancelled": "Transaction cancelled.",
-    "connectFirst": "Please connect your wallet to redeem."
+    "connectFirst": "Please connect your wallet to redeem.",
+    "txHashLabel": "Transaction ID",
+    "viewOnEtherscan": "View on Etherscan"
   },
   "errors": {
     "connectWallet": "Please connect your wallet first.",
