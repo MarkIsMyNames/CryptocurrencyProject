@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,json}\" \".storybook/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx,json}\" \".storybook/**/*.{ts,tsx}\"",
     "preview": "vite preview",
+    "deploy": "hardhat run scripts/deploy.ts --network sepolia",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
@@ -26,6 +27,7 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^5.1.2",
     "@eslint/js": "^9.0.0",
+    "@nomicfoundation/hardhat-ethers": "^4.0.9",
     "@playwright/test": "^1.59.1",
     "@storybook/addon-a11y": "^10.3.5",
     "@storybook/addon-docs": "^10.3.5",
@@ -43,6 +45,7 @@
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/browser-playwright": "^4.1.5",
     "@vitest/coverage-v8": "^4.1.5",
+    "dotenv": "^17.4.2",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -51,6 +54,7 @@
     "eslint-plugin-react-refresh": "^0.5.2",
     "eslint-plugin-storybook": "^10.3.5",
     "globals": "^17.5.0",
+    "hardhat": "^3.4.2",
     "jsdom": "^29.0.2",
     "playwright": "^1.59.1",
     "prettier": "^3.8.3",
