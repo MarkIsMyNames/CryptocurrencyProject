@@ -43,6 +43,34 @@ Edit `.env`:
 VITE_CONTRACT_ADDRESS=0xYourContractAddressHere
 ```
 
+## Deploying the Contract
+
+The app requires `EventTicket.sol` to be deployed on Sepolia before wallet connection will work.
+
+1. Export your MetaMask private key: MetaMask → Account Details → Show Private Key
+2. Add the following to your `.env`:
+
+```
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+DEPLOY_PRIVATE_KEY=0xYourPrivateKeyHere
+```
+
+3. Run:
+
+```bash
+npm run deploy
+```
+
+This compiles the contract, deploys it to Sepolia from your wallet, and automatically updates `VITE_CONTRACT_ADDRESS` in your `.env`.
+
+4. Restart the dev server so Vite picks up the new address:
+
+```bash
+npm run dev
+```
+
+> **Note:** The wallet must have SETH to cover gas fees before deploying. If you haven't already, get test SETH from a faucet (see MetaMask Setup above) and send it to your deploying address before running this command.
+
 ## Running the App
 
 ```bash
