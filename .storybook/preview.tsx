@@ -5,7 +5,8 @@ import { addons } from 'storybook/preview-api'
 import { STORY_RENDERED } from 'storybook/internal/core-events'
 import { theme } from '../src/theme'
 import { Status } from '../src/config'
-import { StoryRenderedEmitter, applyPseudoStateClasses } from './StoryRenderedEmitter'
+import { StoryRenderedEmitter } from './StoryRenderedEmitter'
+import { applyPseudoStateClasses } from './applyPseudoStateClasses'
 
 export default {
   decorators: [
