@@ -71,6 +71,14 @@ npm run dev
 
 > **Note:** The wallet must have SETH to cover gas fees before deploying. If you haven't already, get test SETH from a faucet (see MetaMask Setup above) and send it to your deploying address before running this command.
 
+## Viewing Transactions
+
+After buying a ticket the app displays the transaction ID and a link to view it on Etherscan. You can also look up any transaction manually:
+
+1. Go to https://sepolia.etherscan.io
+2. Paste the transaction ID (starting with `0x`) into the search bar
+3. You will see the transaction status, gas used, block confirmation, and the ETK token transfer
+
 ## Running the App
 
 ```bash
@@ -106,11 +114,6 @@ npm run format:check
 - **Network:** Ethereum Sepolia Testnet
 - **Contract Address:** See `.env` / deployment docs
 - **Deployed via:** Remix IDE (https://remix.ethereum.org)
-
-## Project Structure
-
-See `docs/superpowers/specs/2026-04-27-eventticket-dapp-design.md` for full
-architecture documentation.
 
 ## AI Declaration
 
