@@ -21,7 +21,7 @@ export const theme = {
     textDisabled: '#475569',
     textInverse: '#0f1117',
     textLink: '#818cf8',
-    textLinkHover: '#4f46e5',
+    textLinkHover: '#a5b4fc',
 
     borderDefault: '#2e3250',
     borderFocus: '#4f46e5',
