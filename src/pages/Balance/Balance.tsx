@@ -46,8 +46,8 @@ export function Balance() {
     try {
       const [rawEth, etk, remaining] = await Promise.all([
         provider.getBalance(inputAddress),
-        balanceOf(provider, inputAddress),
-        remainingTickets(provider),
+        config.contractAddress ? balanceOf(provider, inputAddress) : Promise.resolve(0n),
+        config.contractAddress ? remainingTickets(provider) : Promise.resolve(0n),
       ])
       setResult({
         seth: formatEther(rawEth),
