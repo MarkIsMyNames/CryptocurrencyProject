@@ -79,14 +79,6 @@ After buying a ticket the app displays the transaction ID and a link to view it 
 2. Paste the transaction ID (starting with `0x`) into the search bar
 3. You will see the transaction status, gas used, block confirmation, and the ETK token transfer
 
-## Running the App
-
-```bash
-npm run dev
-```
-
-Open http://localhost:5173
-
 ## Running Tests
 
 ```bash
@@ -113,7 +105,7 @@ npm run format:check
 
 - **Network:** Ethereum Sepolia Testnet
 - **Contract Address:** See `.env` / deployment docs
-- **Deployed via:** Remix IDE (https://remix.ethereum.org)
+- **Deployed via:** Hardhat (`npm run deploy`)
 
 ## AI Declaration
 
