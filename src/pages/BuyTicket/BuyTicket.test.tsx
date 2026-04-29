@@ -53,7 +53,12 @@ describe('BuyTicket', () => {
   })
 
   it('shows connect prompt when wallet not connected', () => {
-    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, isConnected: false, signer: null, provider: null })
+    mockUseWallet.mockReturnValueOnce({
+      ...connectedWallet,
+      isConnected: false,
+      signer: null,
+      provider: null,
+    })
     renderPage()
     expect(screen.getByText(en.buyTicket.connectFirst)).toBeInTheDocument()
   })

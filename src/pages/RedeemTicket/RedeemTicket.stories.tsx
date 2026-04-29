@@ -42,11 +42,15 @@ export const ButtonHover: Story = {
   parameters: { pseudo: { hover: true } },
 }
 
-
 export const NotConnected: Story = {
   args: { isConnected: false },
 }
 
 export const NoTicket: Story = {
-  args: { isConnected: true, address: '0xabc123def456', signer: {} as never, etkBalance: BigInt(0) },
+  args: {
+    isConnected: true,
+    address: '0xabc123def456',
+    signer: {} as never,
+    etkBalance: BigInt(0),
+  },
 }

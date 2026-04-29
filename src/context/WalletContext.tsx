@@ -121,7 +121,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [state.provider, state.address])
 
   return (
-    <WalletContext.Provider value={{ ...state, connect, connectWithWallet, disconnect, refreshBalances }}>
+    <WalletContext.Provider
+      value={{ ...state, connect, connectWithWallet, disconnect, refreshBalances }}
+    >
       {children}
     </WalletContext.Provider>
   )

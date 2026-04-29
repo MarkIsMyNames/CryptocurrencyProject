@@ -44,8 +44,14 @@ describe('Navbar', () => {
         </ThemeProvider>
       </MemoryRouter>,
     )
-    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: en.nav.createWallet })).not.toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    expect(screen.getByRole('link', { name: en.nav.createWallet })).not.toHaveAttribute(
+      'aria-current',
+      'page',
+    )
   })
 
   it('nav links point to correct routes', () => {

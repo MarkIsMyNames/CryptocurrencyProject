@@ -167,8 +167,12 @@ export function CreateWallet() {
               />
               <PasswordToggle
                 type="button"
-                aria-label={showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword}
-                onClick={() => { setShowPassword((v) => !v) }}
+                aria-label={
+                  showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword
+                }
+                onClick={() => {
+                  setShowPassword((v) => !v)
+                }}
               >
                 {showPassword ? '🙈' : '👁'}
               </PasswordToggle>
@@ -293,7 +297,12 @@ export function CreateWallet() {
           >
             {en.createWallet.backBtn}
           </SecondaryButton>
-          <PrimaryButton disabled={isConnecting} onClick={() => { void handleVerify() }}>
+          <PrimaryButton
+            disabled={isConnecting}
+            onClick={() => {
+              void handleVerify()
+            }}
+          >
             {isConnecting ? en.createWallet.connecting : en.createWallet.verifyBtn}
           </PrimaryButton>
         </ButtonRow>

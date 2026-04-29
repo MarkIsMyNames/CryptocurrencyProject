@@ -49,4 +49,3 @@ export const MetaMaskConnected: Story = {
 export const ButtonHover: Story = {
   parameters: { pseudo: { hover: true } },
 }
-

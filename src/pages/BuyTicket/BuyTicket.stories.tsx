@@ -42,7 +42,6 @@ export const ButtonHover: Story = {
   parameters: { pseudo: { hover: true } },
 }
 
-
 export const NotConnected: Story = {
   args: { isConnected: false },
 }

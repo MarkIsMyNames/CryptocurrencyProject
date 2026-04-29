@@ -27,10 +27,7 @@ function getContract(signerOrProvider: ContractRunner): EventTicketContract {
   ) as unknown as EventTicketContract
 }
 
-export function balanceOf(
-  signerOrProvider: ContractRunner,
-  address: string,
-): Promise<bigint> {
+export function balanceOf(signerOrProvider: ContractRunner, address: string): Promise<bigint> {
   return getContract(signerOrProvider).balanceOf(address)
 }
 

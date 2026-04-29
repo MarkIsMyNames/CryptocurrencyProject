@@ -74,4 +74,3 @@ export const ConnectedHover: Story = {
   },
   parameters: { pseudo: { hover: true } },
 }
-
