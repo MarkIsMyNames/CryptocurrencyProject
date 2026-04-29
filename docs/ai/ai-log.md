@@ -1599,3 +1599,117 @@ The original flow generated a wallet and immediately showed all details with no 
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 66a2056
+
+## [2026-04-29] #072 — Refactor: Extract TxReceipt into shared component to remove duplication
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/TxReceipt/, src/pages/BuyTicket/, src/pages/RedeemTicket/, src/locales/en.json
+
+**Prompt (Step 1):**
+"The TxReceipt component is duplicated 18 lines across BuyTicket and RedeemTicket — extract it into a shared component and remove the duplication. Update the ai-log and commit hashes."
+
+**Review critique (Step 2):**
+- `TxReceipt` component JSX, four styled components (`TxCard`, `TxLabel`, `TxHash`, `TxLink`), and the `txHashLabel`/`viewOnEtherscan` locale strings were duplicated identically across both pages.
+
+**Resolution (Step 3):**
+- Created `src/components/TxReceipt/TxReceipt.tsx` and `TxReceipt.styles.ts` as the single source of truth.
+- Moved `txHashLabel` and `viewOnEtherscan` strings to a new `txReceipt` section in `en.json`, removing them from `buyTicket` and `redeem`.
+- Replaced local `TxReceipt` exports and duplicate styled components in both pages with imports from the shared component.
+- Updated both Storybook story files to import `TxReceipt` from the shared location.
+- All 70 tests pass, lint and types clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** d897f1f
+
+## [2026-04-29] #073 — Test: Add unit tests and Storybook stories for TxReceipt component
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/TxReceipt/TxReceipt.test.tsx, TxReceipt.stories.tsx
+
+**Prompt (Step 1):**
+"TxReceipt is missing unit tests and Storybook stories — add them following project conventions. Update the ai-log."
+
+**Review critique (Step 2):**
+- The newly extracted `TxReceipt` component had no test or story file, violating the project convention that every component must have both.
+
+**Resolution (Step 3):**
+- Added `TxReceipt.test.tsx` with 4 tests: hash display, label display, correct Etherscan href, and `target="_blank" rel="noreferrer"` attributes.
+- Added `TxReceipt.stories.tsx` with a `Default` story and a `LinkHover` pseudo-state story.
+- All 76 tests across 15 files pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 05f3070
+
+## [2026-04-29] #074 — Feat: Navbar Storybook background fix and Balance result state stories
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/Navbar/Navbar.stories.tsx, src/pages/Balance/Balance.stories.tsx
+
+**Prompt (Step 1):**
+"In the Navbar Storybook you don't have the correct colour under the navbar — fix it. For Balance you need more stories and tests for when actually checking the balance. Update the ai-log."
+
+**Review critique (Step 2):**
+- Navbar story rendered the nav standalone against the page background with no visible container — in the real app it sits in a header with `backgroundCard` and a bottom border.
+- Balance stories only showed `Disconnected`, `ConnectedWallet`, and `ButtonHover` — no stories showing the results grid, the no-ticket state, the invalid address error, or the network error state.
+- Module mocking (`vi.mock`) cannot be used in story files as it requires Vitest's hoisting transform; attempting it caused import failures across all story files. Static render stories using styled components directly were used instead, matching the `TxReceipt` Success story pattern.
+
+**Resolution (Step 3):**
+- Wrapped Navbar story in a `header` decorator with `backgroundCard` background and `borderDefault` bottom border.
+- Added `WithTicket`, `NoTicket`, `NetworkError`, and `InvalidAddress` stories to `Balance.stories.tsx`. `WithTicket`/`NoTicket`/`NetworkError` render the result state directly using styled components; `InvalidAddress` uses a `play` function to type a bad address and click check.
+- Fixed an unnecessary type assertion lint error flagged during the process.
+- All 77 tests across 15 files pass, lint and types clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 671020b
+
+---
+
+## [2026-04-29] #075 — Refactor: Extract BalanceResultView; remove unused Success stories from BuyTicket and RedeemTicket
+
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/BuyTicket/BuyTicket.tsx, src/pages/RedeemTicket/RedeemTicket.tsx, src/pages/Balance/Balance.tsx, corresponding .stories.tsx files
+
+**Prompt (Step 1):**
+"These are way too complicated, please simplify, extract components if needed and update the logs."
+(Referring to the static success/result stories in BuyTicket, RedeemTicket, and Balance which reconstructed full page JSX inline inside story render functions.)
+
+**Review critique (Step 2):**
+- AI initially extracted `BuyTicketSuccessView` and `RedeemTicketSuccessView` as named exports and had the main components use them via an early return on success — adding complexity without real benefit for those pages.
+- For Balance, the `BalanceResultView` extracted was a full-page duplicate including a read-only input row, whereas only the results grid is actually shared with the live component.
+- The `Success` stories for BuyTicket and RedeemTicket were unnecessary given the components are tested via unit tests and the live flow covers the success state.
+
+**Resolution (Step 3):**
+- User removed `BuyTicketSuccessView`, `RedeemTicketSuccessView`, and the `Success` stories from both files — keeping the components as single clean exports.
+- Extracted `BalanceResultView` from `Balance.tsx` as a grid-only component (no page wrapper or input row); `Balance` now renders `<BalanceResultView>` inline instead of duplicating the grid JSX.
+- `WithTicket` and `NoTicket` Balance stories use `<BalanceResultView>` directly.
+- All 76 tests pass, lint and types clean.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** 34728a1
+
+---
+
+## [2026-04-29] #076 — Feat: CreateWallet step components with tests and Storybook stories
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/ — PasswordStep, PhraseStep, VerifyStep, CompleteStep
+
+**Prompt (Step 1):**
+"You need to add Storybooks for the other pages when creating a wallet (not MetaMask). Add tests and Storybooks and update the AI logs."
+
+**Review critique (Step 2):**
+- Initial approach added four exported view components directly into CreateWallet.tsx, which the user correctly identified as overcomplicating the file.
+- Second attempt put large view components with interactive props into CreateWallet.tsx and used them inside CreateWallet() — still too much in one file.
+- Correct approach: separate component files per step (PasswordStep, PhraseStep, VerifyStep, CompleteStep) within the CreateWallet directory, each with its own .test.tsx and .stories.tsx. CreateWallet.tsx stays lean — just state and handlers.
+
+**Resolution (Step 3):**
+- Created `PasswordStep.tsx`, `PhraseStep.tsx`, `VerifyStep.tsx`, `CompleteStep.tsx` — each accepts handler props and renders its step UI.
+- `CreateWallet.tsx` imports and renders the appropriate step component, eliminating duplicated JSX.
+- Created `.test.tsx` for each step component covering renders, disabled states, error display, and callback invocation.
+- Created `.stories.tsx` for each step component covering Default, interactive states (error, acknowledged, connecting), and ButtonHover.
+- `CreateWallet.stories.tsx` trimmed to idle-step stories only (Default, Connecting, MetaMaskError, MetaMaskConnected, ButtonHover).
+- 119 tests across 23 files pass, lint and types clean.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** a076e5b
