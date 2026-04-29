@@ -58,11 +58,15 @@ export function PasswordStep({
               type={showPassword ? 'text' : 'password'}
               placeholder={en.createWallet.passwordPlaceholder}
               value={password}
-              onChange={(e) => { onPasswordChange(e.target.value) }}
+              onChange={(e) => {
+                onPasswordChange(e.target.value)
+              }}
             />
             <PasswordToggle
               type="button"
-              aria-label={showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword}
+              aria-label={
+                showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword
+              }
               onClick={onToggleShow}
             >
               {showPassword ? '🙈' : '👁'}
@@ -77,7 +81,9 @@ export function PasswordStep({
               type={showPassword ? 'text' : 'password'}
               placeholder={en.createWallet.confirmPlaceholder}
               value={confirm}
-              onChange={(e) => { onConfirmChange(e.target.value) }}
+              onChange={(e) => {
+                onConfirmChange(e.target.value)
+              }}
             />
           </PasswordWrapper>
         </InputGroup>

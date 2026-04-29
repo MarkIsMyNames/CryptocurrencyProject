@@ -60,7 +60,9 @@ export function VerifyStep({
               type="text"
               placeholder={en.createWallet.wordPlaceholder}
               value={verifyAnswers[i]}
-              onChange={(e) => { onAnswerChange(i, e.target.value) }}
+              onChange={(e) => {
+                onAnswerChange(i, e.target.value)
+              }}
             />
           </InputGroup>
         ))}

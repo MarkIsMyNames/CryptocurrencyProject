@@ -118,7 +118,9 @@ export function Balance() {
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {result && <BalanceResultView seth={result.seth} etk={result.etk} remaining={result.remaining} />}
+      {result && (
+        <BalanceResultView seth={result.seth} etk={result.etk} remaining={result.remaining} />
+      )}
     </PageWrapper>
   )
 }

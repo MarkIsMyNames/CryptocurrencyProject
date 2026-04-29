@@ -50,4 +50,3 @@ export const NoTicket: Story = {
     etkBalance: BigInt(0),
   },
 }
-

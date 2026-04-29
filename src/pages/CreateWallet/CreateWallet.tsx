@@ -92,10 +92,20 @@ export function CreateWallet() {
         confirm={confirm}
         showPassword={showPassword}
         passwordError={passwordError}
-        onPasswordChange={(v) => { setPassword(v); setPasswordError(null) }}
-        onConfirmChange={(v) => { setConfirm(v); setPasswordError(null) }}
-        onToggleShow={() => { setShowPassword((v) => !v) }}
-        onBack={() => { setStep('idle') }}
+        onPasswordChange={(v) => {
+          setPassword(v)
+          setPasswordError(null)
+        }}
+        onConfirmChange={(v) => {
+          setConfirm(v)
+          setPasswordError(null)
+        }}
+        onToggleShow={() => {
+          setShowPassword((v) => !v)
+        }}
+        onBack={() => {
+          setStep('idle')
+        }}
         onNext={handlePasswordNext}
       />
     )
@@ -107,8 +117,12 @@ export function CreateWallet() {
         mnemonic={wallet.mnemonic}
         acknowledged={acknowledged}
         onAcknowledge={setAcknowledged}
-        onBack={() => { setStep('password') }}
-        onNext={() => { setStep('verify') }}
+        onBack={() => {
+          setStep('password')
+        }}
+        onNext={() => {
+          setStep('verify')
+        }}
       />
     )
   }
@@ -127,8 +141,12 @@ export function CreateWallet() {
           setVerifyAnswers(updated)
           setVerifyError(null)
         }}
-        onBack={() => { setStep('phrase') }}
-        onVerify={() => { void handleVerify() }}
+        onBack={() => {
+          setStep('phrase')
+        }}
+        onVerify={() => {
+          void handleVerify()
+        }}
       />
     )
   }
@@ -137,8 +155,12 @@ export function CreateWallet() {
     return (
       <CompleteStep
         address={wallet.address}
-        onDownload={() => { void handleDownload() }}
-        onGoToBalance={() => { navigate(routes.balance) }}
+        onDownload={() => {
+          void handleDownload()
+        }}
+        onGoToBalance={() => {
+          navigate(routes.balance)
+        }}
       />
     )
   }
@@ -151,7 +173,9 @@ export function CreateWallet() {
         <PrimaryButton onClick={handleStartGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
         <PrimaryButton
           disabled={isConnecting || isConnected}
-          onClick={() => { void connect() }}
+          onClick={() => {
+            void connect()
+          }}
         >
           {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
         </PrimaryButton>

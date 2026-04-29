@@ -54,7 +54,9 @@ export function PhraseStep({
         <input
           type="checkbox"
           checked={acknowledged}
-          onChange={(e) => { onAcknowledge(e.target.checked) }}
+          onChange={(e) => {
+            onAcknowledge(e.target.checked)
+          }}
         />
         {en.createWallet.phraseAcknowledge}
       </CheckboxRow>

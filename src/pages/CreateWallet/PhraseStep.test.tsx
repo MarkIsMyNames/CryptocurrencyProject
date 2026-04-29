@@ -5,7 +5,8 @@ import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { PhraseStep } from './PhraseStep'
 
-const MNEMONIC = 'abandon ability able about above absent absorb abstract absurd abuse access accident'
+const MNEMONIC =
+  'abandon ability able about above absent absorb abstract absurd abuse access accident'
 const noop = () => {}
 
 function renderStep(overrides: Partial<Parameters<typeof PhraseStep>[0]> = {}) {
