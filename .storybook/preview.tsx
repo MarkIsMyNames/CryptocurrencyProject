@@ -26,6 +26,7 @@ export default {
     },
   },
   initialGlobals: {
+    a11y: { manual: false },
     backgrounds: { value: theme.colors.backgroundPage },
   },
 } satisfies Preview
