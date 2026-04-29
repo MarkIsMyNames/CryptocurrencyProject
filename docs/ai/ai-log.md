@@ -1442,3 +1442,160 @@ The original flow generated a wallet and immediately showed all details with no 
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** ea6b1bd
+
+## [2026-04-29] #065 — Fix: Dead Sepolia RPC URL and broken faucet links in README
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** README.md, src/config.ts
+
+**Prompt (Step 1):**
+"The RPC URL https://rpc.sepolia.org in the README doesn't exist — fix the broken README. The faucet links also don't work as both options require an initial ETH balance. Also correct the MetaMask setup instructions to reflect that Sepolia is built in to modern MetaMask."
+
+**Review critique (Step 2):**
+- `rpc.sepolia.org` is dead — returns no response.
+- `sepoliafaucet.com` and QuickNode faucet both gate access behind an existing mainnet balance, useless for a first-time user.
+- MetaMask setup section told users to manually add Sepolia via custom RPC fields, but MetaMask now ships Sepolia built-in — that instruction was misleading. User then clarified the manual RPC flow is actually needed for the custom network approach; updated to use the dropdown → "Add a custom network" path instead.
+- `src/config.ts` `sepoliaRpcUrl` was still pointing at the same dead `rpc.sepolia.org`, which would break the private-key login path.
+
+**Resolution (Step 3):**
+- Replaced dead RPC with `https://ethereum-sepolia-rpc.publicnode.com` in both README and `config.ts`.
+- Replaced faucet links with three zero-prerequisite options: Google Cloud faucet (Google account only), Alchemy faucet (free account), and the PoW faucet at `sepolia-faucet.pk910.de` (no account — mines in browser).
+- Updated MetaMask step 3 to use the network dropdown → "Add a custom network" flow.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 01cdb13
+
+## [2026-04-29] #066 — Fix: MetaMask connect fails with generic error when Sepolia not added; contract not deployed shown clearly
+
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/context/WalletContext.tsx, src/utils/contract.ts, src/locales/en.json, README.md
+
+**Prompt (Step 1):**
+"When connecting MetaMask I get 'An unexpected error occurred. Please try again.' — diagnose and fix the root cause. The contract address is set in .env but the contract is not yet deployed. Also fix the lint warning 'throw of exception caught locally' in WalletContext.tsx and simplify it."
+
+**Review critique (Step 2):**
+- Two distinct root causes: (1) `wallet_switchEthereumChain` throws code `4902` when Sepolia is not yet in MetaMask — unhandled, fell through to generic error. (2) `balanceOf` returns empty data (`BAD_DATA`) when called against an undeployed contract address — also unhandled, fell through to generic error.
+- The nested try/catch with `throw switchErr` in the else branch triggered an ESLint 'throw of exception caught locally' warning and was unnecessarily complex.
+- No deployment instructions existed in the README.
+
+**Resolution (Step 3):**
+- Extracted chain-switching into a module-level `ensureSepoliaNetwork()` that uses `.catch()` to handle code `4902` inline — calls `wallet_addEthereumChain` if chain is missing, re-throws otherwise. Eliminates nested try/catch and the lint warning.
+- Added `BAD_DATA` / `could not decode result data` to `CONTRACT_ERRORS` mapping to a new `contractNotDeployed` string in `en.json`.
+- Added "Deploying the Contract" section to README with step-by-step Remix instructions.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** de6cd55
+
+## [2026-04-29] #067 — Feat: Hardhat deployment pipeline replacing Remix manual flow
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** hardhat.config.ts, scripts/deploy.ts, package.json, .env.example, README.md
+
+**Prompt (Step 1):**
+"Replace the Remix deployment instructions with a Hardhat deployment pipeline so the contract can be deployed from code. Add a deploy script, update the README, and update the ai-log."
+
+**Review critique (Step 2):**
+- Remix instructions required manually copy-pasting the contract into a browser tool, copying the deployed address, and manually updating `.env` — error-prone and not reproducible.
+- Hardhat 3 (installed) uses a different config format than v2: `defineConfig`, `configVariable`, and `plugins` array instead of `require`/`module.exports`.
+- No `scripts/` directory or deploy script existed.
+
+**Resolution (Step 3):**
+- Installed `hardhat`, `@nomicfoundation/hardhat-ethers`, and `dotenv` as dev dependencies.
+- Created `hardhat.config.ts` using Hardhat 3 `defineConfig`/`configVariable` API with Sepolia HTTP network.
+- Created `scripts/deploy.ts` that deploys `EventTicket` with the correct constructor args (`MAX_SUPPLY=1000`, `TICKET_PRICE_WEI=0.01 ETH`) and automatically rewrites `VITE_CONTRACT_ADDRESS` in `.env`.
+- Added `npm run deploy` script to `package.json`.
+- Added `SEPOLIA_RPC_URL` and `DEPLOY_PRIVATE_KEY` to `.env.example`.
+- Replaced Remix section in README with the two-step Hardhat flow.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7d21c27
+
+## [2026-04-29] #068 — Docs: Clarify deploying wallet must be funded before running deploy
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** README.md
+
+**Prompt (Step 1):**
+"Update the README to say ensure the account has funds before deploying. The deploy command fails with insufficient funds if the wallet has no SETH."
+
+**Review critique (Step 2):**
+- The existing note mentioned needing SETH but didn't make clear the funds must be in the deploying wallet address before running the command — a user hit `insufficient funds for transfer` because they hadn't funded the wallet first.
+
+**Resolution (Step 3):**
+- Expanded the note to explicitly state the wallet must have SETH before running `npm run deploy`, and directed the user to the faucet instructions in the MetaMask Setup section.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 11cfae6
+
+## [2026-04-29] #069 — Feat: Display transaction ID with Etherscan link after ticket purchase and redemption
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/BuyTicket/BuyTicket.tsx, BuyTicket.styles.ts, BuyTicket.stories.tsx, src/pages/RedeemTicket/RedeemTicket.tsx, RedeemTicket.styles.ts, RedeemTicket.stories.tsx, src/locales/en.json, README.md
+
+**Prompt (Step 1):**
+"When a ticket is bought or redeemed, display the transaction ID with a link to Etherscan. Add a Success story to both Storybook files showing the post-transaction state. Extract the tx card into a reusable component so the story doesn't duplicate component JSX. Add instructions on how to view transactions to the README. Update the ai-log."
+
+**Review critique (Step 2):**
+- After a successful purchase or redemption the app only showed a status message — no transaction hash, no way for the user to verify the transaction on-chain.
+- Initial Success story for BuyTicket duplicated the full component JSX inline, which diverges from the real component over time.
+- No Storybook story existed for the post-redemption state.
+- No README guidance on how to look up a transaction on Etherscan.
+
+**Resolution (Step 3):**
+- Added `txHashLabel` and `viewOnEtherscan` strings to `en.json` under both `buyTicket` and `redeem` sections.
+- Extracted `TxReceipt` as a named export in both `BuyTicket.tsx` and `RedeemTicket.tsx`, using their respective styled components (`TxCard`, `TxLabel`, `TxHash`, `TxLink`).
+- Stored `tx.hash` in state immediately after submission (before `wait()`) so the hash is visible during on-chain confirmation.
+- Rendered `<TxReceipt hash={txHash} />` inline in both pages.
+- Added `Success` story to both story files — each is 3 lines rendering just `TxReceipt` with a fake hash.
+- Added a "Viewing Transactions" section to the README explaining how to look up a transaction on Sepolia Etherscan.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 9530e67 (BuyTicket), 6d00374 (RedeemTicket)
+
+## [2026-04-29] #070 — Fix: WCAG contrast failure, lint errors, and formatting on TxReceipt and WalletContext
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/BuyTicket/BuyTicket.styles.ts, RedeemTicket.styles.ts, src/context/WalletContext.tsx
+
+**Prompt (Step 1):**
+"Resolve the failing Storybook accessibility tests, linting errors, and formatting issues. Run all tests to confirm everything passes."
+
+**Review critique (Step 2):**
+- `TxLink` used `theme.colors.primary` which does not exist in the theme — fell back to the browser default `#0000ee`, giving a contrast ratio of 1.78:1 against the dark card background (`#1a1d27`), failing WCAG AA (requires 4.5:1).
+- `ensureSepoliaNetwork` used two non-null assertions (`window.ethereum!`) flagged by `@typescript-eslint/no-non-null-assertion`.
+- The catch callback typed the error as `{ code?: number }` instead of `unknown`, violating `@typescript-eslint/use-unknown-in-catch-callback-variable`.
+- Prettier reported formatting issues in `WalletContext.tsx`, `BuyTicket.tsx`, and `RedeemTicket.tsx`.
+
+**Resolution (Step 3):**
+- Changed `TxLink` colour from `theme.colors.primary` to `theme.colors.textLink` (`#818cf8`), giving a 5.7:1 contrast ratio against `#1a1d27`.
+- Refactored `ensureSepoliaNetwork` to accept `ethereum` as a parameter (extracted after the null guard in `connect`), eliminating both non-null assertions.
+- Typed the catch callback error as `unknown` and narrowed with a cast before checking `.code`.
+- Ran `prettier --write` on the three affected files.
+- All 72 Vitest tests pass, lint clean, format clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 903651e
+
+## [2026-04-29] #071 — Fix: TypeScript errors in deploy.ts and add CI typecheck for scripts
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** scripts/deploy.ts, tsconfig.node.json, .github/workflows/lint.yml
+
+**Prompt (Step 1):**
+"Fix TS2591 errors for `fs`, `path`, and `process`, and TS2339 for `.ethers` not existing on `NetworkConnection` in deploy.ts. Add a GitHub Actions step to catch these in CI. Combine the tsconfig files rather than creating a separate one. Update the ai-log and commit hashes."
+
+**Review critique (Step 2):**
+- `scripts/deploy.ts` imported from `'fs'` and `'path'` but no tsconfig covered `scripts/` with `types: ["node"]`, so Node globals were unresolved.
+- `network.create()` returns `NetworkConnection` — the `.ethers` property is added by `@nomicfoundation/hardhat-ethers` via module augmentation, but that import was missing from the script.
+- A separate `tsconfig.scripts.json` was initially created, but `tsconfig.node.json` already has `types: ["node"]` and covers node-environment files — merging was cleaner.
+- The CI lint workflow only ran `tsc --noEmit` (covers `src/` and `e2e/`) with no check on `scripts/` or `hardhat.config.ts`.
+
+**Resolution (Step 3):**
+- Added `import '@nomicfoundation/hardhat-ethers'` to `deploy.ts` to pull in the `NetworkConnection.ethers` type augmentation.
+- Switched bare `'fs'`/`'path'` imports to `'node:fs'`/`'node:path'`.
+- Extended `tsconfig.node.json` `include` to cover `hardhat.config.ts` and `scripts/` instead of creating a separate tsconfig.
+- Added `npx tsc -p tsconfig.node.json --noEmit` step to `lint.yml` so CI catches script type errors on every push/PR.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 66a2056

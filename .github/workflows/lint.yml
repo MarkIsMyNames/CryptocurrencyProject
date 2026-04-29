@@ -18,3 +18,4 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npx tsc --noEmit
+      - run: npx tsc -p tsconfig.node.json --noEmit

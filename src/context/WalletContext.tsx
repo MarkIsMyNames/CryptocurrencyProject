@@ -16,6 +16,29 @@ interface WalletState {
   error: string | null
 }
 
+async function ensureSepoliaNetwork(ethereum: NonNullable<typeof window.ethereum>): Promise<void> {
+  await ethereum
+    .request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: config.sepoliaChainIdHex }],
+    })
+    .catch(async (err: unknown) => {
+      if ((err as { code?: number }).code !== 4902) throw err
+      await ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            chainId: config.sepoliaChainIdHex,
+            chainName: 'Sepolia',
+            nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+            rpcUrls: [config.sepoliaRpcUrl],
+            blockExplorerUrls: ['https://sepolia.etherscan.io'],
+          },
+        ],
+      })
+    })
+}
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>({
     provider: null,
@@ -33,16 +56,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       setState((prev) => ({ ...prev, error: strings.createWallet.metaMaskNotFound }))
       return
     }
+    const ethereum = window.ethereum
     setState((prev) => ({ ...prev, isConnecting: true, error: null }))
     try {
-      let provider = new BrowserProvider(window.ethereum)
+      let provider = new BrowserProvider(ethereum)
       const network = await provider.getNetwork()
       if (Number(network.chainId) !== config.sepoliaChainId) {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: config.sepoliaChainIdHex }],
-        })
-        provider = new BrowserProvider(window.ethereum)
+        await ensureSepoliaNetwork(ethereum)
+        provider = new BrowserProvider(ethereum)
       }
       await provider.send('eth_requestAccounts', [])
       const signer = await provider.getSigner()
