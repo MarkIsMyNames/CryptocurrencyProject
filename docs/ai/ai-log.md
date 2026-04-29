@@ -1264,3 +1264,181 @@ Three parallel review agents identified seven issues:
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** b89b825
+
+## [2026-04-28] #057 — Feat: Status const in config.ts with ESLint enforcement
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/config.ts, src/styles/shared.styles.ts, src/pages/BuyTicket/BuyTicket.tsx, src/pages/RedeemTicket/RedeemTicket.tsx, .storybook/preview.tsx, eslint.config.js
+
+**Prompt (Step 1):**
+"The raw status string literals 'pending', 'success', 'error' used across BuyTicket and RedeemTicket should be a typed const in config.ts, consistent with CLAUDE.md's rule that all configurable values come from config.ts. Add a Status const, derive StatusType from it, update all usages including .storybook/preview.tsx, and add an ESLint no-restricted-syntax rule covering all **/*.{ts,tsx} files (excluding config.ts) to block future raw status string literals."
+
+**Review critique (Step 2):**
+- `StatusType` in shared.styles.ts was a manually written union — should be derived from the const so it can't drift.
+- Initial attempt scoped the ESLint rule to `src/**` only and made a `.storybook/` exception — wrong approach. `.storybook/preview.tsx` had `test: 'error'` which should also use `Status.error` since the value is the same string.
+
+**Resolution (Step 3):**
+- Added `Status = { pending, success, error } as const` to `src/config.ts`.
+- Updated `StatusType` in shared.styles.ts to `(typeof Status)[keyof typeof Status] | null`.
+- Replaced all `'pending'`/`'success'`/`'error'` literals in shared.styles.ts, BuyTicket.tsx, RedeemTicket.tsx, and .storybook/preview.tsx with `Status.*` references.
+- Added `no-restricted-syntax` rule to eslint.config.js scoped to `**/*.{ts,tsx}` (excluding config.ts) blocking raw status string literals.
+- All 48 tests pass, lint and build clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** ad552c5
+
+## [2026-04-28] #058 — Fix: Navbar full-width layout
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/App.styles.ts, src/components/Navbar/Navbar.styles.ts
+
+**Prompt (Step 1):**
+"The navbar at the top of the page should take up the whole width. The root element is constrained to 1126px centered — make AppHeader bleed to full viewport width using the full-bleed technique (width: 100vw; position: relative; left: 50%; transform: translateX(-50%)). Move background and border-bottom from Nav to AppHeader since AppHeader is now the full-width container."
+
+**Review critique (Step 2):**
+`Nav` had `background-color` and `border-bottom` that would duplicate the same properties now on `AppHeader`. Removing them from `Nav` keeps a single source of truth.
+
+**Resolution (Step 3):**
+- Added `width: 100vw; position: relative; left: 50%; transform: translateX(-50%)` to `AppHeader` so it bleeds to full viewport width regardless of the constrained `#root`.
+- Moved `background-color` and `border-bottom` from `Navbar.styles.ts` to `AppHeader` in `App.styles.ts`.
+- Removed `justify-content: space-between` from `Nav` (redundant — `AppHeader` handles the layout between nav and wallet status).
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** f1c9493
+
+## [2026-04-28] #059 — Fix: Navbar brand and links spacing
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/components/Navbar/Navbar.styles.ts
+
+**Prompt (Step 1):**
+"The EventTicket brand label and nav links (Create Wallet etc.) are too close together. Nav lost justify-content: space-between in the previous full-width refactor and also needs flex: 1 so it fills the AppHeader width before space-between can have any effect."
+
+**Review critique (Step 2):**
+`justify-content: space-between` was removed from `Nav` in #058 when background/border were moved to `AppHeader`. Without it, brand and links collapse together. Additionally, `Nav` had no `flex: 1` so it didn't fill the available width of `AppHeader`, making `space-between` ineffective regardless.
+
+**Resolution (Step 3):**
+- Added `flex: 1` to `Nav` so it stretches to fill `AppHeader`.
+- Restored `justify-content: space-between` to push brand and links to opposite ends.
+
+**Verdict:** Accepted
+
+---
+
+## [2026-04-28] #060 — Fix: Connect MetaMask error feedback missing from CreateWallet page
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/CreateWallet.tsx
+
+**Prompt (Step 1):**
+"The Connect MetaMask button silently fails — no error or success feedback is shown to the user. When MetaMask is missing, the wrong network is selected, or the user rejects the request, the error is stored in WalletContext state but CreateWallet never reads or displays it. Add error and success status messages so the user knows what happened after clicking Connect."
+
+**Review critique (Step 2):**
+`WalletContext.connect()` stores feedback in `state.error` and `state.isConnected`, but `CreateWallet.tsx` only destructured `connect` and `isConnecting` from `useWallet()`. The `error` field was entirely ignored. Users who clicked Connect with no MetaMask installed saw nothing happen — the button appeared to be broken.
+
+**Resolution (Step 3):**
+- Destructured `isConnected` and `error` from `useWallet()` in `CreateWallet`.
+- Added a `StatusMessage` (success variant) when `isConnected` is true, showing `en.createWallet.metaMaskSuccess`.
+- Added a `StatusMessage` (error variant) when `error` is non-null and not yet connected, showing the error string from context.
+- Disabled the Connect button when already connected to prevent duplicate attempts.
+- Verified in Playwright (headless): error message appears immediately after clicking Connect with no MetaMask.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** f1c9493
+
+---
+
+## [2026-04-28] #061 — Fix: MetaMask connect crashes with generic error when contract address not set
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/context/WalletContext.tsx
+
+**Prompt (Step 1):**
+"Connecting MetaMask shows 'An unexpected error occurred' immediately after approving in MetaMask. The connect flow fetches the ETK balance via balanceOf() at the end — if VITE_CONTRACT_ADDRESS is not set, config.contractAddress is an empty string, ethers throws 'invalid address', and the catch block shows the generic fallback. Fix the connect flow to handle a missing contract address gracefully and improve catch to show specific error messages."
+
+**Review critique (Step 2):**
+`WalletContext.connect()` called `balanceOf(signer, address)` unconditionally, passing an empty-string address to the ethers `Contract` constructor when `VITE_CONTRACT_ADDRESS` was unset. This threw immediately and was caught by the bare `catch {}` which always emitted `strings.errors.unknownError`. The catch also didn't use `decodeContractError`, so user-facing messages like "cancelled" or "wrong network" were never shown.
+
+**Resolution (Step 3):**
+- Guarded both `balanceOf` calls (in `connect` and `refreshBalances`) with `config.contractAddress ? balanceOf(...) : Promise.resolve(0n)` so a missing contract address silently yields 0 instead of throwing.
+- Changed `catch {}` to `catch (err)` and replaced the hardcoded `strings.errors.unknownError` with `decodeContractError(err)`, which maps known error patterns (cancelled, wrong network, etc.) to human-readable strings and only falls back to the generic message for truly unknown errors.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7580ffb
+
+---
+
+## [2026-04-28] #062 — Feat: MetaMask-style multi-step wallet creation wizard with auto-connect
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/, src/context/WalletContext.tsx, src/utils/contract.ts
+
+**Prompt (Step 1):**
+"Improve the Generate New Wallet flow: after creating a wallet it should auto-connect the app with the generated private key, and the creation flow should mirror MetaMask's UX — password entry with confirmation, a recovery phrase display step, and a phrase verification step where the user must type specific words before proceeding."
+
+**Review critique (Step 2):**
+The original flow generated a wallet and immediately showed all details with no guided steps. There was no password UI (only a `window.prompt` for keystore download), no phrase acknowledgement, no verification, and no auto-connect. The wallet context also lacked a way to connect with a raw private key — only MetaMask (`BrowserProvider`) was supported. Contract utilities were typed to `JsonRpcSigner` specifically, which would reject an ethers `Wallet` signer.
+
+**Resolution (Step 3):**
+- Added `connectWithWallet(privateKey: string): Promise<boolean>` to `WalletContext` — creates a `JsonRpcProvider` + ethers `Wallet`, fetches ETH and ETK balances, and connects the app.
+- Updated `walletContext.ts` interface: `provider` now accepts `JsonRpcProvider`, `signer` accepts `Wallet`.
+- Updated all contract utility functions (`balanceOf`, `remainingTickets`, `buyTicket`, `redeemTicket`) to accept `ContractRunner` instead of `JsonRpcSigner`, so both MetaMask signers and generated wallets can interact with the contract.
+- Rewrote `CreateWallet.tsx` as a 5-step state machine (`idle → password → phrase → verify → complete`): password + confirm with validation (min 8 chars, must match); 12-word phrase grid with acknowledgement checkbox; 3 randomly selected word positions to type; auto-connect and navigate on success.
+- Extended `CreateWallet.styles.ts` with `ProgressDots`, `Dot`, `Form`, `InputGroup`, `Label`, `TextInput`, `ErrorText`, `PhraseGrid`, `PhraseWord`, `WordIndex`, `WordText`, `CheckboxRow`, `VerifyGrid`.
+- Updated `en.json` with all new strings.
+- Rewrote `CreateWallet.test.tsx` with 11 tests covering each step and validation paths.
+- Updated stories to include `MetaMaskError` and `MetaMaskConnected` states.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 7580ffb
+
+---
+
+## [2026-04-28] #063 — Fix: Back button size, password reveal toggle, RPC error on wallet connect
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/CreateWallet.tsx, CreateWallet.styles.ts, src/context/WalletContext.tsx
+
+**Prompt (Step 1):**
+"Three issues with the new wizard: (1) Back button is much smaller than Next/Verify; (2) no way to reveal the password while typing; (3) 'An unexpected error occurred' when connecting a generated wallet — the Sepolia RPC call fails immediately and the whole connect is aborted."
+
+**Review critique (Step 2):**
+`SecondaryButton` had `padding: xs sm`, `font-size: sm`, and `align-self: flex-start` — half the size of `PrimaryButton`'s `padding: sm lg` and `font-size: md`. There was no password visibility toggle on either field. `connectWithWallet` called `provider.getBalance()` before marking the wallet as connected, so any RPC failure (network down, Sepolia unreachable) aborted the entire connect flow and showed the generic error — even though the private key and address are valid and require no network.
+
+**Resolution (Step 3):**
+- `SecondaryButton`: matched `PrimaryButton` padding (`sm lg`), font-size (`md`), and border-radius (`md`); removed `align-self: flex-start`.
+- Added `PasswordWrapper` (relative flex container) and `PasswordToggle` (absolute right-aligned icon button) to styles; wired `showPassword` state toggle to both password inputs using a 👁/🙈 button with `aria-label`.
+- Added `showPassword` and `hidePassword` strings to `en.json`.
+- `connectWithWallet`: moved `setState({ isConnected: true })` and `connected = true` BEFORE the `Promise.all` balance fetch. The `catch` block now only sets an error if `!connected` (i.e., the key/address step itself failed). If the RPC call fails after connection is established, it silently ignores the error — balances remain `null` and the user is still connected.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** f152ca9
+
+## [2026-04-29] #064 — Test: Expand coverage across Playwright e2e, Vitest unit and Storybook layers
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** e2e/wallet.spec.ts, BuyTicket.test.tsx, RedeemTicket.test.tsx, Navbar.test.tsx, *.stories.tsx, src/theme.ts
+
+**Prompt (Step 1):**
+"Can you now improve the test coverage across all Playwright, unit and Storybook (including hover) tests. Ensure all tests pass and update the logs."
+
+**Review critique (Step 2):**
+- `e2e/wallet.spec.ts` was stale — all 14 tests still referenced the old single-step flow (private key reveal, mnemonic visible immediately) and would have failed against the new 4-step wizard.
+- `BuyTicket.test.tsx` had a broken `vi.doMock` test that didn't actually override the module (Vitest doesn't support `vi.doMock` at file scope like Jest), so the connect-prompt test always saw the connected state.
+- `RedeemTicket.test.tsx` only had 3 tests — no connect-prompt, no address display, no pending state, no disabled-button-when-no-ticket tests.
+- `Navbar.test.tsx` missing active-link test (`aria-current=page`).
+- Stories had no hover states on WalletStatus, and `BuyTicket`/`RedeemTicket` stories used the old `pseudo: { hover: 'button' }` selector form.
+- `MetaMaskConnected` story failed WCAG AA: `#22c55e` on `#14532d` gave contrast ratio 3.99:1 (needed 4.5:1).
+
+**Resolution (Step 3):**
+- Rewrote `e2e/wallet.spec.ts` with 4 `describe` blocks (idle, password, phrase, verify) covering 14 tests for the wizard flow. Fixed phrase-step word count locator to `page.getByText(/^\d+\.$/).locator('..')` after `div.filter({ hasText: /^\d+\..+$/ })` matched 13 elements (the PhraseGrid parent div also matched).
+- Rewrote `BuyTicket.test.tsx` using `vi.hoisted(() => vi.fn())` for `useWallet`, enabling `mockReturnValueOnce` per-test overrides. Added connect-prompt, error-on-failure, and disabled-when-owned tests (6 total).
+- Expanded `RedeemTicket.test.tsx` to 9 tests: connect prompt, address display, valid/no-ticket status badge, disabled button, pending state, success, error, and redeem button enabled.
+- Added active-link test to `Navbar.test.tsx` using `MemoryRouter initialEntries`.
+- Added hover stories to `WalletStatus`, `BuyTicket`, `RedeemTicket`, `CreateWallet` and `Navbar` (already had one).
+- Added `NotConnected`/`NoTicket` state stories to `BuyTicket`/`RedeemTicket`.
+- Fixed `statusSuccessSubtle` in `theme.ts` from `#14532d` to `#0a2e18` to achieve 5.3:1 contrast ratio, resolving the WCAG AA failure.
+- All 29 Playwright tests and 70 Vitest/Storybook tests pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** ea6b1bd
