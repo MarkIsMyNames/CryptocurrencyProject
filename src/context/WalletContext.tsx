@@ -16,6 +16,25 @@ interface WalletState {
   error: string | null
 }
 
+async function ensureSepoliaNetwork(): Promise<void> {
+  await window.ethereum!.request({
+    method: 'wallet_switchEthereumChain',
+    params: [{ chainId: config.sepoliaChainIdHex }],
+  }).catch(async (err: { code?: number }) => {
+    if (err.code !== 4902) throw err
+    await window.ethereum!.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: config.sepoliaChainIdHex,
+        chainName: 'Sepolia',
+        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+        rpcUrls: [config.sepoliaRpcUrl],
+        blockExplorerUrls: ['https://sepolia.etherscan.io'],
+      }],
+    })
+  })
+}
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>({
     provider: null,
@@ -38,10 +57,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       let provider = new BrowserProvider(window.ethereum)
       const network = await provider.getNetwork()
       if (Number(network.chainId) !== config.sepoliaChainId) {
-        await window.ethereum.request({
-          method: 'wallet_switchEthereumChain',
-          params: [{ chainId: config.sepoliaChainIdHex }],
-        })
+        await ensureSepoliaNetwork()
         provider = new BrowserProvider(window.ethereum)
       }
       await provider.send('eth_requestAccounts', [])

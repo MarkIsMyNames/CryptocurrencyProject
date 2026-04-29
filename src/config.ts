@@ -17,7 +17,7 @@ export const config = {
     (import.meta.env as unknown as Record<string, string> | undefined)?.VITE_CONTRACT_ADDRESS ?? '',
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
-  sepoliaRpcUrl: 'https://rpc.sepolia.org',
+  sepoliaRpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
   ticketPriceWei: '10000000000000000',
   ticketPriceDisplay: '0.01 SETH',
   defaultTicketSupply: 1000,

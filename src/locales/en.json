@@ -98,6 +98,7 @@
   "errors": {
     "connectWallet": "Please connect your wallet first.",
     "unknownError": "An unexpected error occurred. Please try again.",
+    "contractNotDeployed": "Contract not found at the configured address. Please deploy the contract and update VITE_CONTRACT_ADDRESS.",
     "networkError": "Network error. Please check your connection.",
     "hookOutsideProvider": "useWallet must be used inside WalletProvider",
     "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",

@@ -47,6 +47,7 @@ export function redeemTicket(signer: ContractRunner): Promise<ContractTransactio
 }
 
 const CONTRACT_ERRORS: Array<[string[], string]> = [
+  [['BAD_DATA', 'could not decode result data'], strings.errors.contractNotDeployed],
   [['IncorrectPayment'], strings.errors.incorrectAmount],
   [['AlreadyOwnsTicket'], strings.errors.alreadyOwned],
   [['SoldOut'], strings.errors.soldOut],
