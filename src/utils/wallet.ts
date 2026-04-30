@@ -19,15 +19,15 @@ export function generateWallet(): GeneratedWallet {
 export async function downloadKeystore(wallet: GeneratedWallet, password: string): Promise<void> {
   const ethersWallet = new Wallet(wallet.privateKey)
   const keystore = await ethersWallet.encrypt(password)
-  const blob = new Blob([keystore], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `keystore-${wallet.address.slice(0, 8)}.json`
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
-  URL.revokeObjectURL(url)
+  const keystoreBlob = new Blob([keystore], { type: 'application/json' })
+  const downloadUrl = URL.createObjectURL(keystoreBlob)
+  const anchor = document.createElement('a')
+  anchor.href = downloadUrl
+  anchor.download = `keystore-${wallet.address.slice(0, 8)}.json`
+  document.body.appendChild(anchor)
+  anchor.click()
+  document.body.removeChild(anchor)
+  URL.revokeObjectURL(downloadUrl)
 }
 
 export function truncateAddress(address: string): string {

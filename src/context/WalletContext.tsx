@@ -111,9 +111,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       // Best-effort balance fetch — RPC may be unreachable on first connect
       const [ethBalance, etkBalance] = await fetchBalances(provider, address)
       setState((prev) => ({ ...prev, ethBalance, etkBalance }))
-    } catch {
+    } catch (err) {
       if (!connected) {
-        setState((prev) => ({ ...prev, isConnecting: false, error: strings.errors.unknownError }))
+        setState((prev) => ({ ...prev, isConnecting: false, error: decodeContractError(err) }))
       }
     }
     return connected

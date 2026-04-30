@@ -22,8 +22,15 @@ function BuyTicketConnected() {
   const { signer, provider, etkBalance, refreshBalances } = useConnectedWallet()
   const [remaining, setRemaining] = useState<bigint | null>(null)
   const [status, setStatus] = useState<StatusType>(null)
-  const [statusMessage, setStatusMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
+
+  const statusMessage =
+    status === Status.pending
+      ? strings.buyTicket.pending
+      : status === Status.success
+        ? strings.buyTicket.success
+        : errorMessage
 
   useEffect(() => {
     void remainingTickets(provider).then(setRemaining)
@@ -37,17 +44,15 @@ function BuyTicketConnected() {
 
   async function handleBuy() {
     setStatus(Status.pending)
-    setStatusMessage(strings.buyTicket.pending)
     try {
       const tx = await buyTicket(signer, BigInt(config.ticketPriceWei))
       setTxHash(tx.hash)
       await tx.wait()
       setStatus(Status.success)
-      setStatusMessage(strings.buyTicket.success)
       await refreshBalances()
     } catch (err) {
+      setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
-      setStatusMessage(decodeContractError(err))
     }
   }
 

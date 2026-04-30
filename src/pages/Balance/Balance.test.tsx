@@ -14,6 +14,7 @@ vi.mock('../../context/useWallet', () => ({
 vi.mock('../../utils/contract', () => ({
   balanceOf: vi.fn().mockResolvedValue(BigInt(1)),
   remainingTickets: vi.fn().mockResolvedValue(BigInt(999)),
+  decodeContractError: vi.fn().mockReturnValue(en.errors.unknownError),
 }))
 
 import { balanceOf, remainingTickets } from '../../utils/contract'

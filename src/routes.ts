@@ -6,6 +6,16 @@ export const routes = {
   redeem: '/redeem',
 } as const
 
+export const CreateWalletStep = {
+  idle: 'idle',
+  password: 'password',
+  phrase: 'phrase',
+  verify: 'verify',
+  complete: 'complete',
+} as const
+
+export type CreateWalletStep = (typeof CreateWalletStep)[keyof typeof CreateWalletStep]
+
 export const Status = {
   pending: 'pending',
   success: 'success',
