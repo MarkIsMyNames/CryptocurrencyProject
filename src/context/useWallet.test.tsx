@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
 import type { ReactNode } from 'react'
+import { BrowserProvider, JsonRpcSigner } from 'ethers'
 import { WalletProvider } from './WalletContext'
 import { WalletContext, useWallet, useConnectedWallet, type WalletContextValue } from './useWallet'
 import strings from '../locales/en.json'
@@ -12,8 +13,8 @@ function withProvider(children: ReactNode) {
 const connectedValue: WalletContextValue = {
   isConnected: true,
   address: '0x1234567890abcdef1234567890abcdef12345678',
-  provider: {} as never,
-  signer: {} as never,
+  provider: {} as unknown as BrowserProvider,
+  signer: {} as unknown as JsonRpcSigner,
   ethBalance: 1000000000000000000n,
   etkBalance: 1n,
   isConnecting: false,
