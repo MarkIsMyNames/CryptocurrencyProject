@@ -7,8 +7,8 @@ const MAX_SUPPLY = Number(process.env.VITE_MAX_SUPPLY ?? '1000')
 const TICKET_PRICE_WEI = BigInt(process.env.VITE_TICKET_PRICE_WEI ?? '10000000000000000')
 
 async function main() {
-  const { ethers } = await network.create()
-  const [deployer] = await ethers.getSigners()
+  const { ethers } = await network.create() // Connects to the test network
+  const [deployer] = await ethers.getSigners() // Assigns first signer to deployer
 
   console.log(`Deploying from: ${deployer.address}`)
 
