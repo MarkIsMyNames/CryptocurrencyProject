@@ -21,8 +21,15 @@ import {
 function RedeemTicketConnected() {
   const { signer, address, etkBalance, refreshBalances } = useConnectedWallet()
   const [status, setStatus] = useState<StatusType>(null)
-  const [statusMessage, setStatusMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
+
+  const statusMessage =
+    status === Status.pending
+      ? strings.redeem.pending
+      : status === Status.success
+        ? strings.redeem.success
+        : errorMessage
 
   const hasTicket = etkBalance !== null && etkBalance > 0n
   const isPending = status === Status.pending
@@ -31,17 +38,15 @@ function RedeemTicketConnected() {
 
   async function handleRedeem() {
     setStatus(Status.pending)
-    setStatusMessage(strings.redeem.pending)
     try {
       const tx = await redeemTicket(signer)
       setTxHash(tx.hash)
       await tx.wait()
       setStatus(Status.success)
-      setStatusMessage(strings.redeem.success)
       await refreshBalances()
     } catch (err) {
+      setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
-      setStatusMessage(decodeContractError(err))
     }
   }
 
