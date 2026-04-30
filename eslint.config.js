@@ -93,6 +93,13 @@ export default tseslint.config(
       '@typescript-eslint/no-empty-object-type': 'off',
     },
   },
+  {
+    files: ['src/test-utils.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+
   prettier,
   storybook.configs["flat/recommended"]
 );
