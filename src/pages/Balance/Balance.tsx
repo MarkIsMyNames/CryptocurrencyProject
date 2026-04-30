@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { isAddress, formatEther } from 'ethers'
 import { useWallet } from '../../context/useWallet'
-import { balanceOf, remainingTickets } from '../../utils/contract'
+import { balanceOf, remainingTickets, decodeContractError } from '../../utils/contract'
 import { config } from '../../config'
 import strings from '../../locales/en.json'
 import {
@@ -25,15 +25,7 @@ interface BalanceResult {
   remaining: bigint
 }
 
-export function BalanceResultView({
-  seth,
-  etk,
-  remaining,
-}: {
-  seth: string
-  etk: bigint
-  remaining: bigint
-}) {
+export function BalanceResultView({ seth, etk, remaining }: BalanceResult) {
   return (
     <BalanceGrid>
       <BalanceCard>
@@ -86,8 +78,8 @@ export function Balance() {
         etk,
         remaining,
       })
-    } catch {
-      setError(strings.errors.unknownError)
+    } catch (err) {
+      setError(decodeContractError(err))
     } finally {
       setLoading(false)
     }
@@ -119,7 +111,7 @@ export function Balance() {
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       {result && (
-        <BalanceResultView seth={result.seth} etk={result.etk} remaining={result.remaining} />
+        <BalanceResultView {...result} />
       )}
     </PageWrapper>
   )
