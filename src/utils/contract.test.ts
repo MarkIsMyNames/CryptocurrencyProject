@@ -47,6 +47,16 @@ describe('decodeContractError', () => {
     )
   })
 
+  it('decodes INSUFFICIENT_FUNDS as insufficientFunds', () => {
+    expect(decodeContractError(new Error('INSUFFICIENT_FUNDS'))).toBe(strings.errors.insufficientFunds)
+  })
+
+  it('decodes insufficient funds as insufficientFunds', () => {
+    expect(decodeContractError(new Error('insufficient funds for gas * price + value'))).toBe(
+      strings.errors.insufficientFunds,
+    )
+  })
+
   it('decodes timeout as networkError', () => {
     expect(decodeContractError(new Error('timeout exceeded'))).toBe(strings.errors.networkError)
   })

@@ -110,6 +110,7 @@
     "soldOut": "Sorry, this event is sold out.",
     "noTicket": "No ticket found in this wallet.",
     "cancelled": "Transaction cancelled.",
+    "insufficientFunds": "Insufficient SETH balance. You need at least 0.01 SETH plus gas to buy a ticket.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
     "connectedNoAddress": "WalletStatus: connected but address is null",
     "notConnected": "useConnectedWallet must be used in a connected state"
