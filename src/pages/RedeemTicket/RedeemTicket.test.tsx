@@ -13,6 +13,7 @@ vi.mock('../../utils/contract', () => ({
 
 vi.mock('../../context/useWallet', () => ({
   useWallet: mockUseWallet,
+  useConnectedWallet: mockUseWallet,
 }))
 
 const connectedWallet = {
@@ -52,13 +53,15 @@ describe('RedeemTicket', () => {
   })
 
   it('shows no ticket status when etkBalance is 0', () => {
-    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(0) })
+    const noTicket = { ...connectedWallet, etkBalance: BigInt(0) }
+    mockUseWallet.mockReturnValueOnce(noTicket).mockReturnValueOnce(noTicket)
     customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.noTicket)).toBeInTheDocument()
   })
 
   it('disables redeem button when no ticket', () => {
-    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(0) })
+    const noTicket = { ...connectedWallet, etkBalance: BigInt(0) }
+    mockUseWallet.mockReturnValueOnce(noTicket).mockReturnValueOnce(noTicket)
     customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.redeemBtn)).toBeDisabled()
   })

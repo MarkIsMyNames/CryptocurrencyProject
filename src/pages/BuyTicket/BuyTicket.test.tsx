@@ -14,6 +14,7 @@ vi.mock('../../utils/contract', () => ({
 
 vi.mock('../../context/useWallet', () => ({
   useWallet: mockUseWallet,
+  useConnectedWallet: mockUseWallet,
 }))
 
 const connectedWallet = {
@@ -84,7 +85,8 @@ describe('BuyTicket', () => {
   })
 
   it('disables buy button when already owns a ticket', () => {
-    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(1) })
+    const withTicket = { ...connectedWallet, etkBalance: BigInt(1) }
+    mockUseWallet.mockReturnValueOnce(withTicket).mockReturnValueOnce(withTicket)
     customRender(<BuyTicket />)
     expect(screen.getByText(en.buyTicket.buyBtn)).toBeDisabled()
   })
