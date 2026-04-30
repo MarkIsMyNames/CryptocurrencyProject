@@ -1,4 +1,5 @@
 import { Wallet } from 'ethers'
+import { config } from '../config'
 
 export interface GeneratedWallet {
   address: string
@@ -30,5 +31,5 @@ export async function downloadKeystore(wallet: GeneratedWallet, password: string
 }
 
 export function truncateAddress(address: string): string {
-  return `${address.slice(0, 6)}...${address.slice(-4)}`
+  return `${address.slice(0, config.addressPrefixLength)}...${address.slice(-config.addressSuffixLength)}`
 }

@@ -22,4 +22,6 @@ export const config = {
   defaultTicketSupply: Number(import.meta.env.VITE_MAX_SUPPLY),
   tokenSymbol: 'ETK',
   tokenName: 'EventTicket',
+  addressPrefixLength: 6,
+  addressSuffixLength: 4,
 } as const
