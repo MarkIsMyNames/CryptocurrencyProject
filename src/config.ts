@@ -1,4 +1,5 @@
-export { routes, Status } from './routes'
+export { routes, Status, CreateWalletStep } from './routes'
+export type { CreateWalletStep } from './routes'
 
 import { requireEnv } from '../shared/requireEnv'
 
@@ -16,4 +17,5 @@ export const config = {
   addressPrefixLength: 6,
   addressSuffixLength: 4,
   createWalletStepCount: 3,
+  createWalletVerifyCount: 3,
 } as const
