@@ -8,12 +8,13 @@ test.describe('Wallet — idle step', () => {
     await expect(page).toHaveURL(routes.createWallet)
   })
 
-  test('shows page title, subtitle and both action buttons', async ({ page }) => {
+  test('shows page title, subtitle and all action buttons', async ({ page }) => {
     await page.goto(routes.createWallet)
     await expect(page.getByRole('heading', { name: en.createWallet.title })).toBeVisible()
     await expect(page.getByText(en.createWallet.subtitle)).toBeVisible()
     await expect(page.getByText(en.createWallet.generateBtn)).toBeVisible()
     await expect(page.getByText(en.createWallet.connectBtn)).toBeVisible()
+    await expect(page.getByText(en.createWallet.importKeystoreBtn)).toBeVisible()
   })
 
   test('shows MetaMask error when Connect clicked without extension', async ({ page }) => {
@@ -120,5 +121,79 @@ test.describe('Wallet — verify step', () => {
   test('Back returns to phrase step', async ({ page }) => {
     await page.getByText(en.createWallet.backBtn).click()
     await expect(page.getByText(en.createWallet.phraseAcknowledge)).toBeVisible()
+  })
+})
+
+test.describe('Wallet — keystoreFile step', () => {
+  test('shows Load Keystore button on idle screen', async ({ page }) => {
+    await page.goto(routes.createWallet)
+    await expect(page.getByRole('button', { name: en.createWallet.importKeystoreBtn })).toBeVisible()
+  })
+
+  test('navigates to keystore file step when Load Keystore is clicked', async ({ page }) => {
+    await page.goto(routes.createWallet)
+    await page.getByRole('button', { name: en.createWallet.importKeystoreBtn }).click()
+    await expect(page.getByText(en.createWallet.keystoreFileInstruction)).toBeVisible()
+  })
+
+  test('shows file input with correct label', async ({ page }) => {
+    await page.goto(routes.createWallet)
+    await page.getByRole('button', { name: en.createWallet.importKeystoreBtn }).click()
+    await expect(page.getByLabel(en.createWallet.keystoreFileLabel)).toBeVisible()
+  })
+
+  test('Back returns to idle step', async ({ page }) => {
+    await page.goto(routes.createWallet)
+    await page.getByRole('button', { name: en.createWallet.importKeystoreBtn }).click()
+    await page.getByText(en.createWallet.backBtn).click()
+    await expect(page.getByText(en.createWallet.generateBtn)).toBeVisible()
+  })
+
+  test('shows error for invalid file type', async ({ page }) => {
+    await page.goto(routes.createWallet)
+    await page.getByRole('button', { name: en.createWallet.importKeystoreBtn }).click()
+    await page.getByLabel(en.createWallet.keystoreFileLabel).setInputFiles({
+      name: 'notjson.txt',
+      mimeType: 'text/plain',
+      buffer: Buffer.from('not json'),
+    })
+    await expect(page.getByText(en.createWallet.keystoreFileError)).toBeVisible()
+  })
+})
+
+test.describe('Wallet — keystorePassword step', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(routes.createWallet)
+    await page.getByRole('button', { name: en.createWallet.importKeystoreBtn }).click()
+    await page.getByLabel(en.createWallet.keystoreFileLabel).setInputFiles({
+      name: 'keystore.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from('{"version":3,"id":"test"}'),
+    })
+    await expect(page.getByText(en.createWallet.keystorePasswordInstruction)).toBeVisible()
+  })
+
+  test('shows password input', async ({ page }) => {
+    await expect(page.getByLabel(en.createWallet.keystorePasswordLabel)).toBeVisible()
+  })
+
+  test('shows decrypt button', async ({ page }) => {
+    await expect(page.getByRole('button', { name: en.createWallet.keystoreDecryptBtn })).toBeVisible()
+  })
+
+  test('Back returns to file step', async ({ page }) => {
+    await page.getByText(en.createWallet.backBtn).click()
+    await expect(page.getByText(en.createWallet.keystoreFileInstruction)).toBeVisible()
+  })
+
+  test('decrypt button is enabled when password is entered', async ({ page }) => {
+    await page.getByLabel(en.createWallet.keystorePasswordLabel).fill('somepassword')
+    await expect(page.getByRole('button', { name: en.createWallet.keystoreDecryptBtn })).not.toBeDisabled()
+  })
+
+  test('shows wrong password error after failed decryption', async ({ page }) => {
+    await page.getByLabel(en.createWallet.keystorePasswordLabel).fill('wrongpassword')
+    await page.getByRole('button', { name: en.createWallet.keystoreDecryptBtn }).click()
+    await expect(page.getByText(en.createWallet.keystorePasswordError)).toBeVisible()
   })
 })

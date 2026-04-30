@@ -33,3 +33,15 @@ export async function downloadKeystore(wallet: GeneratedWallet, password: string
 export function truncateAddress(address: string): string {
   return `${address.slice(0, config.addressPrefixLength)}...${address.slice(-config.addressSuffixLength)}`
 }
+
+export function loadKeystore(file: File): Promise<string> {
+  if (!file.name.endsWith('.json') && file.type !== 'application/json') {
+    return Promise.reject(new Error('Not a JSON file'))
+  }
+  return file.text()
+}
+
+export async function decryptKeystore(json: string, password: string): Promise<string> {
+  const wallet = await Wallet.fromEncryptedJson(json, password)
+  return wallet.privateKey
+}

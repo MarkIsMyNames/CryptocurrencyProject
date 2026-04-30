@@ -31,7 +31,9 @@
       "password": "Set Password",
       "phrase": "Recovery Phrase",
       "verify": "Verify Phrase",
-      "complete": "Wallet Ready"
+      "complete": "Wallet Ready",
+      "keystoreFile": "Load Keystore",
+      "keystorePassword": "Decrypt Keystore"
     },
     "passwordLabel": "Password",
     "passwordPlaceholder": "At least 8 characters",
@@ -51,7 +53,16 @@
     "nextBtn": "Next",
     "backBtn": "Back",
     "verifyBtn": "Verify & Connect",
-    "goToBalance": "View My Wallet"
+    "goToBalance": "View My Wallet",
+    "importKeystoreBtn": "Load Keystore",
+    "keystoreFileLabel": "Keystore file (.json)",
+    "keystoreFileInstruction": "Select the JSON keystore file you downloaded when creating your wallet.",
+    "keystoreFileError": "Invalid keystore file. Please select a valid JSON keystore.",
+    "keystorePasswordLabel": "Keystore password",
+    "keystorePasswordPlaceholder": "Enter your keystore password",
+    "keystorePasswordInstruction": "Enter the password you used when generating this keystore.",
+    "keystorePasswordError": "Incorrect password. Please try again.",
+    "keystoreDecryptBtn": "Decrypt & Connect"
   },
   "balance": {
     "title": "Wallet Balance",

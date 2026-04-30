@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useWallet } from '../../context/useWallet'
-import { generateWallet, downloadKeystore } from '../../utils/wallet'
+import { generateWallet, downloadKeystore, loadKeystore, decryptKeystore } from '../../utils/wallet'
 import type { GeneratedWallet } from '../../utils/wallet'
 import { Status, routes, config, CreateWalletStep } from '../../config'
 import en from '../../locales/en.json'
@@ -11,6 +11,8 @@ import { PasswordStep } from './PasswordStep/PasswordStep'
 import { PhraseStep } from './PhraseStep/PhraseStep'
 import { VerifyStep } from './VerifyStep/VerifyStep'
 import { CompleteStep } from './CompleteStep/CompleteStep'
+import { KeystoreFileStep } from './KeystoreFileStep/KeystoreFileStep'
+import { KeystorePasswordStep } from './KeystorePasswordStep/KeystorePasswordStep'
 
 function pickVerifyIndices(mnemonic: string): number[] {
   const wordCount = mnemonic.split(' ').length
@@ -37,6 +39,11 @@ export function CreateWallet() {
     Array(config.createWalletVerifyCount).fill(''),
   )
   const [verifyError, setVerifyError] = useState<string | null>(null)
+  const [keystoreJson, setKeystoreJson] = useState<string | null>(null)
+  const [keystorePassword, setKeystorePassword] = useState('')
+  const [keystoreFileError, setKeystoreFileError] = useState<string | null>(null)
+  const [keystorePasswordError, setKeystorePasswordError] = useState<string | null>(null)
+  const [isDecrypting, setIsDecrypting] = useState(false)
 
   function handleStartGenerate() {
     setPassword('')
@@ -81,6 +88,71 @@ export function CreateWallet() {
   async function handleDownload() {
     if (!wallet) return
     await downloadKeystore(wallet, password)
+  }
+
+  async function handleKeystoreFileSelect(file: File) {
+    setKeystoreFileError(null)
+    try {
+      const json = await loadKeystore(file)
+      setKeystoreJson(json)
+      setKeystorePassword('')
+      setKeystorePasswordError(null)
+      setStep(CreateWalletStep.keystorePassword)
+    } catch {
+      setKeystoreFileError(en.createWallet.keystoreFileError)
+    }
+  }
+
+  async function handleKeystoreDecrypt() {
+    if (!keystoreJson) return
+    setIsDecrypting(true)
+    setKeystorePasswordError(null)
+    try {
+      const privateKey = await decryptKeystore(keystoreJson, keystorePassword)
+      const success = await connectWithWallet(privateKey)
+      if (success) navigate(routes.balance)
+    } catch {
+      setKeystorePasswordError(en.createWallet.keystorePasswordError)
+    } finally {
+      setIsDecrypting(false)
+    }
+  }
+
+  if (step === CreateWalletStep.keystoreFile) {
+    return (
+      <KeystoreFileStep
+        fileError={keystoreFileError}
+        onFileSelect={(file) => {
+          void handleKeystoreFileSelect(file)
+        }}
+        onBack={() => {
+          setKeystoreJson(null)
+          setKeystoreFileError(null)
+          setStep(CreateWalletStep.idle)
+        }}
+      />
+    )
+  }
+
+  if (step === CreateWalletStep.keystorePassword) {
+    return (
+      <KeystorePasswordStep
+        password={keystorePassword}
+        passwordError={keystorePasswordError}
+        isDecrypting={isDecrypting}
+        onPasswordChange={(v) => {
+          setKeystorePassword(v)
+        }}
+        onBack={() => {
+          setKeystorePasswordError(null)
+          setKeystorePassword('')
+          setStep(CreateWalletStep.keystoreFile)
+        }}
+        onDecrypt={() => {
+          void handleKeystoreDecrypt()
+        }}
+      />
+    )
   }
 
   if (step === CreateWalletStep.password) {
@@ -171,6 +243,13 @@ export function CreateWallet() {
         <PrimaryButton onClick={handleStartGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
         <PrimaryButton disabled={isConnecting || isConnected} onClick={() => void connect()}>
           {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
+        </PrimaryButton>
+        <PrimaryButton
+          onClick={() => {
+            setStep(CreateWalletStep.keystoreFile)
+          }}
+        >
+          {en.createWallet.importKeystoreBtn}
         </PrimaryButton>
       </ButtonRow>
       {isConnected && (
