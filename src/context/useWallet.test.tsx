@@ -57,9 +57,9 @@ describe('useWallet', () => {
 describe('useConnectedWallet', () => {
   it('throws in disconnected state', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
-    expect(() => renderHook(useConnectedWallet, { wrapper: ({ children }) => withProvider(children) })).toThrow(
-      strings.errors.notConnected,
-    )
+    expect(() =>
+      renderHook(useConnectedWallet, { wrapper: ({ children }) => withProvider(children) }),
+    ).toThrow(strings.errors.notConnected)
     vi.restoreAllMocks()
   })
 
