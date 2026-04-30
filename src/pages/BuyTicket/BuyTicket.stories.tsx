@@ -1,6 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext, type WalletContextValue } from '../../context/walletContext'
+import { BrowserProvider, JsonRpcSigner } from 'ethers'
+import { vi } from 'vitest'
+import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 import { BuyTicket } from './BuyTicket'
+
+vi.mock('../../utils/contract', () => ({
+  remainingTickets: vi.fn().mockResolvedValue(100n),
+  buyTicket: vi.fn(),
+  decodeContractError: vi.fn(),
+}))
 
 const base: WalletContextValue = {
   isConnected: false,
@@ -34,11 +42,21 @@ type Story = StoryObj<WalletContextValue>
 export const Default: Story = {}
 
 export const Connected: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as never },
+  args: {
+    isConnected: true,
+    address: '0xabc123',
+    signer: {} as unknown as JsonRpcSigner,
+    provider: {} as unknown as BrowserProvider,
+  },
 }
 
 export const ButtonHover: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as never },
+  args: {
+    isConnected: true,
+    address: '0xabc123',
+    signer: {} as unknown as JsonRpcSigner,
+    provider: {} as unknown as BrowserProvider,
+  },
   parameters: { pseudo: { hover: true } },
 }
 

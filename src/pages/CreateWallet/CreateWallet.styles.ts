@@ -164,6 +164,7 @@ export const Label = styled.label`
 `
 
 export const TextInput = styled.input`
+  box-sizing: border-box;
   background: ${({ theme }) => theme.colors.backgroundCard};
   border: 1px solid ${({ theme }) => theme.colors.borderDefault};
   border-radius: ${({ theme }) => theme.borderRadius.md};

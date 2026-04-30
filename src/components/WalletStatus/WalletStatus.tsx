@@ -6,6 +6,10 @@ import { StatusWrapper, StatusDot, StatusText } from './WalletStatus.styles'
 export function WalletStatus() {
   const { isConnected, address } = useWallet()
 
+  if (isConnected && !address) {
+    throw new Error(strings.errors.connectedNoAddress)
+  }
+
   return (
     <StatusWrapper>
       <StatusDot $connected={isConnected} />

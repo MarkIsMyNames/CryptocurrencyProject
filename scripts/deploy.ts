@@ -2,13 +2,14 @@ import '@nomicfoundation/hardhat-ethers'
 import { network } from 'hardhat'
 import { writeFileSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { requireEnv } from '../shared/requireEnv'
 
-const MAX_SUPPLY = 1000
-const TICKET_PRICE_WEI = 10_000_000_000_000_000n // 0.01 ETH
+const MAX_SUPPLY = Number(requireEnv(process.env.VITE_MAX_SUPPLY, 'VITE_MAX_SUPPLY'))
+const TICKET_PRICE_WEI = BigInt(requireEnv(process.env.VITE_TICKET_PRICE_WEI, 'VITE_TICKET_PRICE_WEI'))
 
 async function main() {
-  const { ethers } = await network.create()
-  const [deployer] = await ethers.getSigners()
+  const { ethers } = await network.create() // Connects to the test network
+  const [deployer] = await ethers.getSigners() // Assigns first signer to deployer
 
   console.log(`Deploying from: ${deployer.address}`)
 
@@ -26,7 +27,7 @@ async function main() {
   console.log(`.env updated with new contract address`)
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error(err)
   process.exit(1)
 })

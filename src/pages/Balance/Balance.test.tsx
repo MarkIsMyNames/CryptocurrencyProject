@@ -1,7 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent, waitFor } from '../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { Balance } from './Balance'
 
@@ -26,14 +24,6 @@ const mockGetBalance = vi.fn().mockResolvedValue(BigInt('1500000000000000000'))
 
 const VALID_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678'
 
-function renderPage() {
-  return render(
-    <ThemeProvider theme={theme}>
-      <Balance />
-    </ThemeProvider>,
-  )
-}
-
 function checkAddress(address: string) {
   const input = screen.getByPlaceholderText(en.balance.placeholder)
   fireEvent.change(input, { target: { value: address } })
@@ -42,19 +32,19 @@ function checkAddress(address: string) {
 
 describe('Balance', () => {
   it('renders title and subtitle', () => {
-    renderPage()
+    customRender(<Balance />)
     expect(screen.getByText(en.balance.title)).toBeInTheDocument()
     expect(screen.getByText(en.balance.subtitle)).toBeInTheDocument()
   })
 
   it('renders the address input and check button', () => {
-    renderPage()
+    customRender(<Balance />)
     expect(screen.getByPlaceholderText(en.balance.placeholder)).toBeInTheDocument()
     expect(screen.getByText(en.balance.checkBtn)).toBeInTheDocument()
   })
 
   it('shows invalid address error for bad input', async () => {
-    renderPage()
+    customRender(<Balance />)
     checkAddress('notanaddress')
     await waitFor(() => {
       expect(screen.getByText(en.balance.invalidAddress)).toBeInTheDocument()
@@ -62,7 +52,7 @@ describe('Balance', () => {
   })
 
   it('shows SETH balance after checking', async () => {
-    renderPage()
+    customRender(<Balance />)
     checkAddress(VALID_ADDRESS)
     await waitFor(() => {
       expect(screen.getByText(/1\.5/)).toBeInTheDocument()
@@ -71,7 +61,7 @@ describe('Balance', () => {
 
   it('shows valid ticket badge when ETK > 0', async () => {
     mockBalanceOf.mockResolvedValue(BigInt(1))
-    renderPage()
+    customRender(<Balance />)
     checkAddress(VALID_ADDRESS)
     await waitFor(() => {
       expect(screen.getByText(en.balance.ticketValid)).toBeInTheDocument()
@@ -80,7 +70,7 @@ describe('Balance', () => {
 
   it('shows no ticket badge when ETK = 0', async () => {
     mockBalanceOf.mockResolvedValue(BigInt(0))
-    renderPage()
+    customRender(<Balance />)
     checkAddress(VALID_ADDRESS)
     await waitFor(() => {
       expect(screen.getByText(en.balance.ticketNone)).toBeInTheDocument()
@@ -89,7 +79,7 @@ describe('Balance', () => {
 
   it('shows remaining supply after checking', async () => {
     mockRemainingTickets.mockResolvedValue(BigInt(999))
-    renderPage()
+    customRender(<Balance />)
     checkAddress(VALID_ADDRESS)
     await waitFor(() => {
       expect(screen.getByText(/999/)).toBeInTheDocument()
@@ -98,7 +88,7 @@ describe('Balance', () => {
 
   it('shows unknown error on network failure', async () => {
     mockGetBalance.mockRejectedValueOnce(new Error('network'))
-    renderPage()
+    customRender(<Balance />)
     checkAddress(VALID_ADDRESS)
     await waitFor(() => {
       expect(screen.getByText(en.errors.unknownError)).toBeInTheDocument()

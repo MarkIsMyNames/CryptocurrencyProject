@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useWallet } from '../../context/useWallet'
+import { useWallet, useConnectedWallet } from '../../context/useWallet'
 import { redeemTicket, decodeContractError } from '../../utils/contract'
 import { Status } from '../../config'
 import strings from '../../locales/en.json'
@@ -18,8 +18,8 @@ import {
   ConnectPrompt,
 } from './RedeemTicket.styles'
 
-export function RedeemTicket() {
-  const { signer, address, isConnected, etkBalance, refreshBalances } = useWallet()
+function RedeemTicketConnected() {
+  const { signer, address, etkBalance, refreshBalances } = useConnectedWallet()
   const [status, setStatus] = useState<StatusType>(null)
   const [statusMessage, setStatusMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
@@ -30,7 +30,6 @@ export function RedeemTicket() {
   const isDisabled = isPending || !hasTicket || isSuccess
 
   async function handleRedeem() {
-    if (!signer) return
     setStatus(Status.pending)
     setStatusMessage(strings.redeem.pending)
     try {
@@ -47,32 +46,40 @@ export function RedeemTicket() {
   }
 
   return (
+    <>
+      <TicketCard>
+        <FieldLabel>{strings.redeem.yourAddress}</FieldLabel>
+        <FieldValue>{address}</FieldValue>
+      </TicketCard>
+      <TicketCard>
+        <FieldLabel>{strings.redeem.ticketStatus}</FieldLabel>
+        <TicketStatusBadge $valid={hasTicket}>
+          {hasTicket ? strings.redeem.hasTicket : strings.redeem.noTicket}
+        </TicketStatusBadge>
+      </TicketCard>
+      <PrimaryActionButton
+        onClick={() => {
+          void handleRedeem()
+        }}
+        disabled={isDisabled}
+      >
+        {strings.redeem.redeemBtn}
+      </PrimaryActionButton>
+      {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
+      {txHash !== null && <TxReceipt hash={txHash} />}
+    </>
+  )
+}
+
+export function RedeemTicket() {
+  const { isConnected } = useWallet()
+
+  return (
     <PageWrapper>
       <Title>{strings.redeem.title}</Title>
       <Subtitle>{strings.redeem.subtitle}</Subtitle>
       {isConnected ? (
-        <>
-          <TicketCard>
-            <FieldLabel>{strings.redeem.yourAddress}</FieldLabel>
-            <FieldValue>{address}</FieldValue>
-          </TicketCard>
-          <TicketCard>
-            <FieldLabel>{strings.redeem.ticketStatus}</FieldLabel>
-            <TicketStatusBadge $valid={hasTicket}>
-              {hasTicket ? strings.redeem.hasTicket : strings.redeem.noTicket}
-            </TicketStatusBadge>
-          </TicketCard>
-          <PrimaryActionButton
-            onClick={() => {
-              void handleRedeem()
-            }}
-            disabled={isDisabled}
-          >
-            {strings.redeem.redeemBtn}
-          </PrimaryActionButton>
-          {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
-          {txHash !== null && <TxReceipt hash={txHash} />}
-        </>
+        <RedeemTicketConnected />
       ) : (
         <ConnectPrompt>{strings.redeem.connectFirst}</ConnectPrompt>
       )}

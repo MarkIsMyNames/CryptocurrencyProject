@@ -41,18 +41,25 @@ cp .env.example .env
 Edit `.env`:
 ```
 VITE_CONTRACT_ADDRESS=0xYourContractAddressHere
+VITE_MAX_SUPPLY=1000
+VITE_TICKET_PRICE_WEI=10000000000000000
+VITE_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 ```
+
+`VITE_MAX_SUPPLY` and `VITE_TICKET_PRICE_WEI` must match the values used when the contract was deployed. The defaults (1000 tickets, 0.01 ETH) are pre-filled in `.env.example`.
 
 ## Deploying the Contract
 
 The app requires `EventTicket.sol` to be deployed on Sepolia before wallet connection will work.
 
 1. Export your MetaMask private key: MetaMask → Account Details → Show Private Key
-2. Add the following to your `.env`:
+2. Add the following to your `.env` (adjust `VITE_MAX_SUPPLY` and `VITE_TICKET_PRICE_WEI` if you want different values):
 
 ```
-SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+VITE_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 DEPLOY_PRIVATE_KEY=0xYourPrivateKeyHere
+VITE_MAX_SUPPLY=1000
+VITE_TICKET_PRICE_WEI=10000000000000000
 ```
 
 3. Run:

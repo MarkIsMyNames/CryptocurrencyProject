@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import en from '../src/locales/en.json' with { type: 'json' }
-import { routes } from '../src/config'
+import { routes } from '../src/routes'
 
 test.describe('Balance Check', () => {
   test('shows balance page with address input', async ({ page }) => {

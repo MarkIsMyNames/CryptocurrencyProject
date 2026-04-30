@@ -19,6 +19,7 @@ dist-ssr
 *.d.ts
 !src/styled.d.ts
 !src/globals.d.ts
+!src/vite-env.d.ts
 vite.config.js
 
 # Editor directories and files

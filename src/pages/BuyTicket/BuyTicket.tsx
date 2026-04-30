@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useWallet } from '../../context/useWallet'
+import { useWallet, useConnectedWallet } from '../../context/useWallet'
 import { remainingTickets, buyTicket, decodeContractError } from '../../utils/contract'
 import { config, Status } from '../../config'
 import strings from '../../locales/en.json'
@@ -18,15 +18,14 @@ import {
   ConnectPrompt,
 } from './BuyTicket.styles'
 
-export function BuyTicket() {
-  const { signer, provider, isConnected, etkBalance, refreshBalances } = useWallet()
+function BuyTicketConnected() {
+  const { signer, provider, etkBalance, refreshBalances } = useConnectedWallet()
   const [remaining, setRemaining] = useState<bigint | null>(null)
   const [status, setStatus] = useState<StatusType>(null)
   const [statusMessage, setStatusMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
 
   useEffect(() => {
-    if (!provider) return
     void remainingTickets(provider).then(setRemaining)
   }, [provider])
 
@@ -37,7 +36,6 @@ export function BuyTicket() {
   const isDisabled = isPending || alreadyOwned || isSoldOut || isSuccess
 
   async function handleBuy() {
-    if (!signer) return
     setStatus(Status.pending)
     setStatusMessage(strings.buyTicket.pending)
     try {
@@ -54,6 +52,35 @@ export function BuyTicket() {
   }
 
   return (
+    <>
+      <InfoCard>
+        <InfoRow>
+          <InfoLabel>{strings.buyTicket.remainingLabel}</InfoLabel>
+          <InfoValue>{remaining !== null ? String(remaining) : '—'}</InfoValue>
+        </InfoRow>
+        <InfoRow>
+          <InfoLabel>{strings.buyTicket.yourBalanceLabel}</InfoLabel>
+          <InfoValue>{etkBalance !== null ? String(etkBalance) : '—'}</InfoValue>
+        </InfoRow>
+      </InfoCard>
+      <PrimaryActionButton
+        onClick={() => {
+          void handleBuy()
+        }}
+        disabled={isDisabled}
+      >
+        {strings.buyTicket.buyBtn}
+      </PrimaryActionButton>
+      {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
+      {txHash !== null && <TxReceipt hash={txHash} />}
+    </>
+  )
+}
+
+export function BuyTicket() {
+  const { isConnected } = useWallet()
+
+  return (
     <PageWrapper>
       <Title>{strings.buyTicket.title}</Title>
       <Subtitle>{strings.buyTicket.subtitle}</Subtitle>
@@ -62,31 +89,12 @@ export function BuyTicket() {
           <InfoLabel>{strings.buyTicket.priceLabel}</InfoLabel>
           <InfoValue>{config.ticketPriceDisplay}</InfoValue>
         </InfoRow>
-        <InfoRow>
-          <InfoLabel>{strings.buyTicket.remainingLabel}</InfoLabel>
-          <InfoValue>{remaining !== null ? String(remaining) : '—'}</InfoValue>
-        </InfoRow>
-        {isConnected && (
-          <InfoRow>
-            <InfoLabel>{strings.buyTicket.yourBalanceLabel}</InfoLabel>
-            <InfoValue>{etkBalance !== null ? String(etkBalance) : '—'}</InfoValue>
-          </InfoRow>
-        )}
       </InfoCard>
       {isConnected ? (
-        <PrimaryActionButton
-          onClick={() => {
-            void handleBuy()
-          }}
-          disabled={isDisabled}
-        >
-          {strings.buyTicket.buyBtn}
-        </PrimaryActionButton>
+        <BuyTicketConnected />
       ) : (
         <ConnectPrompt>{strings.buyTicket.connectFirst}</ConnectPrompt>
       )}
-      {status !== null && <StatusMessage $type={status}>{statusMessage}</StatusMessage>}
-      {txHash !== null && <TxReceipt hash={txHash} />}
     </PageWrapper>
   )
 }

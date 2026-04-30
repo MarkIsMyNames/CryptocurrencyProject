@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext, type WalletContextValue } from '../../context/walletContext'
+import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 import en from '../../locales/en.json'
 import { CreateWallet } from './CreateWallet'
 

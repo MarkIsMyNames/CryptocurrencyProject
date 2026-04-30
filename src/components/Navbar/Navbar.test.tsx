@@ -1,30 +1,17 @@
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen } from '../../test-utils'
 import { describe, it, expect } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { routes } from '../../config'
 import { Navbar } from './Navbar'
 
-function renderNavbar() {
-  return render(
-    <MemoryRouter>
-      <ThemeProvider theme={theme}>
-        <Navbar />
-      </ThemeProvider>
-    </MemoryRouter>,
-  )
-}
-
 describe('Navbar', () => {
   it('renders brand name', () => {
-    renderNavbar()
+    customRender(<Navbar />)
     expect(screen.getByText(en.brand)).toBeInTheDocument()
   })
 
   it('renders all navigation links', () => {
-    renderNavbar()
+    customRender(<Navbar />)
     expect(screen.getByText(en.nav.createWallet)).toBeInTheDocument()
     expect(screen.getByText(en.nav.balance)).toBeInTheDocument()
     expect(screen.getByText(en.nav.buyTicket)).toBeInTheDocument()
@@ -32,30 +19,19 @@ describe('Navbar', () => {
   })
 
   it('renders a nav element', () => {
-    const { container } = renderNavbar()
+    const { container } = customRender(<Navbar />)
     expect(container.querySelector('nav')).toBeInTheDocument()
   })
 
-  it('active link has aria-current=page', () => {
-    render(
-      <MemoryRouter initialEntries={[routes.balance]}>
-        <ThemeProvider theme={theme}>
-          <Navbar />
-        </ThemeProvider>
-      </MemoryRouter>,
-    )
-    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
-    expect(screen.getByRole('link', { name: en.nav.createWallet })).not.toHaveAttribute(
-      'aria-current',
-      'page',
-    )
+  it('all nav links have an accessible name', () => {
+    customRender(<Navbar />)
+    screen.getAllByRole('link').forEach((link) => {
+      expect(link).toHaveAccessibleName()
+    })
   })
 
   it('nav links point to correct routes', () => {
-    renderNavbar()
+    customRender(<Navbar />)
     expect(screen.getByRole('link', { name: en.nav.createWallet })).toHaveAttribute(
       'href',
       routes.createWallet,

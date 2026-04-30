@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import strings from '../../locales/en.json'
 import { WalletStatus } from './WalletStatus'
-import { WalletContext, type WalletContextValue } from '../../context/walletContext'
+import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 
 const base: WalletContextValue = {
   isConnected: false,
@@ -40,13 +40,6 @@ export const Connected: Story = {
     address: '0x1234567890abcdef1234567890abcdef12345678',
     ethBalance: BigInt('1000000000000000000'),
     etkBalance: BigInt(1),
-  },
-}
-
-export const ConnectedNoAddress: Story = {
-  args: {
-    isConnected: true,
-    address: null,
   },
 }
 

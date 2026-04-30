@@ -1,7 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent, waitFor } from '../../test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { RedeemTicket } from './RedeemTicket'
 
@@ -15,6 +13,7 @@ vi.mock('../../utils/contract', () => ({
 
 vi.mock('../../context/useWallet', () => ({
   useWallet: mockUseWallet,
+  useConnectedWallet: mockUseWallet,
 }))
 
 const connectedWallet = {
@@ -36,52 +35,46 @@ beforeEach(() => {
   mockUseWallet.mockReturnValue(connectedWallet)
 })
 
-function renderPage() {
-  return render(
-    <ThemeProvider theme={theme}>
-      <RedeemTicket />
-    </ThemeProvider>,
-  )
-}
-
 describe('RedeemTicket', () => {
   it('shows connect prompt when not connected', () => {
     mockUseWallet.mockReturnValueOnce({ ...connectedWallet, isConnected: false })
-    renderPage()
+    customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.connectFirst)).toBeInTheDocument()
   })
 
   it('shows wallet address when connected', () => {
-    renderPage()
+    customRender(<RedeemTicket />)
     expect(screen.getByText('0xabc123')).toBeInTheDocument()
   })
 
   it('shows valid ticket status when etkBalance > 0', () => {
-    renderPage()
+    customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.hasTicket)).toBeInTheDocument()
   })
 
   it('shows no ticket status when etkBalance is 0', () => {
-    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(0) })
-    renderPage()
+    const noTicket = { ...connectedWallet, etkBalance: BigInt(0) }
+    mockUseWallet.mockReturnValueOnce(noTicket).mockReturnValueOnce(noTicket)
+    customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.noTicket)).toBeInTheDocument()
   })
 
   it('disables redeem button when no ticket', () => {
-    mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(0) })
-    renderPage()
+    const noTicket = { ...connectedWallet, etkBalance: BigInt(0) }
+    mockUseWallet.mockReturnValueOnce(noTicket).mockReturnValueOnce(noTicket)
+    customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.redeemBtn)).toBeDisabled()
   })
 
   it('renders redeem button when connected with ticket', () => {
-    renderPage()
+    customRender(<RedeemTicket />)
     expect(screen.getByText(en.redeem.redeemBtn)).toBeInTheDocument()
     expect(screen.getByText(en.redeem.redeemBtn)).not.toBeDisabled()
   })
 
   it('shows pending state during redemption', async () => {
     mockRedeemTicket.mockImplementation(() => new Promise(() => {}))
-    renderPage()
+    customRender(<RedeemTicket />)
     fireEvent.click(screen.getByText(en.redeem.redeemBtn))
     await waitFor(() => {
       expect(screen.getByText(en.redeem.pending)).toBeInTheDocument()
@@ -90,7 +83,7 @@ describe('RedeemTicket', () => {
 
   it('shows success message after redemption', async () => {
     mockRedeemTicket.mockResolvedValue({ wait: vi.fn().mockResolvedValue({}) })
-    renderPage()
+    customRender(<RedeemTicket />)
     fireEvent.click(screen.getByText(en.redeem.redeemBtn))
     await waitFor(() => {
       expect(screen.getByText(en.redeem.success)).toBeInTheDocument()
@@ -99,7 +92,7 @@ describe('RedeemTicket', () => {
 
   it('shows no-ticket error when wallet has no ETK', async () => {
     mockRedeemTicket.mockRejectedValue(new Error('NoTicketToRedeem'))
-    renderPage()
+    customRender(<RedeemTicket />)
     fireEvent.click(screen.getByText(en.redeem.redeemBtn))
     await waitFor(() => {
       expect(screen.getByText(en.redeem.noTicketError)).toBeInTheDocument()

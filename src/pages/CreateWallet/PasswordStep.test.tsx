@@ -1,28 +1,24 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent } from '../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { PasswordStep } from './PasswordStep'
 
 const noop = () => {}
 
 function renderStep(overrides: Partial<Parameters<typeof PasswordStep>[0]> = {}) {
-  return render(
-    <ThemeProvider theme={theme}>
-      <PasswordStep
-        password=""
-        confirm=""
-        showPassword={false}
-        passwordError={null}
-        onPasswordChange={noop}
-        onConfirmChange={noop}
-        onToggleShow={noop}
-        onBack={noop}
-        onNext={noop}
-        {...overrides}
-      />
-    </ThemeProvider>,
+  return customRender(
+    <PasswordStep
+      password=""
+      confirm=""
+      showPassword={false}
+      passwordError={null}
+      onPasswordChange={noop}
+      onConfirmChange={noop}
+      onToggleShow={noop}
+      onBack={noop}
+      onNext={noop}
+      {...overrides}
+    />,
   )
 }
 

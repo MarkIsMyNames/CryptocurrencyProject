@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import en from '../src/locales/en.json' with { type: 'json' }
-import { routes } from '../src/config'
+import { routes } from '../src/routes'
 
 test.describe('Navbar', () => {
   test('renders brand and all nav links', async ({ page }) => {
