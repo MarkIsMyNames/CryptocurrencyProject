@@ -12,14 +12,20 @@ export const Status = {
   error: 'error',
 } as const
 
+function requireEnv(value: string | undefined, name: string): string {
+  if (!value) throw new Error(`Missing required environment variable: ${name}`)
+  return value
+}
+
 export const config = {
-  contractAddress: import.meta.env.VITE_CONTRACT_ADDRESS,
+  contractAddress: requireEnv(import.meta.env.VITE_CONTRACT_ADDRESS, 'VITE_CONTRACT_ADDRESS'),
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
-  sepoliaRpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
-  ticketPriceWei: import.meta.env.VITE_TICKET_PRICE_WEI,
+  metamaskChainNotFoundCode: 4902,
+  sepoliaRpcUrl: requireEnv(import.meta.env.VITE_SEPOLIA_RPC_URL, 'VITE_SEPOLIA_RPC_URL'),
+  ticketPriceWei: requireEnv(import.meta.env.VITE_TICKET_PRICE_WEI, 'VITE_TICKET_PRICE_WEI'),
   ticketPriceDisplay: '0.01 SETH',
-  defaultTicketSupply: Number(import.meta.env.VITE_MAX_SUPPLY),
+  defaultTicketSupply: Number(requireEnv(import.meta.env.VITE_MAX_SUPPLY, 'VITE_MAX_SUPPLY')),
   tokenSymbol: 'ETK',
   tokenName: 'EventTicket',
   addressPrefixLength: 6,
