@@ -55,10 +55,6 @@ function BuyTicketConnected() {
     <>
       <InfoCard>
         <InfoRow>
-          <InfoLabel>{strings.buyTicket.priceLabel}</InfoLabel>
-          <InfoValue>{config.ticketPriceDisplay}</InfoValue>
-        </InfoRow>
-        <InfoRow>
           <InfoLabel>{strings.buyTicket.remainingLabel}</InfoLabel>
           <InfoValue>{remaining !== null ? String(remaining) : '—'}</InfoValue>
         </InfoRow>
@@ -88,6 +84,12 @@ export function BuyTicket() {
     <PageWrapper>
       <Title>{strings.buyTicket.title}</Title>
       <Subtitle>{strings.buyTicket.subtitle}</Subtitle>
+      <InfoCard>
+        <InfoRow>
+          <InfoLabel>{strings.buyTicket.priceLabel}</InfoLabel>
+          <InfoValue>{config.ticketPriceDisplay}</InfoValue>
+        </InfoRow>
+      </InfoCard>
       {isConnected ? (
         <BuyTicketConnected />
       ) : (

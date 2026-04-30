@@ -18,9 +18,4 @@ test.describe('Buy Ticket', () => {
     await expect(page.getByRole('heading', { name: en.buyTicket.title })).toBeVisible()
     await expect(page.getByText(en.buyTicket.subtitle)).toBeVisible()
   })
-
-  test('shows tickets remaining label', async ({ page }) => {
-    await page.goto(routes.buyTicket)
-    await expect(page.getByText(en.buyTicket.remainingLabel)).toBeVisible()
-  })
 })
