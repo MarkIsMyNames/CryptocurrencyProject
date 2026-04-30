@@ -8,7 +8,10 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialEntries?: string[]
 }
 
-export function customRender(ui: React.ReactElement, { initialEntries, ...options }: CustomRenderOptions = {}) {
+export function customRender(
+  ui: React.ReactElement,
+  { initialEntries, ...options }: CustomRenderOptions = {},
+) {
   return render(
     <MemoryRouter initialEntries={initialEntries}>
       <ThemeProvider theme={theme}>{ui}</ThemeProvider>

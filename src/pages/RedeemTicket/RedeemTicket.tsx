@@ -78,7 +78,11 @@ export function RedeemTicket() {
     <PageWrapper>
       <Title>{strings.redeem.title}</Title>
       <Subtitle>{strings.redeem.subtitle}</Subtitle>
-      {isConnected ? <RedeemTicketConnected /> : <ConnectPrompt>{strings.redeem.connectFirst}</ConnectPrompt>}
+      {isConnected ? (
+        <RedeemTicketConnected />
+      ) : (
+        <ConnectPrompt>{strings.redeem.connectFirst}</ConnectPrompt>
+      )}
     </PageWrapper>
   )
 }

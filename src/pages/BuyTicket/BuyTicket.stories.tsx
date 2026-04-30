@@ -35,11 +35,21 @@ type Story = StoryObj<WalletContextValue>
 export const Default: Story = {}
 
 export const Connected: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as unknown as JsonRpcSigner, provider: {} as unknown as BrowserProvider },
+  args: {
+    isConnected: true,
+    address: '0xabc123',
+    signer: {} as unknown as JsonRpcSigner,
+    provider: {} as unknown as BrowserProvider,
+  },
 }
 
 export const ButtonHover: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as unknown as JsonRpcSigner, provider: {} as unknown as BrowserProvider },
+  args: {
+    isConnected: true,
+    address: '0xabc123',
+    signer: {} as unknown as JsonRpcSigner,
+    provider: {} as unknown as BrowserProvider,
+  },
   parameters: { pseudo: { hover: true } },
 }
 

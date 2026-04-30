@@ -47,5 +47,4 @@ describe('WalletStatus', () => {
     customRender(<WalletStatus />)
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument()
   })
-
 })

@@ -5,7 +5,10 @@ import strings from '../locales/en.json'
 import { balanceOf, decodeContractError } from '../utils/contract'
 import { WalletContext, type WalletContextValue } from './useWallet'
 
-type WalletState = Omit<WalletContextValue, 'connect' | 'connectWithWallet' | 'disconnect' | 'refreshBalances'>
+type WalletState = Omit<
+  WalletContextValue,
+  'connect' | 'connectWithWallet' | 'disconnect' | 'refreshBalances'
+>
 
 const disconnectedState: WalletState = {
   provider: null,
@@ -25,25 +28,36 @@ function connectedState(
   ethBalance: bigint | null,
   etkBalance: bigint | null,
 ): WalletState {
-  return { provider, signer, address, ethBalance, etkBalance, isConnected: true, isConnecting: false, error: null }
+  return {
+    provider,
+    signer,
+    address,
+    ethBalance,
+    etkBalance,
+    isConnected: true,
+    isConnecting: false,
+    error: null,
+  }
 }
 
 async function fetchBalances(
   provider: BrowserProvider | JsonRpcProvider,
   address: string,
 ): Promise<[bigint, bigint]> {
-  return Promise.all([
-    provider.getBalance(address),
-    balanceOf(provider, address),
-  ])
+  return Promise.all([provider.getBalance(address), balanceOf(provider, address)])
 }
 
-async function getSepoliaProvider(ethereum: NonNullable<typeof window.ethereum>): Promise<BrowserProvider> {
+async function getSepoliaProvider(
+  ethereum: NonNullable<typeof window.ethereum>,
+): Promise<BrowserProvider> {
   const provider = new BrowserProvider(ethereum)
   const network = await provider.getNetwork()
   if (network.chainId !== BigInt(config.sepoliaChainId)) {
     await ethereum
-      .request({ method: 'wallet_switchEthereumChain', params: [{ chainId: config.sepoliaChainIdHex }] })
+      .request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: config.sepoliaChainIdHex }],
+      })
       .catch(async (err: unknown) => {
         if ((err as { code?: number }).code !== config.metamaskChainNotFoundCode) throw err
         await ethereum.request({
@@ -116,7 +130,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [state.provider, state.address])
 
   return (
-    <WalletContext.Provider value={{ ...state, connect, connectWithWallet, disconnect, refreshBalances }}>
+    <WalletContext.Provider
+      value={{ ...state, connect, connectWithWallet, disconnect, refreshBalances }}
+    >
       {children}
     </WalletContext.Provider>
   )

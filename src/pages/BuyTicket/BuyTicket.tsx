@@ -88,7 +88,11 @@ export function BuyTicket() {
     <PageWrapper>
       <Title>{strings.buyTicket.title}</Title>
       <Subtitle>{strings.buyTicket.subtitle}</Subtitle>
-      {isConnected ? <BuyTicketConnected /> : <ConnectPrompt>{strings.buyTicket.connectFirst}</ConnectPrompt>}
+      {isConnected ? (
+        <BuyTicketConnected />
+      ) : (
+        <ConnectPrompt>{strings.buyTicket.connectFirst}</ConnectPrompt>
+      )}
     </PageWrapper>
   )
 }

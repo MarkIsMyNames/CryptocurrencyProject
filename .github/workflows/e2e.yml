@@ -16,8 +16,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
+      - run: cp .env.example .env
       - run: npx playwright install --with-deps chromium
       - run: npm run build
       - run: npx playwright test
-        env:
-          VITE_CONTRACT_ADDRESS: '0x0000000000000000000000000000000000000000'
