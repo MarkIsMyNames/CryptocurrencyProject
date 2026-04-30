@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import { WalletContext, type WalletContextValue } from '../../context/walletContext'
+import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 import { BuyTicket } from './BuyTicket'
 
 const base: WalletContextValue = {
@@ -34,11 +34,11 @@ type Story = StoryObj<WalletContextValue>
 export const Default: Story = {}
 
 export const Connected: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as never },
+  args: { isConnected: true, address: '0xabc123', signer: {} as never, provider: {} as never },
 }
 
 export const ButtonHover: Story = {
-  args: { isConnected: true, address: '0xabc123', signer: {} as never },
+  args: { isConnected: true, address: '0xabc123', signer: {} as never, provider: {} as never },
   parameters: { pseudo: { hover: true } },
 }
 

@@ -111,6 +111,7 @@
     "noTicket": "No ticket found in this wallet.",
     "cancelled": "Transaction cancelled.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
-    "connectedNoAddress": "WalletStatus: connected but address is null"
+    "connectedNoAddress": "WalletStatus: connected but address is null",
+    "notConnected": "useConnectedWallet must be used in a connected state"
   }
 }

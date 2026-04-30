@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { userEvent, within } from 'storybook/test'
-import { WalletContext, type WalletContextValue } from '../../context/walletContext'
+import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 import { Balance, BalanceResultView } from './Balance'
 import en from '../../locales/en.json'
 

@@ -3,7 +3,7 @@ import { BrowserProvider, JsonRpcProvider, Wallet } from 'ethers'
 import { config } from '../config'
 import strings from '../locales/en.json'
 import { balanceOf, decodeContractError } from '../utils/contract'
-import { WalletContext, type WalletContextValue } from './walletContext'
+import { WalletContext, type WalletContextValue } from './useWallet'
 
 interface WalletState {
   provider: BrowserProvider | JsonRpcProvider | null
