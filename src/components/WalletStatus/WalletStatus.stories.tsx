@@ -43,13 +43,6 @@ export const Connected: Story = {
   },
 }
 
-export const ConnectedNoAddress: Story = {
-  args: {
-    isConnected: true,
-    address: null,
-  },
-}
-
 export const WithError: Story = {
   args: {
     error: strings.createWallet.metaMaskNotFound,

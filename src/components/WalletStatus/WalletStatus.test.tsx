@@ -31,6 +31,11 @@ describe('WalletStatus', () => {
     expect(screen.getByText(en.walletStatus.disconnected)).toBeInTheDocument()
   })
 
+  it('throws when connected but address is null', () => {
+    vi.mocked(useWallet).mockReturnValue({ ...base, isConnected: true, address: null })
+    expect(() => customRender(<WalletStatus />)).toThrow(en.errors.connectedNoAddress)
+  })
+
   it('shows truncated address when connected', () => {
     vi.mocked(useWallet).mockReturnValue({
       ...base,
@@ -43,9 +48,4 @@ describe('WalletStatus', () => {
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument()
   })
 
-  it('shows disconnected label when connected but no address', () => {
-    vi.mocked(useWallet).mockReturnValue({ ...base, isConnected: true, address: null })
-    customRender(<WalletStatus />)
-    expect(screen.getByText(en.walletStatus.disconnected)).toBeInTheDocument()
-  })
 })
