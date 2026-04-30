@@ -13,14 +13,13 @@ export const Status = {
 } as const
 
 export const config = {
-  contractAddress:
-    (import.meta.env as unknown as Record<string, string> | undefined)?.VITE_CONTRACT_ADDRESS ?? '',
+  contractAddress: import.meta.env.VITE_CONTRACT_ADDRESS,
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
   sepoliaRpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
-  ticketPriceWei: '10000000000000000',
+  ticketPriceWei: import.meta.env.VITE_TICKET_PRICE_WEI,
   ticketPriceDisplay: '0.01 SETH',
-  defaultTicketSupply: 1000,
+  defaultTicketSupply: Number(import.meta.env.VITE_MAX_SUPPLY),
   tokenSymbol: 'ETK',
   tokenName: 'EventTicket',
 } as const

@@ -3,8 +3,8 @@ import { network } from 'hardhat'
 import { writeFileSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-const MAX_SUPPLY = 1000
-const TICKET_PRICE_WEI = 10_000_000_000_000_000n // 0.01 ETH
+const MAX_SUPPLY = Number(process.env.VITE_MAX_SUPPLY ?? '1000')
+const TICKET_PRICE_WEI = BigInt(process.env.VITE_TICKET_PRICE_WEI ?? '10000000000000000')
 
 async function main() {
   const { ethers } = await network.create()
@@ -26,7 +26,7 @@ async function main() {
   console.log(`.env updated with new contract address`)
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error(err)
   process.exit(1)
 })
