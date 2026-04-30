@@ -12,10 +12,7 @@ export const Status = {
   error: 'error',
 } as const
 
-function requireEnv(value: string | undefined, name: string): string {
-  if (!value) throw new Error(`Missing required environment variable: ${name}`)
-  return value
-}
+import { requireEnv } from '../shared/requireEnv'
 
 export const config = {
   contractAddress: requireEnv(import.meta.env.VITE_CONTRACT_ADDRESS, 'VITE_CONTRACT_ADDRESS'),

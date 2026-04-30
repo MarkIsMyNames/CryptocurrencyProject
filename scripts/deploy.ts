@@ -2,9 +2,10 @@ import '@nomicfoundation/hardhat-ethers'
 import { network } from 'hardhat'
 import { writeFileSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { requireEnv } from '../shared/requireEnv'
 
-const MAX_SUPPLY = Number(process.env.VITE_MAX_SUPPLY ?? '1000')
-const TICKET_PRICE_WEI = BigInt(process.env.VITE_TICKET_PRICE_WEI ?? '10000000000000000')
+const MAX_SUPPLY = Number(requireEnv(process.env.VITE_MAX_SUPPLY, 'VITE_MAX_SUPPLY'))
+const TICKET_PRICE_WEI = BigInt(requireEnv(process.env.VITE_TICKET_PRICE_WEI, 'VITE_TICKET_PRICE_WEI'))
 
 async function main() {
   const { ethers } = await network.create() // Connects to the test network
