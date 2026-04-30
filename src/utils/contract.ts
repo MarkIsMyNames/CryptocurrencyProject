@@ -63,6 +63,7 @@ export function decodeContractError(error: unknown): string {
     for (const [patterns, message] of CONTRACT_ERRORS) {
       if (patterns.some((p) => msg.includes(p))) return message
     }
+    return msg
   }
   return strings.errors.unknownError
 }
