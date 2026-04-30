@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { WalletContext, type WalletContextValue } from '../../context/walletContext'
-import { RedeemTicket, TxReceipt } from './RedeemTicket'
+import { RedeemTicket } from './RedeemTicket'
 
 const base: WalletContextValue = {
   isConnected: false,
@@ -34,16 +34,12 @@ type Story = StoryObj<WalletContextValue>
 export const Default: Story = {}
 
 export const HasTicket: Story = {
-  args: { isConnected: true, address: '0xabc123def456', signer: {} as never },
+  args: { isConnected: true, address: '0xabc123def456', signer: {} as never, etkBalance: 1n },
 }
 
 export const ButtonHover: Story = {
-  args: { isConnected: true, address: '0xabc123def456', signer: {} as never },
+  args: { isConnected: true, address: '0xabc123def456', signer: {} as never, etkBalance: 1n },
   parameters: { pseudo: { hover: true } },
-}
-
-export const NotConnected: Story = {
-  args: { isConnected: false },
 }
 
 export const NoTicket: Story = {
@@ -53,10 +49,4 @@ export const NoTicket: Story = {
     signer: {} as never,
     etkBalance: BigInt(0),
   },
-}
-
-export const Success: Story = {
-  render: () => (
-    <TxReceipt hash="0xabc1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd" />
-  ),
 }

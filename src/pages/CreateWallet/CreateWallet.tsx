@@ -6,38 +6,14 @@ import type { GeneratedWallet } from '../../utils/wallet'
 import { Status, routes } from '../../config'
 import en from '../../locales/en.json'
 import { StatusMessage } from '../../styles/shared.styles'
-import {
-  PageWrapper,
-  Title,
-  Subtitle,
-  ButtonRow,
-  PrimaryButton,
-  SecondaryButton,
-  Card,
-  CardLabel,
-  CardValue,
-  StepLabel,
-  ProgressDots,
-  PasswordWrapper,
-  PasswordToggle,
-  Dot,
-  Form,
-  InputGroup,
-  Label,
-  TextInput,
-  ErrorText,
-  PhraseGrid,
-  PhraseWord,
-  WordIndex,
-  WordText,
-  CheckboxRow,
-  WarningBox,
-  VerifyGrid,
-} from './CreateWallet.styles'
+import { PageWrapper, Title, Subtitle, ButtonRow, PrimaryButton } from './CreateWallet.styles'
+import { PasswordStep } from './PasswordStep'
+import { PhraseStep } from './PhraseStep'
+import { VerifyStep } from './VerifyStep'
+import { CompleteStep } from './CompleteStep'
 
 type Step = 'idle' | 'password' | 'phrase' | 'verify' | 'complete'
 
-const STEPS: Step[] = ['password', 'phrase', 'verify', 'complete']
 const VERIFY_COUNT = 3
 
 function pickVerifyIndices(mnemonic: string): number[] {
@@ -63,8 +39,6 @@ export function CreateWallet() {
   const [verifyIndices, setVerifyIndices] = useState<number[]>([])
   const [verifyAnswers, setVerifyAnswers] = useState<string[]>(['', '', ''])
   const [verifyError, setVerifyError] = useState<string | null>(null)
-
-  const stepIndex = STEPS.indexOf(step)
 
   function handleStartGenerate() {
     setPassword('')
@@ -92,10 +66,6 @@ export function CreateWallet() {
     setStep('phrase')
   }
 
-  function handlePhraseNext() {
-    setStep('verify')
-  }
-
   async function handleVerify() {
     if (!wallet) return
     const words = wallet.mnemonic.split(' ')
@@ -115,229 +85,107 @@ export function CreateWallet() {
     await downloadKeystore(wallet, password)
   }
 
-  if (step === 'idle') {
-    return (
-      <PageWrapper>
-        <Title>{en.createWallet.title}</Title>
-        <Subtitle>{en.createWallet.subtitle}</Subtitle>
-        <ButtonRow>
-          <PrimaryButton onClick={handleStartGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
-          <PrimaryButton
-            disabled={isConnecting || isConnected}
-            onClick={() => {
-              void connect()
-            }}
-          >
-            {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
-          </PrimaryButton>
-        </ButtonRow>
-        {isConnected && (
-          <StatusMessage $type={Status.success}>{en.createWallet.metaMaskSuccess}</StatusMessage>
-        )}
-        {error !== null && !isConnected && (
-          <StatusMessage $type={Status.error}>{error}</StatusMessage>
-        )}
-      </PageWrapper>
-    )
-  }
-
   if (step === 'password') {
     return (
-      <PageWrapper>
-        <StepLabel>{en.createWallet.steps.password}</StepLabel>
-        <ProgressDots>
-          {STEPS.slice(0, -1).map((s, i) => (
-            <Dot key={s} $active={i === stepIndex} $done={i < stepIndex} />
-          ))}
-        </ProgressDots>
-        <Title>{en.createWallet.steps.password}</Title>
-        <Form>
-          <InputGroup>
-            <Label htmlFor="pw">{en.createWallet.passwordLabel}</Label>
-            <PasswordWrapper>
-              <TextInput
-                id="pw"
-                type={showPassword ? 'text' : 'password'}
-                placeholder={en.createWallet.passwordPlaceholder}
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value)
-                  setPasswordError(null)
-                }}
-              />
-              <PasswordToggle
-                type="button"
-                aria-label={
-                  showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword
-                }
-                onClick={() => {
-                  setShowPassword((v) => !v)
-                }}
-              >
-                {showPassword ? '🙈' : '👁'}
-              </PasswordToggle>
-            </PasswordWrapper>
-          </InputGroup>
-          <InputGroup>
-            <Label htmlFor="pw-confirm">{en.createWallet.confirmLabel}</Label>
-            <PasswordWrapper>
-              <TextInput
-                id="pw-confirm"
-                type={showPassword ? 'text' : 'password'}
-                placeholder={en.createWallet.confirmPlaceholder}
-                value={confirm}
-                onChange={(e) => {
-                  setConfirm(e.target.value)
-                  setPasswordError(null)
-                }}
-              />
-            </PasswordWrapper>
-          </InputGroup>
-          {passwordError !== null && <ErrorText>{passwordError}</ErrorText>}
-        </Form>
-        <ButtonRow>
-          <SecondaryButton
-            onClick={() => {
-              setStep('idle')
-            }}
-          >
-            {en.createWallet.backBtn}
-          </SecondaryButton>
-          <PrimaryButton onClick={handlePasswordNext}>{en.createWallet.nextBtn}</PrimaryButton>
-        </ButtonRow>
-      </PageWrapper>
+      <PasswordStep
+        password={password}
+        confirm={confirm}
+        showPassword={showPassword}
+        passwordError={passwordError}
+        onPasswordChange={(v) => {
+          setPassword(v)
+          setPasswordError(null)
+        }}
+        onConfirmChange={(v) => {
+          setConfirm(v)
+          setPasswordError(null)
+        }}
+        onToggleShow={() => {
+          setShowPassword((v) => !v)
+        }}
+        onBack={() => {
+          setStep('idle')
+        }}
+        onNext={handlePasswordNext}
+      />
     )
   }
 
   if (step === 'phrase' && wallet !== null) {
-    const words = wallet.mnemonic.split(' ')
     return (
-      <PageWrapper>
-        <StepLabel>{en.createWallet.steps.phrase}</StepLabel>
-        <ProgressDots>
-          {STEPS.slice(0, -1).map((s, i) => (
-            <Dot key={s} $active={i === stepIndex} $done={i < stepIndex} />
-          ))}
-        </ProgressDots>
-        <Title>{en.createWallet.steps.phrase}</Title>
-        <WarningBox>{en.createWallet.phraseInstruction}</WarningBox>
-        <PhraseGrid>
-          {words.map((word, i) => (
-            <PhraseWord key={i}>
-              <WordIndex>{i + 1}.</WordIndex>
-              <WordText>{word}</WordText>
-            </PhraseWord>
-          ))}
-        </PhraseGrid>
-        <CheckboxRow>
-          <input
-            type="checkbox"
-            checked={acknowledged}
-            onChange={(e) => {
-              setAcknowledged(e.target.checked)
-            }}
-          />
-          {en.createWallet.phraseAcknowledge}
-        </CheckboxRow>
-        <ButtonRow>
-          <SecondaryButton
-            onClick={() => {
-              setStep('password')
-            }}
-          >
-            {en.createWallet.backBtn}
-          </SecondaryButton>
-          <PrimaryButton disabled={!acknowledged} onClick={handlePhraseNext}>
-            {en.createWallet.nextBtn}
-          </PrimaryButton>
-        </ButtonRow>
-      </PageWrapper>
+      <PhraseStep
+        mnemonic={wallet.mnemonic}
+        acknowledged={acknowledged}
+        onAcknowledge={setAcknowledged}
+        onBack={() => {
+          setStep('password')
+        }}
+        onNext={() => {
+          setStep('verify')
+        }}
+      />
     )
   }
 
   if (step === 'verify' && wallet !== null) {
     return (
-      <PageWrapper>
-        <StepLabel>{en.createWallet.steps.verify}</StepLabel>
-        <ProgressDots>
-          {STEPS.slice(0, -1).map((s, i) => (
-            <Dot key={s} $active={i === stepIndex} $done={i < stepIndex} />
-          ))}
-        </ProgressDots>
-        <Title>{en.createWallet.steps.verify}</Title>
-        <Subtitle>{en.createWallet.verifyInstruction}</Subtitle>
-        <VerifyGrid>
-          {verifyIndices.map((wordIdx, i) => (
-            <InputGroup key={wordIdx}>
-              <Label htmlFor={`verify-${String(i)}`}>
-                {en.createWallet.wordPosition.replace('{{n}}', String(wordIdx + 1))}
-              </Label>
-              <TextInput
-                id={`verify-${String(i)}`}
-                type="text"
-                placeholder={en.createWallet.wordPlaceholder}
-                value={verifyAnswers[i]}
-                onChange={(e) => {
-                  const updated = [...verifyAnswers]
-                  updated[i] = e.target.value
-                  setVerifyAnswers(updated)
-                  setVerifyError(null)
-                }}
-              />
-            </InputGroup>
-          ))}
-        </VerifyGrid>
-        {verifyError !== null && <ErrorText>{verifyError}</ErrorText>}
-        {error !== null && <StatusMessage $type={Status.error}>{error}</StatusMessage>}
-        <ButtonRow>
-          <SecondaryButton
-            onClick={() => {
-              setStep('phrase')
-            }}
-          >
-            {en.createWallet.backBtn}
-          </SecondaryButton>
-          <PrimaryButton
-            disabled={isConnecting}
-            onClick={() => {
-              void handleVerify()
-            }}
-          >
-            {isConnecting ? en.createWallet.connecting : en.createWallet.verifyBtn}
-          </PrimaryButton>
-        </ButtonRow>
-      </PageWrapper>
+      <VerifyStep
+        verifyIndices={verifyIndices}
+        verifyAnswers={verifyAnswers}
+        verifyError={verifyError}
+        connectError={error}
+        isConnecting={isConnecting}
+        onAnswerChange={(i, v) => {
+          const updated = [...verifyAnswers]
+          updated[i] = v
+          setVerifyAnswers(updated)
+          setVerifyError(null)
+        }}
+        onBack={() => {
+          setStep('phrase')
+        }}
+        onVerify={() => {
+          void handleVerify()
+        }}
+      />
     )
   }
 
   if (step === 'complete' && wallet !== null) {
     return (
-      <PageWrapper>
-        <Title>{en.createWallet.steps.complete}</Title>
-        <StatusMessage $type={Status.success}>{en.createWallet.walletCreated}</StatusMessage>
-        <Card>
-          <CardLabel>{en.createWallet.addressLabel}</CardLabel>
-          <CardValue>{wallet.address}</CardValue>
-        </Card>
-        <ButtonRow>
-          <SecondaryButton
-            onClick={() => {
-              void handleDownload()
-            }}
-          >
-            {en.createWallet.downloadBtn}
-          </SecondaryButton>
-          <PrimaryButton
-            onClick={() => {
-              navigate(routes.balance)
-            }}
-          >
-            {en.createWallet.goToBalance}
-          </PrimaryButton>
-        </ButtonRow>
-      </PageWrapper>
+      <CompleteStep
+        address={wallet.address}
+        onDownload={() => {
+          void handleDownload()
+        }}
+        onGoToBalance={() => {
+          navigate(routes.balance)
+        }}
+      />
     )
   }
 
-  return null
+  return (
+    <PageWrapper>
+      <Title>{en.createWallet.title}</Title>
+      <Subtitle>{en.createWallet.subtitle}</Subtitle>
+      <ButtonRow>
+        <PrimaryButton onClick={handleStartGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
+        <PrimaryButton
+          disabled={isConnecting || isConnected}
+          onClick={() => {
+            void connect()
+          }}
+        >
+          {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
+        </PrimaryButton>
+      </ButtonRow>
+      {isConnected && (
+        <StatusMessage $type={Status.success}>{en.createWallet.metaMaskSuccess}</StatusMessage>
+      )}
+      {error !== null && !isConnected && (
+        <StatusMessage $type={Status.error}>{error}</StatusMessage>
+      )}
+    </PageWrapper>
+  )
 }

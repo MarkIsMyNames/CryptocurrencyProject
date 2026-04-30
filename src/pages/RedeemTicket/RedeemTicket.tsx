@@ -4,6 +4,7 @@ import { redeemTicket, decodeContractError } from '../../utils/contract'
 import { Status } from '../../config'
 import strings from '../../locales/en.json'
 import { type StatusType } from '../../styles/shared.styles'
+import { TxReceipt } from '../../components/TxReceipt/TxReceipt'
 import {
   PageWrapper,
   Title,
@@ -15,23 +16,7 @@ import {
   PrimaryActionButton,
   StatusMessage,
   ConnectPrompt,
-  TxCard,
-  TxLabel,
-  TxHash,
-  TxLink,
 } from './RedeemTicket.styles'
-
-export function TxReceipt({ hash }: { hash: string }) {
-  return (
-    <TxCard>
-      <TxLabel>{strings.redeem.txHashLabel}</TxLabel>
-      <TxHash>{hash}</TxHash>
-      <TxLink href={`https://sepolia.etherscan.io/tx/${hash}`} target="_blank" rel="noreferrer">
-        {strings.redeem.viewOnEtherscan}
-      </TxLink>
-    </TxCard>
-  )
-}
 
 export function RedeemTicket() {
   const { signer, address, isConnected, etkBalance, refreshBalances } = useWallet()

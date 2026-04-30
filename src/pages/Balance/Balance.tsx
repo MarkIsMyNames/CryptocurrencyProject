@@ -25,6 +25,38 @@ interface BalanceResult {
   remaining: bigint
 }
 
+export function BalanceResultView({
+  seth,
+  etk,
+  remaining,
+}: {
+  seth: string
+  etk: bigint
+  remaining: bigint
+}) {
+  return (
+    <BalanceGrid>
+      <BalanceCard>
+        <BalanceLabel>{strings.balance.sethLabel}</BalanceLabel>
+        <BalanceValue>{`${parseFloat(seth).toFixed(4)} SETH`}</BalanceValue>
+      </BalanceCard>
+      <BalanceCard>
+        <BalanceLabel>{strings.balance.etkLabel}</BalanceLabel>
+        <BalanceValue>{etk.toString()}</BalanceValue>
+        <TicketBadge $valid={etk > 0n}>
+          {etk > 0n ? strings.balance.ticketValid : strings.balance.ticketNone}
+        </TicketBadge>
+      </BalanceCard>
+      <BalanceCard>
+        <BalanceLabel>{strings.balance.supplyLabel}</BalanceLabel>
+        <BalanceValue>
+          {remaining.toString()} / {config.defaultTicketSupply}
+        </BalanceValue>
+      </BalanceCard>
+    </BalanceGrid>
+  )
+}
+
 export function Balance() {
   const { provider, address: connectedAddress } = useWallet()
   const [inputAddress, setInputAddress] = useState(connectedAddress ?? '')
@@ -87,27 +119,7 @@ export function Balance() {
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
       {result && (
-        <BalanceGrid>
-          <BalanceCard>
-            <BalanceLabel>{strings.balance.sethLabel}</BalanceLabel>
-            <BalanceValue>{`${parseFloat(result.seth).toFixed(4)} SETH`}</BalanceValue>
-          </BalanceCard>
-
-          <BalanceCard>
-            <BalanceLabel>{strings.balance.etkLabel}</BalanceLabel>
-            <BalanceValue>{result.etk.toString()}</BalanceValue>
-            <TicketBadge $valid={result.etk > 0n}>
-              {result.etk > 0n ? strings.balance.ticketValid : strings.balance.ticketNone}
-            </TicketBadge>
-          </BalanceCard>
-
-          <BalanceCard>
-            <BalanceLabel>{strings.balance.supplyLabel}</BalanceLabel>
-            <BalanceValue>
-              {result.remaining.toString()} / {config.defaultTicketSupply}
-            </BalanceValue>
-          </BalanceCard>
-        </BalanceGrid>
+        <BalanceResultView seth={result.seth} etk={result.etk} remaining={result.remaining} />
       )}
     </PageWrapper>
   )
