@@ -1,7 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent } from '../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { CompleteStep } from './CompleteStep'
 
@@ -9,10 +7,8 @@ const FAKE_ADDRESS = '0xAbCd1234567890abcdef1234567890abcdef1234'
 const noop = () => {}
 
 function renderStep(overrides: Partial<Parameters<typeof CompleteStep>[0]> = {}) {
-  return render(
-    <ThemeProvider theme={theme}>
-      <CompleteStep address={FAKE_ADDRESS} onDownload={noop} onGoToBalance={noop} {...overrides} />
-    </ThemeProvider>,
+  return customRender(
+    <CompleteStep address={FAKE_ADDRESS} onDownload={noop} onGoToBalance={noop} {...overrides} />,
   )
 }
 

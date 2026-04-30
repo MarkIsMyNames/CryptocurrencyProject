@@ -1,8 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
-import { MemoryRouter } from 'react-router-dom'
+import { customRender, screen, fireEvent, waitFor } from '../../test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import * as walletUtils from '../../utils/wallet'
 import { CreateWallet } from './CreateWallet'
@@ -28,18 +25,8 @@ vi.mock('../../utils/wallet', () => ({
 
 const MOCK_MNEMONIC = 'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12'
 
-function renderPage() {
-  return render(
-    <MemoryRouter>
-      <ThemeProvider theme={theme}>
-        <CreateWallet />
-      </ThemeProvider>
-    </MemoryRouter>,
-  )
-}
-
 function advanceToPasswordStep() {
-  renderPage()
+  customRender(<CreateWallet />)
   fireEvent.click(screen.getByText(en.createWallet.generateBtn))
 }
 
@@ -83,7 +70,7 @@ describe('CreateWallet', () => {
 
   describe('idle step', () => {
     it('renders both action buttons', () => {
-      renderPage()
+      customRender(<CreateWallet />)
       expect(screen.getByText(en.createWallet.generateBtn)).toBeInTheDocument()
       expect(screen.getByText(en.createWallet.connectBtn)).toBeInTheDocument()
     })

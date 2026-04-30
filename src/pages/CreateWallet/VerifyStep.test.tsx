@@ -1,7 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent } from '../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { VerifyStep } from './VerifyStep'
 
@@ -10,20 +8,18 @@ const INDICES = [0, 4, 8]
 const ANSWERS = ['', '', '']
 
 function renderStep(overrides: Partial<Parameters<typeof VerifyStep>[0]> = {}) {
-  return render(
-    <ThemeProvider theme={theme}>
-      <VerifyStep
-        verifyIndices={INDICES}
-        verifyAnswers={ANSWERS}
-        verifyError={null}
-        connectError={null}
-        isConnecting={false}
-        onAnswerChange={noop}
-        onBack={noop}
-        onVerify={noop}
-        {...overrides}
-      />
-    </ThemeProvider>,
+  return customRender(
+    <VerifyStep
+      verifyIndices={INDICES}
+      verifyAnswers={ANSWERS}
+      verifyError={null}
+      connectError={null}
+      isConnecting={false}
+      onAnswerChange={noop}
+      onBack={noop}
+      onVerify={noop}
+      {...overrides}
+    />,
   )
 }
 

@@ -1,7 +1,5 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent } from '../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { PhraseStep } from './PhraseStep'
 
@@ -10,17 +8,15 @@ const MNEMONIC =
 const noop = () => {}
 
 function renderStep(overrides: Partial<Parameters<typeof PhraseStep>[0]> = {}) {
-  return render(
-    <ThemeProvider theme={theme}>
-      <PhraseStep
-        mnemonic={MNEMONIC}
-        acknowledged={false}
-        onAcknowledge={noop}
-        onBack={noop}
-        onNext={noop}
-        {...overrides}
-      />
-    </ThemeProvider>,
+  return customRender(
+    <PhraseStep
+      mnemonic={MNEMONIC}
+      acknowledged={false}
+      onAcknowledge={noop}
+      onBack={noop}
+      onNext={noop}
+      {...overrides}
+    />,
   )
 }
 

@@ -1,7 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen } from '../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { WalletStatus } from './WalletStatus'
 
@@ -26,14 +24,10 @@ const base = {
   refreshBalances: vi.fn(),
 }
 
-function renderWithTheme(ui: React.ReactElement) {
-  return render(<ThemeProvider theme={theme}>{ui}</ThemeProvider>)
-}
-
 describe('WalletStatus', () => {
   it('shows disconnected label when no wallet connected', () => {
     vi.mocked(useWallet).mockReturnValue(base)
-    renderWithTheme(<WalletStatus />)
+    customRender(<WalletStatus />)
     expect(screen.getByText(en.walletStatus.disconnected)).toBeInTheDocument()
   })
 
@@ -45,13 +39,13 @@ describe('WalletStatus', () => {
       ethBalance: BigInt('1000000000000000000'),
       etkBalance: BigInt(1),
     })
-    renderWithTheme(<WalletStatus />)
+    customRender(<WalletStatus />)
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument()
   })
 
   it('shows disconnected label when connected but no address', () => {
     vi.mocked(useWallet).mockReturnValue({ ...base, isConnected: true, address: null })
-    renderWithTheme(<WalletStatus />)
+    customRender(<WalletStatus />)
     expect(screen.getByText(en.walletStatus.disconnected)).toBeInTheDocument()
   })
 })

@@ -1,7 +1,5 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { ThemeProvider } from 'styled-components'
+import { customRender, screen, fireEvent, waitFor } from '../../test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { theme } from '../../theme'
 import en from '../../locales/en.json'
 import { BuyTicket } from './BuyTicket'
 
@@ -37,17 +35,9 @@ beforeEach(() => {
   mockUseWallet.mockReturnValue(connectedWallet)
 })
 
-function renderPage() {
-  return render(
-    <ThemeProvider theme={theme}>
-      <BuyTicket />
-    </ThemeProvider>,
-  )
-}
-
 describe('BuyTicket', () => {
   it('renders ticket price and buy button', () => {
-    renderPage()
+    customRender(<BuyTicket />)
     expect(screen.getByText(en.buyTicket.buyBtn)).toBeInTheDocument()
     expect(screen.getByText(/0\.01 SETH/)).toBeInTheDocument()
   })
@@ -59,13 +49,13 @@ describe('BuyTicket', () => {
       signer: null,
       provider: null,
     })
-    renderPage()
+    customRender(<BuyTicket />)
     expect(screen.getByText(en.buyTicket.connectFirst)).toBeInTheDocument()
   })
 
   it('shows pending state during transaction', async () => {
     mockBuyTicket.mockImplementation(() => new Promise(() => {}))
-    renderPage()
+    customRender(<BuyTicket />)
     await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
     fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
@@ -75,7 +65,7 @@ describe('BuyTicket', () => {
 
   it('shows success message after purchase', async () => {
     mockBuyTicket.mockResolvedValue({ wait: vi.fn().mockResolvedValue({}) })
-    renderPage()
+    customRender(<BuyTicket />)
     await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
     fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
@@ -85,7 +75,7 @@ describe('BuyTicket', () => {
 
   it('shows error message on failed purchase', async () => {
     mockBuyTicket.mockRejectedValue(new Error('tx failed'))
-    renderPage()
+    customRender(<BuyTicket />)
     await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
     fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
@@ -95,7 +85,7 @@ describe('BuyTicket', () => {
 
   it('disables buy button when already owns a ticket', () => {
     mockUseWallet.mockReturnValueOnce({ ...connectedWallet, etkBalance: BigInt(1) })
-    renderPage()
+    customRender(<BuyTicket />)
     expect(screen.getByText(en.buyTicket.buyBtn)).toBeDisabled()
   })
 })
