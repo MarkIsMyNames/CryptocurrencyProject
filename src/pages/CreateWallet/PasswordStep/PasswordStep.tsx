@@ -10,9 +10,9 @@ import {
   Label,
   TextInput,
   PasswordWrapper,
-  PasswordToggle,
   ErrorText,
 } from '../CreateWallet.styles'
+import { PasswordRevealToggle } from '../PasswordRevealToggle/PasswordRevealToggle'
 
 interface PasswordStepProps {
   password: string
@@ -56,15 +56,7 @@ export function PasswordStep({
                 onPasswordChange(e.target.value)
               }}
             />
-            <PasswordToggle
-              type="button"
-              aria-label={
-                showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword
-              }
-              onClick={onToggleShow}
-            >
-              {showPassword ? '🙈' : '👁'}
-            </PasswordToggle>
+            <PasswordRevealToggle show={showPassword} onToggle={onToggleShow} />
           </PasswordWrapper>
         </InputGroup>
         <InputGroup>

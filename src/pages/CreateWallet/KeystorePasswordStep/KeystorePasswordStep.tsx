@@ -9,9 +9,9 @@ import {
   Label,
   TextInput,
   PasswordWrapper,
-  PasswordToggle,
   ErrorText,
 } from '../CreateWallet.styles'
+import { PasswordRevealToggle } from '../PasswordRevealToggle/PasswordRevealToggle'
 
 interface KeystorePasswordStepProps {
   password: string
@@ -31,6 +31,7 @@ export function KeystorePasswordStep({
   onDecrypt,
 }: KeystorePasswordStepProps) {
   const [showPassword, setShowPassword] = useState(false)
+  function togglePassword() { setShowPassword((v) => !v) }
   return (
     <PageWrapper>
       <Subtitle>{en.createWallet.keystorePasswordInstruction}</Subtitle>
@@ -47,15 +48,7 @@ export function KeystorePasswordStep({
                 onPasswordChange(e.target.value)
               }}
             />
-            <PasswordToggle
-              type="button"
-              aria-label={showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword}
-              onClick={() => {
-                setShowPassword((v) => !v)
-              }}
-            >
-              {showPassword ? '🙈' : '👁'}
-            </PasswordToggle>
+            <PasswordRevealToggle show={showPassword} onToggle={togglePassword} />
           </PasswordWrapper>
         </InputGroup>
         {passwordError !== null && <ErrorText>{passwordError}</ErrorText>}
