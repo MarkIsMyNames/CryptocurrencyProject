@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import type { ReactNode } from 'react'
 import { WalletProvider } from './WalletContext'
 import { WalletContext, useWallet, useConnectedWallet, type WalletContextValue } from './useWallet'
@@ -40,9 +40,7 @@ describe('useWallet', () => {
   })
 
   it('throws outside WalletProvider', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() => renderHook(useWallet)).toThrow(strings.errors.hookOutsideProvider)
-    vi.restoreAllMocks()
   })
 
   it('exposes connect, disconnect, connectWithWallet, refreshBalances as functions', () => {
@@ -56,11 +54,9 @@ describe('useWallet', () => {
 
 describe('useConnectedWallet', () => {
   it('throws in disconnected state', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => {})
     expect(() =>
       renderHook(useConnectedWallet, { wrapper: ({ children }) => withProvider(children) }),
     ).toThrow(strings.errors.notConnected)
-    vi.restoreAllMocks()
   })
 
   it('returns non-nullable provider, signer, address when connected', () => {
