@@ -1,7 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { BrowserProvider, JsonRpcSigner } from 'ethers'
+import { vi } from 'vitest'
 import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 import { BuyTicket } from './BuyTicket'
+
+vi.mock('../../utils/contract', () => ({
+  remainingTickets: vi.fn().mockResolvedValue(100n),
+  buyTicket: vi.fn(),
+  decodeContractError: vi.fn(),
+}))
 
 const base: WalletContextValue = {
   isConnected: false,

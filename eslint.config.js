@@ -52,7 +52,7 @@ export default tseslint.config(
   },
   {
     files: ['**/*.{ts,tsx}'],
-    ignores: ['src/config.ts'],
+    ignores: ['src/config.ts', 'src/routes.ts'],
     rules: {
       'no-restricted-syntax': [
         'error',
