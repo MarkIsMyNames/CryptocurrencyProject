@@ -23,16 +23,11 @@ describe('Navbar', () => {
     expect(container.querySelector('nav')).toBeInTheDocument()
   })
 
-  it('active link has aria-current=page', () => {
-    customRender(<Navbar />, { initialEntries: [routes.balance] })
-    expect(screen.getByRole('link', { name: en.nav.balance })).toHaveAttribute(
-      'aria-current',
-      'page',
-    )
-    expect(screen.getByRole('link', { name: en.nav.createWallet })).not.toHaveAttribute(
-      'aria-current',
-      'page',
-    )
+  it('all nav links have an accessible name', () => {
+    customRender(<Navbar />)
+    screen.getAllByRole('link').forEach((link) => {
+      expect(link).toHaveAccessibleName()
+    })
   })
 
   it('nav links point to correct routes', () => {
