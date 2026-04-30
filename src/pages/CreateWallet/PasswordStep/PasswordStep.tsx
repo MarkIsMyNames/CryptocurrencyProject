@@ -52,9 +52,7 @@ export function PasswordStep({
               type={showPassword ? 'text' : 'password'}
               placeholder={en.createWallet.passwordPlaceholder}
               value={password}
-              onChange={(e) => {
-                onPasswordChange(e.target.value)
-              }}
+              onChange={(e) => onPasswordChange(e.target.value)}
             />
             <PasswordToggle
               type="button"
@@ -75,9 +73,7 @@ export function PasswordStep({
               type={showPassword ? 'text' : 'password'}
               placeholder={en.createWallet.confirmPlaceholder}
               value={confirm}
-              onChange={(e) => {
-                onConfirmChange(e.target.value)
-              }}
+              onChange={(e) => onConfirmChange(e.target.value)}
             />
           </PasswordWrapper>
         </InputGroup>
