@@ -94,6 +94,25 @@ describe('KeystorePasswordStep', () => {
     expect(onBack).toHaveBeenCalledOnce()
   })
 
+  it('toggles input type when the show/hide button is clicked', () => {
+    customRender(
+      <KeystorePasswordStep
+        password=""
+        passwordError={null}
+        isDecrypting={false}
+        onPasswordChange={vi.fn()}
+        onBack={vi.fn()}
+        onDecrypt={vi.fn()}
+      />,
+    )
+    const input = screen.getByLabelText(en.createWallet.keystorePasswordLabel)
+    expect(input).toHaveAttribute('type', 'password')
+    fireEvent.click(screen.getByRole('button', { name: en.createWallet.showPassword }))
+    expect(input).toHaveAttribute('type', 'text')
+    fireEvent.click(screen.getByRole('button', { name: en.createWallet.hidePassword }))
+    expect(input).toHaveAttribute('type', 'password')
+  })
+
   it('calls onDecrypt when the decrypt button is clicked', () => {
     const onDecrypt = vi.fn()
     customRender(

@@ -191,6 +191,15 @@ test.describe('Wallet — keystorePassword step', () => {
     await expect(page.getByRole('button', { name: en.createWallet.keystoreDecryptBtn })).not.toBeDisabled()
   })
 
+  test('password reveal toggle changes input type', async ({ page }) => {
+    const input = page.getByLabel(en.createWallet.keystorePasswordLabel)
+    await expect(input).toHaveAttribute('type', 'password')
+    await page.getByRole('button', { name: en.createWallet.showPassword }).click()
+    await expect(input).toHaveAttribute('type', 'text')
+    await page.getByRole('button', { name: en.createWallet.hidePassword }).click()
+    await expect(input).toHaveAttribute('type', 'password')
+  })
+
   test('shows wrong password error after failed decryption', async ({ page }) => {
     await page.getByLabel(en.createWallet.keystorePasswordLabel).fill('wrongpassword')
     await page.getByRole('button', { name: en.createWallet.keystoreDecryptBtn }).click()

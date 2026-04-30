@@ -33,7 +33,9 @@ export const ButtonHover: Story = {
   parameters: { pseudo: { hover: 'button' } },
 }
 
-export const ButtonFocus: Story = {
-  args: base,
-  parameters: { pseudo: { focusVisible: 'button' } },
+export const PasswordVisible: Story = {
+  args: { ...base, password: 'mysecret' },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole('button', { name: en.createWallet.showPassword }))
+  },
 }

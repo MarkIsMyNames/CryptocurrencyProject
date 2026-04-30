@@ -19,8 +19,3 @@ export const BackHover: Story = {
   args: { fileError: null, onFileSelect: noopFile, onBack: noop },
   parameters: { pseudo: { hover: 'button' } },
 }
-
-export const BackFocus: Story = {
-  args: { fileError: null, onFileSelect: noopFile, onBack: noop },
-  parameters: { pseudo: { focus: 'button' } },
-}

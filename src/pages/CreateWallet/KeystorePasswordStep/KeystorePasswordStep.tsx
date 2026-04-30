@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import en from '../../../locales/en.json'
 import { StepNavButtons } from '../StepNavButtons/StepNavButtons'
 import {
@@ -7,6 +8,8 @@ import {
   InputGroup,
   Label,
   TextInput,
+  PasswordWrapper,
+  PasswordToggle,
   ErrorText,
 } from '../CreateWallet.styles'
 
@@ -27,21 +30,33 @@ export function KeystorePasswordStep({
   onBack,
   onDecrypt,
 }: KeystorePasswordStepProps) {
+  const [showPassword, setShowPassword] = useState(false)
   return (
     <PageWrapper>
       <Subtitle>{en.createWallet.keystorePasswordInstruction}</Subtitle>
       <Form>
         <InputGroup>
           <Label htmlFor="keystore-pw">{en.createWallet.keystorePasswordLabel}</Label>
-          <TextInput
-            id="keystore-pw"
-            type="password"
-            placeholder={en.createWallet.keystorePasswordPlaceholder}
-            value={password}
-            onChange={(e) => {
-              onPasswordChange(e.target.value)
-            }}
-          />
+          <PasswordWrapper>
+            <TextInput
+              id="keystore-pw"
+              type={showPassword ? 'text' : 'password'}
+              placeholder={en.createWallet.keystorePasswordPlaceholder}
+              value={password}
+              onChange={(e) => {
+                onPasswordChange(e.target.value)
+              }}
+            />
+            <PasswordToggle
+              type="button"
+              aria-label={showPassword ? en.createWallet.hidePassword : en.createWallet.showPassword}
+              onClick={() => {
+                setShowPassword((v) => !v)
+              }}
+            >
+              {showPassword ? '🙈' : '👁'}
+            </PasswordToggle>
+          </PasswordWrapper>
         </InputGroup>
         {passwordError !== null && <ErrorText>{passwordError}</ErrorText>}
       </Form>
