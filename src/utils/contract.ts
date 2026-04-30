@@ -54,6 +54,7 @@ const CONTRACT_ERRORS: Array<[string[], string]> = [
   [['NoTicketToRedeem'], strings.errors.noTicket],
   [['user rejected'], strings.errors.cancelled],
   [['network changed', 'chain'], strings.errors.wrongNetwork],
+  [['timeout', 'TIMEOUT', 'SERVER_ERROR', 'could not detect network'], strings.errors.networkError],
 ]
 
 export function decodeContractError(error: unknown): string {
