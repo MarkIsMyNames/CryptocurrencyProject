@@ -915,7 +915,7 @@ Confirm `npm run lint` and `tsc --noEmit` pass with zero errors and zero warning
 - `npm run lint` and `tsc --noEmit` pass with zero errors and zero warnings
 
 **Verdict:** Modified
-**Commit hash (Step 4):** TBD
+**Commit hash (Step 4):** f152ca9
 
 ---
 
@@ -1713,3 +1713,67 @@ The original flow generated a wallet and immediately showed all details with no 
 
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** a076e5b
+
+---
+
+## [2026-04-29] #077 — Fix: RedeemTicket HasTicket and ButtonHover stories missing etkBalance
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/RedeemTicket/RedeemTicket.stories.tsx
+
+**Prompt (Step 1):**
+"Redeem ticket on hover and has ticket should have a ticket but now they don't."
+
+**Review critique (Step 2):**
+- `HasTicket` and `ButtonHover` stories passed `signer` and `address` but omitted `etkBalance`, so it defaulted to `null` from the base object — making `hasTicket` false and the button disabled.
+
+**Resolution (Step 3):**
+- Added `etkBalance: 1n` to both `HasTicket` and `ButtonHover` story args so `hasTicket` evaluates to true, showing the ticket badge and enabling the redeem button.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** bb183a1
+
+---
+
+## [2026-04-30] #078 — Fix: SecondaryButton hover contrast and catch it in Storybook test runner
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/theme.ts, .storybook/preview.tsx, .storybook/StoryRenderedEmitter.tsx
+
+**Prompt (Step 1):**
+"Color contrast serious violation on Back button hover — `#4f46e5` on `#0f1117` = 3:1, expected 4.5:1. Fix and catch with GitHub Actions."
+
+**Review critique (Step 2):**
+- `textLinkHover: '#4f46e5'` (indigo-600) gives only 3:1 contrast on the page background — fails WCAG AA (needs 4.5:1).
+- AI initially added a11y/format steps to `lint.yml` — rejected; dedicated `accessibility.yml` and `format.yml` workflows already exist.
+- Root cause of hover violations not being caught in `npx vitest run --project=storybook`: `storybook-addon-pseudo-states` applies `.pseudo-hover` classes in a `setTimeout(fn, 0)` macrotask that fires AFTER the a11y `afterEach` hook. Additionally, `rewriteStyleSheets()` (which rewrites `:hover` CSS to `.pseudo-hover`) only runs when `STORY_RENDERED` fires on the Storybook channel — an event the vitest runner never emits on its own.
+- AI went through several approaches (per-story play functions, meta-level play, global `play` in preview.tsx) before discovering the right hook. `play` at project level is not in the `Preview` TypeScript type. Meta-level play functions ran but didn't solve the timing because `withPseudoState`'s setTimeout wasn't scheduled yet when play ran. Per-story play functions with manual class application worked but required changes in each stories file.
+- User required a single `.storybook`-level solution with no per-story changes.
+
+**Resolution (Step 3):**
+- Changed `textLinkHover` in `theme.ts` from `#4f46e5` to `#a5b4fc` (indigo-300, 9.4:1 contrast).
+- `StoryRenderedEmitter` in `.storybook/StoryRenderedEmitter.tsx` emits `STORY_RENDERED` in a global decorator `useEffect`, triggering `rewriteStyleSheets()` so `:hover` rules are rewritten to `.pseudo-hover` selectors.
+- Added `afterEach` to `.storybook/preview.tsx`: it runs BEFORE the a11y addon's `afterEach` (user hooks are reversed-first in Storybook's merged hook array), reads `parameters.pseudo` from the story context, applies `.pseudo-hover`/`.pseudo-hover-all` classes to matching elements, then emits `STORY_RENDERED` again to ensure CSS is rewritten. No changes required in any stories file.
+- With `textLinkHover: '#4f46e5'`, all four `ButtonHover` stories in CreateWallet steps fail with "insufficient color contrast of 3 (foreground #4f46e5, expected 4.5:1)"; with `#a5b4fc`, all 43 storybook tests pass.
+
+**Verdict:** Modified before acceptance
+**Commit hash (Step 4):** e04a8e1
+
+---
+
+## [2026-04-30] #079 — Fix: Remove unnecessary Playwright install from unit-tests workflow
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** .github/workflows/unit-tests.yml
+
+**Prompt (Step 1):**
+"I think the github action for running unit tests doesn't need `npx playwright install chromium --with-deps`."
+
+**Review critique (Step 2):**
+- `npx playwright install chromium --with-deps` was added in #023 when the Storybook browser project was part of vitest. That project was later moved to `accessibility.yml`. The unit-tests workflow now only runs `npx vitest run --coverage` which uses jsdom — no browser needed.
+
+**Resolution (Step 3):**
+- Removed `- run: npx playwright install chromium --with-deps` from `.github/workflows/unit-tests.yml`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 3a53fe5
