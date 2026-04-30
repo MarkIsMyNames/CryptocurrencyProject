@@ -2394,3 +2394,270 @@ No issues — straightforward extraction.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** a11e543
+
+---
+
+## [2026-04-30] #105 — Refactor: Simplify Balance and BuyTicket components
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/Balance/Balance.tsx, src/pages/BuyTicket/BuyTicket.tsx
+
+**Prompt (Step 1):**
+"Can `Balance.tsx` or `BuyTicket.tsx` be simplified? The `BalanceResultView` props duplicate the `BalanceResult` interface, and `BuyTicket` stores `statusMessage` as state even though it's mostly derivable from `status`."
+
+**Review critique (Step 2):**
+- `BalanceResultView` had an inline `{ seth: string; etk: bigint; remaining: bigint }` prop type that was identical to the `BalanceResult` interface defined just above — duplication with no benefit.
+- The call site spread `seth={result.seth} etk={result.etk} remaining={result.remaining}` when `result` already had exactly the right shape for `{...result}`.
+- `BuyTicket` stored `statusMessage` as state and called `setStatusMessage` in three places. The pending and success messages are fixed strings derivable from `status`; only the error message is dynamic (from `decodeContractError`).
+
+**Resolution (Step 3):**
+- Changed `BalanceResultView` props to `BalanceResult` directly, removing the duplicate inline type.
+- Call site updated to `<BalanceResultView {...result} />`.
+- Replaced `statusMessage` state in `BuyTicket` and `RedeemTicket` with a derived expression; kept a single `errorMessage` state for the dynamic contract error string. Removed `setStatusMessage` calls from both `handleBuy` and `handleRedeem`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 8f8cb47
+
+---
+
+## [2026-04-30] #106 — Refactor: Replace generic catch blocks with decodeContractError throughout
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/Balance/Balance.tsx, src/context/WalletContext.tsx
+
+**Prompt (Step 1):**
+"Apply `decodeContractError` to all `catch` blocks that currently show a generic unknown error — I want errors to be as descriptive as possible."
+
+**Review critique (Step 2):**
+- `Balance.tsx` caught all errors and always showed `strings.errors.unknownError`, discarding information about what actually failed (contract not deployed, wrong network, user cancelled, etc.).
+- `WalletContext.tsx` `connectWithWallet` had `catch { ... unknownError }` — same issue, same fix available.
+- `connect` already used `decodeContractError`; `connectWithWallet` was inconsistent.
+
+**Resolution (Step 3):**
+- `Balance.tsx`: imported `decodeContractError` and replaced `catch { setError(strings.errors.unknownError) }` with `catch (err) { setError(decodeContractError(err)) }`.
+- `WalletContext.tsx` `connectWithWallet`: changed `catch {` to `catch (err)` and replaced the hardcoded `unknownError` with `decodeContractError(err)`, consistent with `connect`.
+- Added `decodeContractError` to the `vi.mock` factory in `Balance.test.tsx` (it was missing and caused a Vitest export error).
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 8f8cb47
+
+---
+
+## [2026-04-30] #107 — Refactor: Simplify RedeemTicket statusMessage and extend decodeContractError with network/timeout patterns
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/RedeemTicket/RedeemTicket.tsx, src/utils/contract.ts
+
+**Prompt (Step 1):**
+"Apply the same `statusMessage` simplification to `RedeemTicket.tsx`. Also extend `decodeContractError` with any missing error patterns — `networkError` is defined in `en.json` but never matched."
+
+**Review critique (Step 2):**
+- `RedeemTicket` had the same `statusMessage` state pattern as `BuyTicket` before #105 — storing fixed strings as state alongside `status`.
+- `CONTRACT_ERRORS` had no entry for network/RPC failures. Ethers v6 throws messages containing `timeout`, `TIMEOUT`, `SERVER_ERROR`, and `could not detect network` for connectivity issues — all of which would fall through to the generic `unknownError` despite `strings.errors.networkError` existing in `en.json`.
+
+**Resolution (Step 3):**
+- Applied the `errorMessage` state + derived `statusMessage` pattern to `RedeemTicket`, matching `BuyTicket`.
+- Added `['timeout', 'TIMEOUT', 'SERVER_ERROR', 'could not detect network']` → `strings.errors.networkError` to `CONTRACT_ERRORS`, so RPC timeouts and connectivity failures show a descriptive message instead of the generic fallback.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 0e47f39
+
+---
+
+## [2026-04-30] #108 — Refactor: Move STEP_COUNT to config, extract StepProgress component, add prop interfaces
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/config.ts, src/pages/CreateWallet/StepProgress.tsx, src/pages/CreateWallet/PasswordStep.tsx, src/pages/CreateWallet/PhraseStep.tsx, src/pages/CreateWallet/VerifyStep.tsx
+
+**Prompt (Step 1):**
+"`STEP_COUNT = 3` is hardcoded in all three step files and should be in config. The `ProgressDots`/`Dot` block is identical in all three — extract it to a shared component. Inline prop types should be proper interfaces."
+
+**Review critique (Step 2):**
+- `STEP_COUNT = 3` was copy-pasted into `PasswordStep`, `PhraseStep`, and `VerifyStep` with no shared source — changing the step count would require editing three files.
+- The `ProgressDots` + `Array.from` + `Dot` block was structurally identical across all three files, differing only in the active step index. Three copies with no abstraction.
+- Each step component used an inline `{ prop: type }` object as the props type annotation, making the types anonymous and harder to reference from tests or stories.
+- Each step title string (e.g. `en.createWallet.steps.verify`) was referenced twice — once for `StepLabel` and once for `Title`.
+
+**Resolution (Step 3):**
+- Added `createWalletStepCount: 3` to `config` in `src/config.ts`.
+- Created `src/pages/CreateWallet/StepProgress.tsx` — renders `ProgressDots` with `Dot` active/done state derived from a `stepIndex` prop, using `config.createWalletStepCount` for length.
+- Replaced the three inline `ProgressDots` blocks with `<StepProgress stepIndex={n} />`.
+- Removed `STEP_COUNT`, `ProgressDots`, and `Dot` imports from all three step files.
+- Converted inline prop types to named interfaces: `PasswordStepProps`, `PhraseStepProps`, `VerifyStepProps`.
+- Extracted the repeated step title lookup to a `const title` in each component.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 1336e76
+
+## [2026-04-30] #109 — Refactor: Extract StepNavButtons component
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/StepNavButtons.tsx, PasswordStep.tsx, PhraseStep.tsx, VerifyStep.tsx
+
+**Prompt (Step 1):**
+"The `ButtonRow` block with back/next buttons is duplicated across PasswordStep, PhraseStep, and VerifyStep. Extract it into a shared `StepNavButtons` component. It needs an optional `primaryLabel` prop (defaults to nextBtn) and an optional `disabled` prop. Add tests and stories."
+
+**Review critique (Step 2):**
+- `ButtonRow` + `SecondaryButton` + `PrimaryButton` block appeared three times across the three step files, with the only variation being `primaryLabel` and `disabled` on the primary button.
+- No test coverage or stories existed for this repeated UI pattern.
+
+**Resolution (Step 3):**
+- Created `StepNavButtons.tsx` with `onBack`, `onNext`, optional `primaryLabel` (defaults to `en.createWallet.nextBtn`), and optional `disabled`.
+- Created `StepNavButtons.test.tsx` with 5 tests covering render, click handlers, custom label, and disabled state.
+- Created `StepNavButtons.stories.tsx` with Default, Disabled, CustomLabel, Loading, and ButtonHover stories.
+- Replaced inline ButtonRow blocks in PasswordStep, PhraseStep, and VerifyStep with `<StepNavButtons>`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 621c872
+
+## [2026-04-30] #110 — Refactor: Give each CreateWallet sub-component its own subfolder
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/ — all sub-components
+
+**Prompt (Step 1):**
+"For all components in CreateWallet, give them their own folder following the project convention (each component in its own directory with .tsx, .test.tsx, .stories.tsx)."
+
+**Review critique (Step 2):**
+- All six sub-components (PasswordStep, PhraseStep, VerifyStep, CompleteStep, StepProgress, StepNavButtons) were flat files in the CreateWallet directory, violating the project convention of each component living in its own subdirectory.
+- Moving files one level deeper required updating all relative import paths in both the component files and their test/story siblings.
+
+**Resolution (Step 3):**
+- Created subdirectories for each of the six sub-components.
+- Moved each component's .tsx, .test.tsx, and .stories.tsx into its subdirectory.
+- Updated inter-component imports: `./StepProgress` → `../StepProgress/StepProgress`, `./CreateWallet.styles` → `../CreateWallet.styles`.
+- Updated utility imports in moved files: `../../locales/` → `../../../locales/`, `../../config` → `../../../config`, `../../test-utils` → `../../../test-utils`, `../../styles/` → `../../../styles/`.
+- Updated `CreateWallet.tsx` imports: `./PasswordStep` → `./PasswordStep/PasswordStep`, etc.
+- All 87 tests pass after the move.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** cfd8939
+
+## [2026-04-30] #111 — Refactor: Move PasswordStep onChange handlers inline, add CreateWalletStep const, move VERIFY_COUNT to config
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/PasswordStep/PasswordStep.tsx, src/routes.ts, src/config.ts, src/pages/CreateWallet/CreateWallet.tsx
+
+**Prompt (Step 1):**
+"Simplify PasswordStep onChange handlers. Move `VERIFY_COUNT = 3` to config. Extract `'idle' | 'password' | 'phrase' | 'verify' | 'complete'` as a `CreateWalletStep` const in routes.ts and use the values throughout."
+
+**Review critique (Step 2):**
+- `onChange` handlers in PasswordStep used unnecessary block bodies (`() => { fn(v) }`) instead of concise expressions.
+- `VERIFY_COUNT = 3` was a module-level magic number in `CreateWallet.tsx` with no shared source.
+- Step values were raw string literals scattered across `CreateWallet.tsx` — renaming any step would require a grep-and-replace across the file with no compile-time safety.
+
+**Resolution (Step 3):**
+- Condensed both `onChange` handlers in `PasswordStep.tsx` to single-expression form.
+- Added `createWalletVerifyCount: 3` to `config` in `src/config.ts`; replaced `VERIFY_COUNT` reference with `config.createWalletVerifyCount`.
+- Added `CreateWalletStep` const object and matching type alias to `src/routes.ts`; re-exported both from `src/config.ts`.
+- Replaced all step string literals in `CreateWallet.tsx` (`'idle'`, `'password'`, etc.) with `CreateWalletStep.*` values.
+- Replaced `type Step = 'idle' | ...` union with `type Step = CreateWalletStep`.
+- All 87 tests pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 4dbefce
+
+## [2026-04-30] #112 — Refactor: Simplify CreateWallet.tsx
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/CreateWallet/CreateWallet.tsx
+
+**Prompt (Step 1):**
+"Simplify CreateWallet.tsx: remove the redundant `type Step` alias, replace `['', '', '']` magic array with `Array(config.createWalletVerifyCount).fill('')`, and condense unnecessary block-body arrow callbacks."
+
+**Review critique (Step 2):**
+- `type Step = CreateWalletStep` was a pointless alias that added an extra level of indirection with no benefit.
+- `['', '', '']` appeared twice (initial state and reset in `handlePasswordNext`) — both hardcoded to 3 with no reference to the config constant already defined for this purpose.
+- Several single-statement callbacks used block bodies (`() => { fn() }`) where a concise expression sufficed.
+
+**Resolution (Step 3):**
+- Removed `type Step` alias; `useState` now typed directly as `useState<CreateWalletStep>`.
+- Replaced both `['', '', '']` instances with `Array(config.createWalletVerifyCount).fill('')`.
+- Condensed `onToggleShow`, `onBack`, `onNext`, `onVerify`, `onDownload`, `onGoToBalance`, and MetaMask connect `onClick` to single-expression form.
+- All 47 CreateWallet tests pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 8cb4e5c
+
+## [2026-04-30] #113 — Fix: Return raw error message from decodeContractError for unrecognised errors
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/utils/contract.ts
+
+**Prompt (Step 1):**
+"`decodeContractError` falls back to `unknownError` when an `Error` is thrown but matches no pattern in `CONTRACT_ERRORS`. Return the raw `error.message` instead so callers get the actual error detail rather than a generic string."
+
+**Review critique (Step 2):**
+- Any `Error` instance not matching a known pattern silently returned `unknownError`, discarding potentially useful diagnostic information shown to the user.
+- Only truly non-`Error` throws (e.g. a thrown string or null) warrant the fully generic fallback.
+
+**Resolution (Step 3):**
+- Added `return msg` inside the `instanceof Error` branch, after the pattern loop, so unrecognised errors surface their actual message.
+- `unknownError` is now only returned when the thrown value is not an `Error` instance at all.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 485b5ed
+
+## [2026-04-30] #114 — Refactor: Improve variable names in downloadKeystore
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/utils/wallet.ts
+
+**Prompt (Step 1):**
+"Rename `blob`, `url`, and `a` in `downloadKeystore` to more descriptive names that reflect their purpose."
+
+**Review critique (Step 2):**
+- `blob`, `url`, and `a` are generic names that require reading the surrounding code to understand their purpose.
+
+**Resolution (Step 3):**
+- Renamed `blob` → `keystoreBlob`, `url` → `downloadUrl`, `a` → `anchor`.
+- Updated all references within the function consistently.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** aa8b4de
+
+## [2026-04-30] #115 — Test: Add unit tests for contract.ts and wallet.ts
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/utils/contract.test.ts, src/utils/wallet.test.ts
+
+**Prompt (Step 1):**
+"Add unit tests for `decodeContractError` in contract.ts covering all known error patterns, unrecognised errors, and non-Error throws. Add unit tests for `generateWallet`, `truncateAddress`, and `downloadKeystore` in wallet.ts."
+
+**Review critique (Step 2):**
+- Neither `contract.ts` nor `wallet.ts` had any test coverage despite containing core utility logic.
+- `wallet.ts` uses `Wallet.createRandom()` from ethers which calls `crypto.getRandomValues` — not available in jsdom without a polyfill, so ethers must be mocked.
+- `vi.fn().mockReturnValue` cannot be used with `new`; requires a class mock pattern for the `Wallet` constructor.
+
+**Resolution (Step 3):**
+- Created `contract.test.ts` with 12 tests covering all `CONTRACT_ERRORS` patterns, unrecognised `Error` (returns raw message), and non-Error throws (returns `unknownError`).
+- Created `wallet.test.ts` with 5 tests; mocked ethers using a `class MockWallet` with `static createRandom` to satisfy both `new Wallet()` and `Wallet.createRandom()` call sites.
+- `downloadKeystore` test stubs `URL.createObjectURL`, `document.createElement`, and `document.body.appendChild/removeChild` to verify filename and click behaviour without a real DOM download.
+- All 17 utility tests pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** e504c81
+
+## [2026-04-30] #116 — Fix: Build errors, lint violations, and format issues from recent refactors
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/config.ts, src/pages/CreateWallet/CreateWallet.tsx, src/pages/CreateWallet/PasswordStep/PasswordStep.tsx, src/utils/wallet.test.ts
+
+**Prompt (Step 1):**
+"Run npm run build. Fix build errors, then run formatting and linting checks and fix those too, then run Playwright."
+
+**Review critique (Step 2):**
+- `config.ts` exported `CreateWalletStep` twice — once as a value via `export { }` and once as a type via `export type { }` — causing TS2300 duplicate identifier on build.
+- `@typescript-eslint/no-confusing-void-expression` fired on concise arrow callbacks returning `void` expressions (state setters, `void asyncFn()`). ESLint requires block bodies when the return value is `void`.
+- `wallet.test.ts` referenced `anchor.click` and `URL.revokeObjectURL` as unbound method references in `expect()`, triggering `@typescript-eslint/unbound-method`.
+- Several files had Prettier formatting drift.
+
+**Resolution (Step 3):**
+- Removed the duplicate `export type { CreateWalletStep }` line from `config.ts` — a single `export { CreateWalletStep }` covers both the value and the type.
+- Added block bodies to all concise arrow callbacks returning `void` in `CreateWallet.tsx` and `PasswordStep.tsx`.
+- Extracted `click` and `revokeObjectURL` as named `vi.fn()` variables in `wallet.test.ts` to avoid unbound method references in assertions.
+- Ran Prettier over all affected files.
+- All 28 Playwright tests, lint, format check, and build pass.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** e504c81
