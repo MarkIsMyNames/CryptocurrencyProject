@@ -31,10 +31,12 @@ export function useWallet(): WalletContextValue {
   return ctx
 }
 
+function isConnected(wallet: WalletContextValue): wallet is ConnectedWalletContextValue {
+  return !!(wallet.isConnected && wallet.provider && wallet.signer && wallet.address)
+}
+
 export function useConnectedWallet(): ConnectedWalletContextValue {
   const wallet = useWallet()
-  if (!wallet.isConnected || !wallet.provider || !wallet.signer || !wallet.address) {
-    throw new Error(strings.errors.notConnected)
-  }
-  return wallet as ConnectedWalletContextValue
+  if (!isConnected(wallet)) throw new Error(strings.errors.notConnected)
+  return wallet
 }
