@@ -1,6 +1,6 @@
-import { Status } from '../../config'
-import en from '../../locales/en.json'
-import { StatusMessage } from '../../styles/shared.styles'
+import { Status } from '../../../config'
+import en from '../../../locales/en.json'
+import { StatusMessage } from '../../../styles/shared.styles'
 import {
   PageWrapper,
   Title,
@@ -10,7 +10,7 @@ import {
   Card,
   CardLabel,
   CardValue,
-} from './CreateWallet.styles'
+} from '../CreateWallet.styles'
 
 export function CompleteStep({
   address,

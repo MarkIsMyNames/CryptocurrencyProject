@@ -15,4 +15,5 @@ export const config = {
   tokenName: 'EventTicket',
   addressPrefixLength: 6,
   addressSuffixLength: 4,
+  createWalletStepCount: 3,
 } as const

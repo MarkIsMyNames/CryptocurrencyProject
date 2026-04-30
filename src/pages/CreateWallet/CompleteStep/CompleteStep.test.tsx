@@ -1,6 +1,6 @@
-import { customRender, screen, fireEvent } from '../../test-utils'
+import { customRender, screen, fireEvent } from '../../../test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import en from '../../locales/en.json'
+import en from '../../../locales/en.json'
 import { CompleteStep } from './CompleteStep'
 
 const FAKE_ADDRESS = '0xAbCd1234567890abcdef1234567890abcdef1234'

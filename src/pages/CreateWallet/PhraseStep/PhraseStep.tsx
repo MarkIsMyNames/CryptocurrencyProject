@@ -1,45 +1,32 @@
-import en from '../../locales/en.json'
+import en from '../../../locales/en.json'
+import { StepProgress } from '../StepProgress/StepProgress'
+import { StepNavButtons } from '../StepNavButtons/StepNavButtons'
 import {
   PageWrapper,
   Title,
-  ButtonRow,
-  PrimaryButton,
-  SecondaryButton,
   StepLabel,
-  ProgressDots,
-  Dot,
   WarningBox,
   PhraseGrid,
   PhraseWord,
   WordIndex,
   WordText,
   CheckboxRow,
-} from './CreateWallet.styles'
+} from '../CreateWallet.styles'
 
-const STEP_COUNT = 3
-
-export function PhraseStep({
-  mnemonic,
-  acknowledged,
-  onAcknowledge,
-  onBack,
-  onNext,
-}: {
+interface PhraseStepProps {
   mnemonic: string
   acknowledged: boolean
   onAcknowledge: (v: boolean) => void
   onBack: () => void
   onNext: () => void
-}) {
+}
+
+export function PhraseStep({ mnemonic, acknowledged, onAcknowledge, onBack, onNext }: PhraseStepProps) {
   const words = mnemonic.split(' ')
   return (
     <PageWrapper>
       <StepLabel>{en.createWallet.steps.phrase}</StepLabel>
-      <ProgressDots>
-        {Array.from({ length: STEP_COUNT }, (_, i) => (
-          <Dot key={i} $active={i === 1} $done={i < 1} />
-        ))}
-      </ProgressDots>
+      <StepProgress stepIndex={1} />
       <Title>{en.createWallet.steps.phrase}</Title>
       <WarningBox>{en.createWallet.phraseInstruction}</WarningBox>
       <PhraseGrid>
@@ -60,12 +47,7 @@ export function PhraseStep({
         />
         {en.createWallet.phraseAcknowledge}
       </CheckboxRow>
-      <ButtonRow>
-        <SecondaryButton onClick={onBack}>{en.createWallet.backBtn}</SecondaryButton>
-        <PrimaryButton disabled={!acknowledged} onClick={onNext}>
-          {en.createWallet.nextBtn}
-        </PrimaryButton>
-      </ButtonRow>
+      <StepNavButtons onBack={onBack} onNext={onNext} disabled={!acknowledged} />
     </PageWrapper>
   )
 }

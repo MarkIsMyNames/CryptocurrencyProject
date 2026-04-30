@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
-import en from '../../locales/en.json'
+import en from '../../../locales/en.json'
 import { PasswordStep } from './PasswordStep'
 
 const noop = () => {}

@@ -1,13 +1,10 @@
-import en from '../../locales/en.json'
+import en from '../../../locales/en.json'
+import { StepProgress } from '../StepProgress/StepProgress'
+import { StepNavButtons } from '../StepNavButtons/StepNavButtons'
 import {
   PageWrapper,
   Title,
-  ButtonRow,
-  PrimaryButton,
-  SecondaryButton,
   StepLabel,
-  ProgressDots,
-  Dot,
   Form,
   InputGroup,
   Label,
@@ -15,9 +12,19 @@ import {
   PasswordWrapper,
   PasswordToggle,
   ErrorText,
-} from './CreateWallet.styles'
+} from '../CreateWallet.styles'
 
-const STEP_COUNT = 3
+interface PasswordStepProps {
+  password: string
+  confirm: string
+  showPassword: boolean
+  passwordError: string | null
+  onPasswordChange: (v: string) => void
+  onConfirmChange: (v: string) => void
+  onToggleShow: () => void
+  onBack: () => void
+  onNext: () => void
+}
 
 export function PasswordStep({
   password,
@@ -29,26 +36,13 @@ export function PasswordStep({
   onToggleShow,
   onBack,
   onNext,
-}: {
-  password: string
-  confirm: string
-  showPassword: boolean
-  passwordError: string | null
-  onPasswordChange: (v: string) => void
-  onConfirmChange: (v: string) => void
-  onToggleShow: () => void
-  onBack: () => void
-  onNext: () => void
-}) {
+}: PasswordStepProps) {
+  const title = en.createWallet.steps.password
   return (
     <PageWrapper>
-      <StepLabel>{en.createWallet.steps.password}</StepLabel>
-      <ProgressDots>
-        {Array.from({ length: STEP_COUNT }, (_, i) => (
-          <Dot key={i} $active={i === 0} $done={false} />
-        ))}
-      </ProgressDots>
-      <Title>{en.createWallet.steps.password}</Title>
+      <StepLabel>{title}</StepLabel>
+      <StepProgress stepIndex={0} />
+      <Title>{title}</Title>
       <Form>
         <InputGroup>
           <Label htmlFor="pw">{en.createWallet.passwordLabel}</Label>
@@ -89,10 +83,7 @@ export function PasswordStep({
         </InputGroup>
         {passwordError !== null && <ErrorText>{passwordError}</ErrorText>}
       </Form>
-      <ButtonRow>
-        <SecondaryButton onClick={onBack}>{en.createWallet.backBtn}</SecondaryButton>
-        <PrimaryButton onClick={onNext}>{en.createWallet.nextBtn}</PrimaryButton>
-      </ButtonRow>
+      <StepNavButtons onBack={onBack} onNext={onNext} />
     </PageWrapper>
   )
 }

@@ -1,24 +1,30 @@
-import { Status } from '../../config'
-import en from '../../locales/en.json'
-import { StatusMessage } from '../../styles/shared.styles'
+import { Status } from '../../../config'
+import en from '../../../locales/en.json'
+import { StepProgress } from '../StepProgress/StepProgress'
+import { StepNavButtons } from '../StepNavButtons/StepNavButtons'
+import { StatusMessage } from '../../../styles/shared.styles'
 import {
   PageWrapper,
   Title,
   Subtitle,
-  ButtonRow,
-  PrimaryButton,
-  SecondaryButton,
   StepLabel,
-  ProgressDots,
-  Dot,
   InputGroup,
   Label,
   TextInput,
   ErrorText,
   VerifyGrid,
-} from './CreateWallet.styles'
+} from '../CreateWallet.styles'
 
-const STEP_COUNT = 3
+interface VerifyStepProps {
+  verifyIndices: number[]
+  verifyAnswers: string[]
+  verifyError: string | null
+  connectError: string | null
+  isConnecting: boolean
+  onAnswerChange: (i: number, v: string) => void
+  onBack: () => void
+  onVerify: () => void
+}
 
 export function VerifyStep({
   verifyIndices,
@@ -29,24 +35,11 @@ export function VerifyStep({
   onAnswerChange,
   onBack,
   onVerify,
-}: {
-  verifyIndices: number[]
-  verifyAnswers: string[]
-  verifyError: string | null
-  connectError: string | null
-  isConnecting: boolean
-  onAnswerChange: (i: number, v: string) => void
-  onBack: () => void
-  onVerify: () => void
-}) {
+}: VerifyStepProps) {
   return (
     <PageWrapper>
       <StepLabel>{en.createWallet.steps.verify}</StepLabel>
-      <ProgressDots>
-        {Array.from({ length: STEP_COUNT }, (_, i) => (
-          <Dot key={i} $active={i === 2} $done={i < 2} />
-        ))}
-      </ProgressDots>
+      <StepProgress stepIndex={2} />
       <Title>{en.createWallet.steps.verify}</Title>
       <Subtitle>{en.createWallet.verifyInstruction}</Subtitle>
       <VerifyGrid>
@@ -69,12 +62,12 @@ export function VerifyStep({
       </VerifyGrid>
       {verifyError !== null && <ErrorText>{verifyError}</ErrorText>}
       {connectError !== null && <StatusMessage $type={Status.error}>{connectError}</StatusMessage>}
-      <ButtonRow>
-        <SecondaryButton onClick={onBack}>{en.createWallet.backBtn}</SecondaryButton>
-        <PrimaryButton disabled={isConnecting} onClick={onVerify}>
-          {isConnecting ? en.createWallet.connecting : en.createWallet.verifyBtn}
-        </PrimaryButton>
-      </ButtonRow>
+      <StepNavButtons
+        onBack={onBack}
+        onNext={onVerify}
+        primaryLabel={isConnecting ? en.createWallet.connecting : en.createWallet.verifyBtn}
+        disabled={isConnecting}
+      />
     </PageWrapper>
   )
 }
