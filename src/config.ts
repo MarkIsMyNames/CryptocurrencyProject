@@ -1,5 +1,4 @@
 export { routes, Status, CreateWalletStep } from './routes'
-export type { CreateWalletStep } from './routes'
 
 import { requireEnv } from '../shared/requireEnv'
 

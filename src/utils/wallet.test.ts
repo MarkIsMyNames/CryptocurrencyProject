@@ -6,7 +6,9 @@ vi.mock('ethers', () => {
   const mockInstance = {
     address: '0xAbCd1234AbCd1234AbCd1234AbCd1234AbCd1234',
     privateKey: '0x' + 'a'.repeat(64),
-    mnemonic: { phrase: 'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12' },
+    mnemonic: {
+      phrase: 'word1 word2 word3 word4 word5 word6 word7 word8 word9 word10 word11 word12',
+    },
     encrypt: vi.fn().mockResolvedValue('{"mock":"keystore"}'),
   }
   class MockWallet {
@@ -47,15 +49,18 @@ describe('truncateAddress', () => {
 })
 
 describe('downloadKeystore', () => {
+  const revokeObjectURL = vi.fn()
+
   beforeEach(() => {
     vi.stubGlobal('URL', {
       createObjectURL: vi.fn().mockReturnValue('blob:mock-url'),
-      revokeObjectURL: vi.fn(),
+      revokeObjectURL,
     })
   })
 
   it('triggers a file download with the correct filename', async () => {
-    const anchor = { href: '', download: '', click: vi.fn() }
+    const click = vi.fn()
+    const anchor = { href: '', download: '', click }
     vi.spyOn(document.body, 'appendChild').mockImplementation(() => anchor as unknown as Node)
     vi.spyOn(document.body, 'removeChild').mockImplementation(() => anchor as unknown as Node)
     vi.spyOn(document, 'createElement').mockReturnValue(anchor as unknown as HTMLAnchorElement)
@@ -64,7 +69,7 @@ describe('downloadKeystore', () => {
     await downloadKeystore(wallet, 'password123')
 
     expect(anchor.download).toBe(`keystore-${wallet.address.slice(0, 8)}.json`)
-    expect(anchor.click).toHaveBeenCalledOnce()
-    expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
+    expect(click).toHaveBeenCalledOnce()
+    expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-url')
   })
 })

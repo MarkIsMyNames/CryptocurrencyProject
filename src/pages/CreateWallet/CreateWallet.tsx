@@ -12,7 +12,6 @@ import { PhraseStep } from './PhraseStep/PhraseStep'
 import { VerifyStep } from './VerifyStep/VerifyStep'
 import { CompleteStep } from './CompleteStep/CompleteStep'
 
-
 function pickVerifyIndices(mnemonic: string): number[] {
   const wordCount = mnemonic.split(' ').length
   const indices = new Set<number>()
@@ -34,7 +33,9 @@ export function CreateWallet() {
   const [wallet, setWallet] = useState<GeneratedWallet | null>(null)
   const [acknowledged, setAcknowledged] = useState(false)
   const [verifyIndices, setVerifyIndices] = useState<number[]>([])
-  const [verifyAnswers, setVerifyAnswers] = useState<string[]>(Array(config.createWalletVerifyCount).fill(''))
+  const [verifyAnswers, setVerifyAnswers] = useState<string[]>(
+    Array(config.createWalletVerifyCount).fill(''),
+  )
   const [verifyError, setVerifyError] = useState<string | null>(null)
 
   function handleStartGenerate() {
@@ -97,8 +98,12 @@ export function CreateWallet() {
           setConfirm(v)
           setPasswordError(null)
         }}
-        onToggleShow={() => setShowPassword((v) => !v)}
-        onBack={() => setStep(CreateWalletStep.idle)}
+        onToggleShow={() => {
+          setShowPassword((v) => !v)
+        }}
+        onBack={() => {
+          setStep(CreateWalletStep.idle)
+        }}
         onNext={handlePasswordNext}
       />
     )
@@ -110,8 +115,12 @@ export function CreateWallet() {
         mnemonic={wallet.mnemonic}
         acknowledged={acknowledged}
         onAcknowledge={setAcknowledged}
-        onBack={() => setStep(CreateWalletStep.password)}
-        onNext={() => setStep(CreateWalletStep.verify)}
+        onBack={() => {
+          setStep(CreateWalletStep.password)
+        }}
+        onNext={() => {
+          setStep(CreateWalletStep.verify)
+        }}
       />
     )
   }
@@ -130,8 +139,12 @@ export function CreateWallet() {
           setVerifyAnswers(updated)
           setVerifyError(null)
         }}
-        onBack={() => setStep(CreateWalletStep.phrase)}
-        onVerify={() => void handleVerify()}
+        onBack={() => {
+          setStep(CreateWalletStep.phrase)
+        }}
+        onVerify={() => {
+          void handleVerify()
+        }}
       />
     )
   }
@@ -140,8 +153,12 @@ export function CreateWallet() {
     return (
       <CompleteStep
         address={wallet.address}
-        onDownload={() => void handleDownload()}
-        onGoToBalance={() => navigate(routes.balance)}
+        onDownload={() => {
+          void handleDownload()
+        }}
+        onGoToBalance={() => {
+          navigate(routes.balance)
+        }}
       />
     )
   }
@@ -152,10 +169,7 @@ export function CreateWallet() {
       <Subtitle>{en.createWallet.subtitle}</Subtitle>
       <ButtonRow>
         <PrimaryButton onClick={handleStartGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
-        <PrimaryButton
-          disabled={isConnecting || isConnected}
-          onClick={() => void connect()}
-        >
+        <PrimaryButton disabled={isConnecting || isConnected} onClick={() => void connect()}>
           {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
         </PrimaryButton>
       </ButtonRow>

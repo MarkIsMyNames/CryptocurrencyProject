@@ -25,7 +25,9 @@ describe('StepNavButtons', () => {
   })
 
   it('renders a custom primary label', () => {
-    customRender(<StepNavButtons onBack={vi.fn()} onNext={vi.fn()} primaryLabel={en.createWallet.verifyBtn} />)
+    customRender(
+      <StepNavButtons onBack={vi.fn()} onNext={vi.fn()} primaryLabel={en.createWallet.verifyBtn} />,
+    )
     expect(screen.getByText(en.createWallet.verifyBtn)).toBeInTheDocument()
   })
 

@@ -21,7 +21,13 @@ interface PhraseStepProps {
   onNext: () => void
 }
 
-export function PhraseStep({ mnemonic, acknowledged, onAcknowledge, onBack, onNext }: PhraseStepProps) {
+export function PhraseStep({
+  mnemonic,
+  acknowledged,
+  onAcknowledge,
+  onBack,
+  onNext,
+}: PhraseStepProps) {
   const words = mnemonic.split(' ')
   return (
     <PageWrapper>

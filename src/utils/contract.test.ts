@@ -18,11 +18,15 @@ describe('decodeContractError', () => {
   })
 
   it('decodes could not decode result data as contractNotDeployed', () => {
-    expect(decodeContractError(new Error('could not decode result data'))).toBe(strings.errors.contractNotDeployed)
+    expect(decodeContractError(new Error('could not decode result data'))).toBe(
+      strings.errors.contractNotDeployed,
+    )
   })
 
   it('decodes IncorrectPayment as incorrectAmount', () => {
-    expect(decodeContractError(new Error('IncorrectPayment()'))).toBe(strings.errors.incorrectAmount)
+    expect(decodeContractError(new Error('IncorrectPayment()'))).toBe(
+      strings.errors.incorrectAmount,
+    )
   })
 
   it('decodes AlreadyOwnsTicket as alreadyOwned', () => {
@@ -38,7 +42,9 @@ describe('decodeContractError', () => {
   })
 
   it('decodes user rejected as cancelled', () => {
-    expect(decodeContractError(new Error('user rejected the request'))).toBe(strings.errors.cancelled)
+    expect(decodeContractError(new Error('user rejected the request'))).toBe(
+      strings.errors.cancelled,
+    )
   })
 
   it('decodes timeout as networkError', () => {
@@ -50,6 +56,8 @@ describe('decodeContractError', () => {
   })
 
   it('decodes could not detect network as networkError', () => {
-    expect(decodeContractError(new Error('could not detect network'))).toBe(strings.errors.networkError)
+    expect(decodeContractError(new Error('could not detect network'))).toBe(
+      strings.errors.networkError,
+    )
   })
 })

@@ -110,9 +110,7 @@ export function Balance() {
 
       {error && <ErrorMessage>{error}</ErrorMessage>}
 
-      {result && (
-        <BalanceResultView {...result} />
-      )}
+      {result && <BalanceResultView {...result} />}
     </PageWrapper>
   )
 }
