@@ -83,10 +83,10 @@ const WALLET_PK_KEY = 'wallet_pk'
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>(disconnectedState)
 
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (): Promise<boolean> => {
     if (!window.ethereum) {
       setState((prev) => ({ ...prev, error: strings.createWallet.metaMaskNotFound }))
-      return
+      return false
     }
     setState((prev) => ({ ...prev, isConnecting: true, error: null }))
     try {
@@ -96,8 +96,10 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const address = await signer.getAddress()
       const [ethBalance, etkBalance] = await fetchBalances(provider, address)
       setState(connectedState(provider, signer, address, ethBalance, etkBalance))
+      return true
     } catch (err) {
       setState((prev) => ({ ...prev, isConnecting: false, error: decodeContractError(err) }))
+      return false
     }
   }, [])
 

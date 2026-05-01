@@ -25,7 +25,7 @@ function pickVerifyIndices(mnemonic: string): number[] {
 
 export function CreateWallet() {
   const navigate = useNavigate()
-  const { connect, connectWithWallet, isConnecting, isConnected, error } = useWallet()
+  const { connect, connectWithWallet, isConnecting, error } = useWallet()
 
   const [step, setStep] = useState<CreateWalletStep>(CreateWalletStep.idle)
   const [password, setPassword] = useState('')
@@ -44,8 +44,10 @@ export function CreateWallet() {
   const [keystoreFileError, setKeystoreFileError] = useState<string | null>(null)
   const [keystorePasswordError, setKeystorePasswordError] = useState<string | null>(null)
   const [isDecrypting, setIsDecrypting] = useState(false)
+  const [idleSuccess, setIdleSuccess] = useState<string | null>(null)
 
   function handleStartGenerate() {
+    setIdleSuccess(null)
     setPassword('')
     setConfirm('')
     setPasswordError(null)
@@ -110,7 +112,10 @@ export function CreateWallet() {
     try {
       const privateKey = await decryptKeystore(keystoreJson, keystorePassword)
       const success = await connectWithWallet(privateKey)
-      if (success) navigate(routes.balance)
+      if (success) {
+        setStep(CreateWalletStep.idle)
+        setIdleSuccess(en.createWallet.keystoreConnected)
+      }
     } catch {
       setKeystorePasswordError(en.createWallet.keystorePasswordError)
     } finally {
@@ -241,21 +246,30 @@ export function CreateWallet() {
       <Subtitle>{en.createWallet.subtitle}</Subtitle>
       <ButtonRow>
         <PrimaryButton onClick={handleStartGenerate}>{en.createWallet.generateBtn}</PrimaryButton>
-        <PrimaryButton disabled={isConnecting || isConnected} onClick={() => void connect()}>
+        <PrimaryButton
+          disabled={isConnecting}
+          onClick={() => {
+            setIdleSuccess(null)
+            void connect().then((success) => {
+              if (success) setIdleSuccess(en.createWallet.metaMaskSuccess)
+            })
+          }}
+        >
           {isConnecting ? en.createWallet.connecting : en.createWallet.connectBtn}
         </PrimaryButton>
         <PrimaryButton
           onClick={() => {
+            setIdleSuccess(null)
             setStep(CreateWalletStep.keystoreFile)
           }}
         >
           {en.createWallet.importKeystoreBtn}
         </PrimaryButton>
       </ButtonRow>
-      {isConnected && (
-        <StatusMessage $type={Status.success}>{en.createWallet.metaMaskSuccess}</StatusMessage>
+      {idleSuccess !== null && (
+        <StatusMessage $type={Status.success}>{idleSuccess}</StatusMessage>
       )}
-      {error !== null && !isConnected && (
+      {error !== null && (
         <StatusMessage $type={Status.error}>{error}</StatusMessage>
       )}
     </PageWrapper>

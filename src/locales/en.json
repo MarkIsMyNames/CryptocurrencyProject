@@ -62,7 +62,8 @@
     "keystorePasswordPlaceholder": "Enter your keystore password",
     "keystorePasswordInstruction": "Enter the password you used when generating this keystore.",
     "keystorePasswordError": "Incorrect password. Please try again.",
-    "keystoreDecryptBtn": "Decrypt & Connect"
+    "keystoreDecryptBtn": "Decrypt & Connect",
+    "keystoreConnected": "Wallet loaded and connected successfully."
   },
   "balance": {
     "title": "Wallet Balance",

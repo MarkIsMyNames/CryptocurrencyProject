@@ -19,7 +19,7 @@ const connectedValue: WalletContextValue = {
   etkBalance: 1n,
   isConnecting: false,
   error: null,
-  connect: () => Promise.resolve(),
+  connect: () => Promise.resolve(false),
   disconnect: () => {},
   connectWithWallet: () => Promise.resolve(true),
   refreshBalances: () => Promise.resolve(),

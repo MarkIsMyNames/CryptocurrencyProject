@@ -1,7 +1,6 @@
 import { customRender, screen, fireEvent, waitFor } from '../../test-utils'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import en from '../../locales/en.json'
-import { routes } from '../../routes'
 import * as walletUtils from '../../utils/wallet'
 import { CreateWallet } from './CreateWallet'
 
@@ -258,16 +257,14 @@ describe('CreateWallet', () => {
       expect(connectingBtn).toBeDisabled()
     })
 
-    it('navigates to balance on successful decrypt', async () => {
+    it('shows success message on idle after successful decrypt', async () => {
       advanceToKeystorePasswordStep()
       await screen.findByText(en.createWallet.keystorePasswordInstruction)
       fireEvent.change(screen.getByLabelText(en.createWallet.keystorePasswordLabel), {
         target: { value: 'correctpassword' },
       })
       fireEvent.click(screen.getByText(en.createWallet.keystoreDecryptBtn))
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith(routes.balance)
-      })
+      expect(await screen.findByText(en.createWallet.keystoreConnected)).toBeInTheDocument()
     })
   })
 })

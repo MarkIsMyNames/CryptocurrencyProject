@@ -11,7 +11,7 @@ export interface WalletContextValue {
   isConnected: boolean
   isConnecting: boolean
   error: string | null
-  connect: () => Promise<void>
+  connect: () => Promise<boolean>
   connectWithWallet: (privateKey: string) => Promise<boolean>
   disconnect: () => void
   refreshBalances: () => Promise<void>
