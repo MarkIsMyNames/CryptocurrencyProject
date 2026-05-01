@@ -2860,3 +2860,31 @@ No issues — straightforward extraction.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 328bee9
+
+## [2026-05-01] #125 — Feature: Config error screen when .env is missing
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/main.tsx, src/AppEntry.tsx, src/ConfigError.tsx, src/ConfigError.test.tsx, src/main.styles.ts, src/locales/en.json
+
+**Prompt (Step 1):**
+"A duplicate clone of the app with no .env file shows a blank screen on load. Show a styled error message instead. Requirements: (1) all user-facing strings must come from en.json; (2) all colours and spacing must come from theme.ts via a main.styles.ts file — no inline style strings; (3) the error UI must be testable; (4) the TypeScript compiler must not report TS18047 (possibly null) errors."
+
+**Review critique (Step 2):**
+- The blank screen occurs because `requireEnv` throws synchronously during `config.ts` module evaluation, before any code in `main.tsx` runs — a try/catch around `createRoot().render()` does not catch module-level throws.
+- Fix requires dynamic import of the app so the module evaluation error is caught as a promise rejection.
+- Inline style strings in main.tsx violate the colour-in-theme-only convention and cannot reference theme tokens.
+- TS18047: `rootEl` typed as `HTMLElement | null` — closure functions do not benefit from the outer null-check narrowing, so `rootEl` remained `HTMLElement | null` inside `showConfigError`. Fix by passing `el: HTMLElement` as a parameter.
+- Testing `main.tsx` directly is impractical due to module-level side effects and dynamic imports. Extracting the error UI into `ConfigError.tsx` makes it independently testable.
+- First attempt used `vi.stubGlobal('document', ...)` in tests which overwrote `document.createElement`, breaking `beforeEach`. Extracting the component removed the need to test main.tsx at all.
+
+**Resolution (Step 3):**
+- `main.tsx` now only imports React, `createRoot`, and `ConfigError` (all safe — no config deps). It dynamically imports `AppEntry` and renders `<ConfigError>` on rejection.
+- `AppEntry.tsx` holds the React bootstrap (previously in main.tsx) and exports `renderApp`.
+- `ConfigError.tsx` is a simple component that receives a `message` prop and renders the error UI using styled components from `main.styles.ts`.
+- `main.styles.ts` defines `ErrorPage`, `ErrorBox`, `ErrorTitle`, `ErrorDetail`, `ErrorHint` using `theme` object directly (no ThemeProvider — the normal app bootstrap may have failed).
+- `en.json` gains `configError.title` and `configError.hint`.
+- `ConfigError.test.tsx` covers: title shown, error message shown, hint shown, non-Error string coerced to message.
+- TS18047 fixed by passing the narrowed element as a typed parameter to `showConfigError`.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** c8fe838
