@@ -87,7 +87,7 @@
     "success": "Ticket purchased successfully!",
     "alreadyOwned": "You already own a ticket.",
     "soldOut": "Sorry, this event is sold out.",
-    "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
+    "incorrectAmount": "Incorrect payment amount. Please check the ticket price and try again.",
     "cancelled": "Transaction cancelled.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
     "connectFirst": "Please connect your wallet first."
@@ -116,12 +116,12 @@
     "contractNotDeployed": "Contract not found at the configured address. Please deploy the contract and update VITE_CONTRACT_ADDRESS.",
     "networkError": "Network error. Please check your connection.",
     "hookOutsideProvider": "useWallet must be used inside WalletProvider",
-    "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
+    "incorrectAmount": "Incorrect payment amount. Please check the ticket price and try again.",
     "alreadyOwned": "You already own a ticket.",
     "soldOut": "Sorry, this event is sold out.",
     "noTicket": "No ticket found in this wallet.",
     "cancelled": "Transaction cancelled.",
-    "insufficientFunds": "Insufficient SETH balance. You need at least 0.01 SETH plus gas to buy a ticket.",
+    "insufficientFunds": "Insufficient SETH balance to cover the ticket price and gas.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
     "connectedNoAddress": "WalletStatus: connected but address is null",
     "notConnected": "useConnectedWallet must be used in a connected state"

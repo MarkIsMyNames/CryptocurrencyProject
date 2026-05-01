@@ -2,14 +2,16 @@ export { routes, Status, CreateWalletStep } from './routes'
 
 import { requireEnv } from '../shared/requireEnv'
 
+const ticketPriceWei = requireEnv(import.meta.env.VITE_TICKET_PRICE_WEI, 'VITE_TICKET_PRICE_WEI')
+
 export const config = {
   contractAddress: requireEnv(import.meta.env.VITE_CONTRACT_ADDRESS, 'VITE_CONTRACT_ADDRESS'),
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
   metamaskChainNotFoundCode: 4902,
   sepoliaRpcUrl: requireEnv(import.meta.env.VITE_SEPOLIA_RPC_URL, 'VITE_SEPOLIA_RPC_URL'),
-  ticketPriceWei: requireEnv(import.meta.env.VITE_TICKET_PRICE_WEI, 'VITE_TICKET_PRICE_WEI'),
-  ticketPriceDisplay: '0.01 SETH',
+  ticketPriceWei,
+  ticketPriceDisplay: `${String(Number(ticketPriceWei) / 1e18)} SETH`,
   defaultTicketSupply: Number(requireEnv(import.meta.env.VITE_MAX_SUPPLY, 'VITE_MAX_SUPPLY')),
   tokenSymbol: 'ETK',
   tokenName: 'EventTicket',

@@ -1,4 +1,4 @@
-import { useState, useCallback, type ReactNode } from 'react'
+import { useState, useCallback, useEffect, type ReactNode } from 'react'
 import { BrowserProvider, JsonRpcProvider, Wallet } from 'ethers'
 import { config } from '../config'
 import strings from '../locales/en.json'
@@ -78,6 +78,8 @@ async function getSepoliaProvider(
   return provider
 }
 
+const WALLET_PK_KEY = 'wallet_pk'
+
 export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>(disconnectedState)
 
@@ -108,6 +110,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const address = signer.address
       setState(connectedState(provider, signer, address, null, null))
       connected = true
+      sessionStorage.setItem(WALLET_PK_KEY, privateKey)
       // Best-effort balance fetch — RPC may be unreachable on first connect
       const [ethBalance, etkBalance] = await fetchBalances(provider, address)
       setState((prev) => ({ ...prev, ethBalance, etkBalance }))
@@ -120,8 +123,24 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const disconnect = useCallback(() => {
+    sessionStorage.removeItem(WALLET_PK_KEY)
     setState(disconnectedState)
   }, [])
+
+  // Rehydrate on mount: private-key wallet from sessionStorage, MetaMask via eth_accounts
+  useEffect(() => {
+    const storedKey = sessionStorage.getItem(WALLET_PK_KEY)
+    if (storedKey) {
+      void connectWithWallet(storedKey)
+      return
+    }
+    if (!window.ethereum) return
+    void (window.ethereum.request({ method: 'eth_accounts' }) as Promise<string[]>).then(
+      (accounts) => {
+        if (accounts.length > 0) void connect()
+      },
+    )
+  }, [connect, connectWithWallet])
 
   const refreshBalances = useCallback(async () => {
     if (!state.provider || !state.address) throw new Error(strings.errors.notConnected)
