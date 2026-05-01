@@ -1,25 +1,20 @@
-import { StrictMode } from 'react'
+import { createElement } from 'react'
 import { createRoot } from 'react-dom/client'
-import { ThemeProvider } from 'styled-components'
-import { BrowserRouter } from 'react-router-dom'
-import { theme } from './theme'
-import { WalletProvider } from './context/WalletContext'
-import App from './App'
+import { ConfigError } from './ConfigError'
 import strings from './locales/en.json'
 
-document.title = strings.brand
+const rootEl = document.getElementById('root')
+if (!rootEl) throw new Error(strings.configError.rootNotFound)
 
-const root = document.getElementById('root')
-if (!root) throw new Error('Root element not found')
+function showConfigError(el: HTMLElement, err: unknown) {
+  const message = err instanceof Error ? err.message : String(err)
+  createRoot(el).render(createElement(ConfigError, { message }))
+}
 
-createRoot(root).render(
-  <StrictMode>
-    <BrowserRouter>
-      <ThemeProvider theme={theme}>
-        <WalletProvider>
-          <App />
-        </WalletProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  </StrictMode>,
-)
+import('./AppEntry')
+  .then(({ renderApp }) => {
+    renderApp(rootEl)
+  })
+  .catch((err: unknown) => {
+    showConfigError(rootEl, err)
+  })

@@ -126,14 +126,6 @@ URL) come from environment variables read through `src/config.ts`.
 
 ---
 
-#### Ticket Purchase
-
-> A successful call to `buyTicket()` that mints 1 ETK to the purchaser.
-
-**Transaction:** `https://sepolia.etherscan.io/tx/0xYOUR_BUY_TX_HASH`
-
----
-
 ## Prerequisites
 
 - Node.js 20+
