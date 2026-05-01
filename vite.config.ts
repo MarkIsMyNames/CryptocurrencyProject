@@ -1,14 +1,12 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import path from 'node:path';
+import { join } from 'node:path';
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
-const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const testEnv = Object.fromEntries(
-  readFileSync(path.join(dirname, '.env.example'), 'utf8')
+  readFileSync(join(import.meta.dirname, '.env.example'), 'utf8')
     .split('\n')
     .filter((line) => line.includes('=') && !line.startsWith('#'))
     .map((line) => {
@@ -17,11 +15,10 @@ const testEnv = Object.fromEntries(
     })
 )
 
-const themeSource = readFileSync(path.join(dirname, 'src/theme.ts'), 'utf8')
+const themeSource = readFileSync(join(import.meta.dirname, 'src/theme.ts'), 'utf8')
 const backgroundPage = themeSource.match(/backgroundPage:\s*'([^']+)'/)?.[1]
 if (!backgroundPage) throw new Error('Could not extract backgroundPage from src/theme.ts')
 
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [
     react(),
@@ -43,12 +40,7 @@ export default defineConfig({
       }
     }, {
       extends: true,
-      plugins: [
-      // The plugin will run tests for the stories defined in your Storybook config
-      // See options at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon#storybooktest
-      storybookTest({
-        configDir: path.join(dirname, '.storybook')
-      })],
+      plugins: [storybookTest({ configDir: join(import.meta.dirname, '.storybook') })],
       test: {
         name: 'storybook',
         env: testEnv,
@@ -56,9 +48,7 @@ export default defineConfig({
           enabled: true,
           headless: true,
           provider: playwright({}),
-          instances: [{
-            browser: 'chromium'
-          }]
+          instances: [{ browser: 'chromium' }]
         }
       }
     }]
