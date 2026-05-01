@@ -9,7 +9,9 @@
   "walletStatus": {
     "connected": "Connected",
     "disconnected": "Not connected",
-    "address": "Address"
+    "address": "Address",
+    "copyAddress": "Copy address",
+    "copied": "Copied!"
   },
   "createWallet": {
     "title": "Create or Connect Wallet",

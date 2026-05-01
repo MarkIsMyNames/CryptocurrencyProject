@@ -32,19 +32,22 @@ export default {
 
 type Story = StoryObj<WalletContextValue>
 
-export const Disconnected: Story = {}
-
-export const Connected: Story = {
-  args: {
-    isConnected: true,
-    address: '0x1234567890abcdef1234567890abcdef12345678',
-    ethBalance: BigInt('1000000000000000000'),
-    etkBalance: BigInt(1),
-  },
+const connectedArgs = {
+  isConnected: true,
+  address: '0x1234567890abcdef1234567890abcdef12345678',
+  ethBalance: BigInt('1000000000000000000'),
+  etkBalance: BigInt(1),
 }
 
+export const Disconnected: Story = {}
+
+export const Connected: Story = { args: connectedArgs }
+
 export const WithError: Story = {
-  args: {
-    error: strings.createWallet.metaMaskNotFound,
-  },
+  args: { error: strings.createWallet.metaMaskNotFound },
+}
+
+export const Hover: Story = {
+  args: connectedArgs,
+  parameters: { pseudo: { hover: true } },
 }

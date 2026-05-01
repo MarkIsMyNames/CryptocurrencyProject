@@ -1,9 +1,13 @@
 import styled from 'styled-components'
 
-export const StatusWrapper = styled.div`
+export const StatusWrapper = styled.div<{ $clickable?: boolean }>`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.spacing.sm};
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
 `
 
 export const StatusDot = styled.span<{ $connected: boolean }>`
