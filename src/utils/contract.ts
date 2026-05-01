@@ -56,6 +56,7 @@ const CONTRACT_ERRORS: Array<[string[], string]> = [
   [['INSUFFICIENT_FUNDS', 'insufficient funds'], strings.errors.insufficientFunds],
   [['network changed', 'chain'], strings.errors.wrongNetwork],
   [['timeout', 'TIMEOUT', 'SERVER_ERROR', 'could not detect network'], strings.errors.networkError],
+  [['UNCONFIGURED_NAME', 'ENS name'], strings.errors.invalidContractAddress],
 ]
 
 export function decodeContractError(error: unknown): string {

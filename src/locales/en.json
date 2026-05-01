@@ -132,6 +132,7 @@
     "insufficientFunds": "Insufficient SETH balance to cover the ticket price and gas.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
     "connectedNoAddress": "WalletStatus: connected but address is null",
+    "invalidContractAddress": "VITE_CONTRACT_ADDRESS is not a valid Ethereum address. Deploy the contract and set the real address in .env.",
     "notConnected": "useConnectedWallet must be used in a connected state"
   }
 }

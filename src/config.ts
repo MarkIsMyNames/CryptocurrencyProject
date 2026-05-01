@@ -1,11 +1,18 @@
 export { routes, Status, CreateWalletStep } from './routes'
 
+import { isAddress } from 'ethers'
 import { requireEnv } from '../shared/requireEnv'
+import strings from './locales/en.json'
 
 const ticketPriceWei = requireEnv(import.meta.env.VITE_TICKET_PRICE_WEI, 'VITE_TICKET_PRICE_WEI')
 
+const contractAddress = requireEnv(import.meta.env.VITE_CONTRACT_ADDRESS, 'VITE_CONTRACT_ADDRESS')
+if (!isAddress(contractAddress)) {
+  throw new Error(strings.errors.invalidContractAddress)
+}
+
 export const config = {
-  contractAddress: requireEnv(import.meta.env.VITE_CONTRACT_ADDRESS, 'VITE_CONTRACT_ADDRESS'),
+  contractAddress,
   sepoliaChainId: 11155111,
   sepoliaChainIdHex: '0xaa36a7',
   metamaskChainNotFoundCode: 4902,
