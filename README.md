@@ -17,17 +17,15 @@ as a pure API it calls over JSON-RPC.
 
 #### Smart Contract — `contracts/EventTicket.sol`
 
-Three OpenZeppelin base contracts are composed to cover the security surface:
-
-| Detail | Value                                                                                                                                                                                                                                                                          |
-|---|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Token symbol | ETK — using an ERC-20 token means wallets like MetaMask can display balances natively                                                                                                                                                                                          |
-| Decimals | 0 (overridden) — 1 ETK is always 1 whole ticket; fractional tickets have no meaning in this domain                                                                                                                                                                             |
-| Ticket price | Set at deploy time via constructor; stored as `immutable` so the compiler bakes it into the bytecode rather than a storage slot, saving a storage read on every `buyTicket` call                                                                                               |
-| Max supply | Set at deploy time via constructor; `immutable` — `remainingTickets()` subtracts `totalSupply()` from this value on every read                                                                                                                                                 |
-| Non-transferable | `_update` reverts unless the caller is address zero (mint) or the recipient is address zero (burn) |
-| Reentrancy | `nonReentrant` guard on `buyTicket` and `withdrawFunds` because both functions transfer ETH; without it a malicious contract could re-enter before the state update commits and drain funds                                                                                    |
-| Errors | Custom errors (`IncorrectPayment`, `AlreadyOwnsTicket`, `SoldOut`, …) rather than `require` strings — 4-byte selector payload costs less gas and gives the frontend a machine-readable signal to map to a friendly message                                                     |
+| Detail | Value |
+|---|---|
+| Token symbol | ETK — using an ERC-20 token means wallets like MetaMask can display balances natively without custom integration |
+| Decimals | 0 (overridden) — 1 ETK is always 1 whole ticket; fractional tickets have no meaning in this domain |
+| Ticket price | Set at deploy time via constructor; stored as `immutable` so the compiler bakes it into the bytecode rather than a storage slot, saving a storage read on every `buyTicket` call |
+| Max supply | Set at deploy time via constructor; also `immutable` — `remainingTickets()` subtracts `totalSupply()` from this value on every read |
+| Non-transferable | `_update` (the OZ v5 internal transfer hook) reverts unless the caller is address zero (mint) or the recipient is address zero (burn) — one interception point covers both `transfer` and `transferFrom` |
+| Reentrancy | `nonReentrant` guard on `buyTicket` and `withdrawFunds` because both transfer ETH; without it a malicious contract could re-enter before the state update commits and drain funds |
+| Errors | Custom errors (`IncorrectPayment`, `AlreadyOwnsTicket`, `SoldOut`, …) rather than `require` strings — 4-byte selector payload costs less gas and gives the frontend a machine-readable signal to map to a friendly message |
 
 Public interface:
 
