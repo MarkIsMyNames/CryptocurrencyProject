@@ -121,8 +121,8 @@ URL) come from environment variables read through `src/config.ts`.
 
 > A successful deployment of the `EventTicket` contract.
 
-**Transaction:** `https://sepolia.etherscan.io/tx/0xYOUR_DEPLOY_TX_HASH`
-**Contract address:** `https://sepolia.etherscan.io/address/0xYOUR_CONTRACT_ADDRESS`
+**Transaction:** https://sepolia.etherscan.io/tx/0x735ffdba7458d83ff8e8ecc4f0574ba766ffaf1075f8ab0638da4142d3a894aa
+**Contract address:** https://sepolia.etherscan.io/address/0x5fA9FfA6cCf23fF2162FC19bAE0334e491BF325C
 
 ---
 
@@ -161,39 +161,34 @@ URL) come from environment variables read through `src/config.ts`.
 npm install
 ```
 
-## Environment Setup
+## Environment Setup & Deploying the Contract
 
-Copy `.env.example` to `.env` and fill in the deployed contract address:
+Copy `.env.example` to `.env`:
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env`:
+Edit `.env` with your values — all fields are needed whether you are running the
+app or deploying the contract:
+
 ```
 VITE_CONTRACT_ADDRESS=0xYourContractAddressHere
 VITE_MAX_SUPPLY=1000
 VITE_TICKET_PRICE_WEI=10000000000000000
 VITE_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+DEPLOY_PRIVATE_KEY=0xYourPrivateKeyHere
 ```
 
 `VITE_MAX_SUPPLY` and `VITE_TICKET_PRICE_WEI` must match the values used when
 the contract was deployed. The defaults (1000 tickets, 0.01 SETH) are pre-filled
-in `.env.example`.
+in `.env.example`. `DEPLOY_PRIVATE_KEY` is only required when running
+`npm run deploy` — export it from MetaMask → Account Details → Show Private Key.
 
-## Deploying the Contract
+To deploy the contract:
 
-1. Export your MetaMask private key: MetaMask → Account Details → Show Private Key
-2. Add to `.env`:
-
-```
-VITE_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
-DEPLOY_PRIVATE_KEY=0xYourPrivateKeyHere
-VITE_MAX_SUPPLY=1000
-VITE_TICKET_PRICE_WEI=10000000000000000
-```
-
-3. Run:
+1. Ensure your deploying wallet holds SETH for gas fees (see MetaMask Setup above).
+2. Run:
 
 ```bash
 npm run deploy
