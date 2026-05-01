@@ -12,6 +12,8 @@ export const CreateWalletStep = {
   phrase: 'phrase',
   verify: 'verify',
   complete: 'complete',
+  keystoreFile: 'keystoreFile',
+  keystorePassword: 'keystorePassword',
 } as const
 
 export type CreateWalletStep = (typeof CreateWalletStep)[keyof typeof CreateWalletStep]

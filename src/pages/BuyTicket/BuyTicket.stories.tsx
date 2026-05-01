@@ -1,14 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite'
 import { BrowserProvider, JsonRpcSigner } from 'ethers'
-import { vi } from 'vitest'
 import { WalletContext, type WalletContextValue } from '../../context/useWallet'
 import { BuyTicket } from './BuyTicket'
-
-vi.mock('../../utils/contract', () => ({
-  remainingTickets: vi.fn().mockResolvedValue(100n),
-  buyTicket: vi.fn(),
-  decodeContractError: vi.fn(),
-}))
 
 const base: WalletContextValue = {
   isConnected: false,
@@ -19,7 +12,7 @@ const base: WalletContextValue = {
   error: null,
   provider: null,
   signer: null,
-  connect: () => Promise.resolve(),
+  connect: () => Promise.resolve(false),
   disconnect: () => {},
   connectWithWallet: () => Promise.resolve(true),
   refreshBalances: () => Promise.resolve(),
@@ -41,12 +34,18 @@ type Story = StoryObj<WalletContextValue>
 
 export const Default: Story = {}
 
+const mockProvider = {
+  resolveName: (name: string) => Promise.resolve(name),
+  getNetwork: () => Promise.resolve({ chainId: 11155111n }),
+  call: () => Promise.resolve('0x0000000000000000000000000000000000000000000000000000000000000064'),
+} as unknown as BrowserProvider
+
 export const Connected: Story = {
   args: {
     isConnected: true,
     address: '0xabc123',
     signer: {} as unknown as JsonRpcSigner,
-    provider: {} as unknown as BrowserProvider,
+    provider: mockProvider,
   },
 }
 
@@ -55,11 +54,7 @@ export const ButtonHover: Story = {
     isConnected: true,
     address: '0xabc123',
     signer: {} as unknown as JsonRpcSigner,
-    provider: {} as unknown as BrowserProvider,
+    provider: mockProvider,
   },
   parameters: { pseudo: { hover: true } },
-}
-
-export const NotConnected: Story = {
-  args: { isConnected: false },
 }

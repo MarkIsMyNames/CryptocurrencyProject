@@ -1,5 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { generateWallet, downloadKeystore, truncateAddress } from './wallet'
+import {
+  generateWallet,
+  downloadKeystore,
+  truncateAddress,
+  loadKeystore,
+  decryptKeystore,
+} from './wallet'
 import { config } from '../config'
 
 vi.mock('ethers', () => {
@@ -17,6 +23,7 @@ vi.mock('ethers', () => {
     mnemonic = mockInstance.mnemonic
     encrypt = mockInstance.encrypt
     static createRandom = vi.fn().mockReturnValue(mockInstance)
+    static fromEncryptedJson = vi.fn()
   }
   return { Wallet: MockWallet }
 })
@@ -45,6 +52,39 @@ describe('truncateAddress', () => {
     expect(result).toBe(
       `${address.slice(0, config.addressPrefixLength)}...${address.slice(-config.addressSuffixLength)}`,
     )
+  })
+})
+
+describe('loadKeystore', () => {
+  it('returns file text for a valid JSON file', async () => {
+    const json = '{"version":3}'
+    const file = new File([json], 'keystore.json', { type: 'application/json' })
+    const result = await loadKeystore(file)
+    expect(result).toBe(json)
+  })
+
+  it('throws for a non-JSON file', async () => {
+    const file = new File(['not json'], 'keystore.txt', { type: 'text/plain' })
+    await expect(loadKeystore(file)).rejects.toThrow()
+  })
+})
+
+describe('decryptKeystore', () => {
+  it('returns private key on correct password', async () => {
+    const { Wallet: MockWallet } = await import('ethers')
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    vi.mocked(MockWallet.fromEncryptedJson).mockResolvedValueOnce({
+      privateKey: '0x' + 'b'.repeat(64),
+    } as never)
+    const result = await decryptKeystore('{"mock":"ks"}', 'correct')
+    expect(result).toBe('0x' + 'b'.repeat(64))
+  })
+
+  it('throws on wrong password', async () => {
+    const { Wallet: MockWallet } = await import('ethers')
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    vi.mocked(MockWallet.fromEncryptedJson).mockRejectedValueOnce(new Error('invalid password'))
+    await expect(decryptKeystore('{"mock":"ks"}', 'wrong')).rejects.toThrow('invalid password')
   })
 })
 

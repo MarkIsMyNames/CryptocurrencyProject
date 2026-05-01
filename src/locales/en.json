@@ -9,7 +9,9 @@
   "walletStatus": {
     "connected": "Connected",
     "disconnected": "Not connected",
-    "address": "Address"
+    "address": "Address",
+    "copyAddress": "Copy address",
+    "copied": "Copied!"
   },
   "createWallet": {
     "title": "Create or Connect Wallet",
@@ -31,7 +33,9 @@
       "password": "Set Password",
       "phrase": "Recovery Phrase",
       "verify": "Verify Phrase",
-      "complete": "Wallet Ready"
+      "complete": "Wallet Ready",
+      "keystoreFile": "Load Keystore",
+      "keystorePassword": "Decrypt Keystore"
     },
     "passwordLabel": "Password",
     "passwordPlaceholder": "At least 8 characters",
@@ -51,7 +55,17 @@
     "nextBtn": "Next",
     "backBtn": "Back",
     "verifyBtn": "Verify & Connect",
-    "goToBalance": "View My Wallet"
+    "goToBalance": "View My Wallet",
+    "importKeystoreBtn": "Load Keystore",
+    "keystoreFileLabel": "Keystore file (.json)",
+    "keystoreFileInstruction": "Select the JSON keystore file you downloaded when creating your wallet.",
+    "keystoreFileError": "Invalid keystore file. Please select a valid JSON keystore.",
+    "keystorePasswordLabel": "Keystore password",
+    "keystorePasswordPlaceholder": "Enter your keystore password",
+    "keystorePasswordInstruction": "Enter the password you used when generating this keystore.",
+    "keystorePasswordError": "Incorrect password. Please try again.",
+    "keystoreDecryptBtn": "Decrypt & Connect",
+    "keystoreConnected": "Wallet loaded and connected successfully."
   },
   "balance": {
     "title": "Wallet Balance",
@@ -76,7 +90,7 @@
     "success": "Ticket purchased successfully!",
     "alreadyOwned": "You already own a ticket.",
     "soldOut": "Sorry, this event is sold out.",
-    "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
+    "incorrectAmount": "Incorrect payment amount. Please check the ticket price and try again.",
     "cancelled": "Transaction cancelled.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
     "connectFirst": "Please connect your wallet first."
@@ -105,11 +119,12 @@
     "contractNotDeployed": "Contract not found at the configured address. Please deploy the contract and update VITE_CONTRACT_ADDRESS.",
     "networkError": "Network error. Please check your connection.",
     "hookOutsideProvider": "useWallet must be used inside WalletProvider",
-    "incorrectAmount": "Incorrect SETH amount. Please send exactly 0.01 SETH.",
+    "incorrectAmount": "Incorrect payment amount. Please check the ticket price and try again.",
     "alreadyOwned": "You already own a ticket.",
     "soldOut": "Sorry, this event is sold out.",
     "noTicket": "No ticket found in this wallet.",
     "cancelled": "Transaction cancelled.",
+    "insufficientFunds": "Insufficient SETH balance to cover the ticket price and gas.",
     "wrongNetwork": "Please switch to the Sepolia testnet.",
     "connectedNoAddress": "WalletStatus: connected but address is null",
     "notConnected": "useConnectedWallet must be used in a connected state"

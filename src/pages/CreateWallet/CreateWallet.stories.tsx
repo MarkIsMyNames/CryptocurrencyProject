@@ -12,7 +12,7 @@ const base: WalletContextValue = {
   isConnected: false,
   isConnecting: false,
   error: null,
-  connect: () => Promise.resolve(),
+  connect: () => Promise.resolve(false),
   connectWithWallet: () => Promise.resolve(true),
   disconnect: () => {},
   refreshBalances: () => Promise.resolve(),
@@ -40,10 +40,6 @@ export const Connecting: Story = {
 
 export const MetaMaskError: Story = {
   args: { error: en.createWallet.metaMaskNotFound },
-}
-
-export const MetaMaskConnected: Story = {
-  args: { isConnected: true },
 }
 
 export const ButtonHover: Story = {

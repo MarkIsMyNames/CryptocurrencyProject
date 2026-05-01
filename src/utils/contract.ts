@@ -53,6 +53,7 @@ const CONTRACT_ERRORS: Array<[string[], string]> = [
   [['SoldOut'], strings.errors.soldOut],
   [['NoTicketToRedeem'], strings.errors.noTicket],
   [['user rejected'], strings.errors.cancelled],
+  [['INSUFFICIENT_FUNDS', 'insufficient funds'], strings.errors.insufficientFunds],
   [['network changed', 'chain'], strings.errors.wrongNetwork],
   [['timeout', 'TIMEOUT', 'SERVER_ERROR', 'could not detect network'], strings.errors.networkError],
 ]

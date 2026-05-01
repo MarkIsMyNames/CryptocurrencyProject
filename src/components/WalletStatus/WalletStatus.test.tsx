@@ -1,5 +1,5 @@
-import { customRender, screen } from '../../test-utils'
-import { describe, it, expect, vi } from 'vitest'
+import { customRender, screen, fireEvent } from '../../test-utils'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import en from '../../locales/en.json'
 import { WalletStatus } from './WalletStatus'
 
@@ -25,6 +25,10 @@ const base = {
 }
 
 describe('WalletStatus', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+  })
+
   it('shows disconnected label when no wallet connected', () => {
     vi.mocked(useWallet).mockReturnValue(base)
     customRender(<WalletStatus />)
@@ -46,5 +50,24 @@ describe('WalletStatus', () => {
     })
     customRender(<WalletStatus />)
     expect(screen.getByText('0x1234...5678')).toBeInTheDocument()
+  })
+
+  it('copies address to clipboard and shows copied feedback on click', async () => {
+    const address = '0x1234567890abcdef1234567890abcdef12345678'
+    vi.mocked(useWallet).mockReturnValue({ ...base, isConnected: true, address })
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('navigator', { clipboard: { writeText } })
+
+    customRender(<WalletStatus />)
+    fireEvent.click(screen.getByRole('button'))
+
+    expect(writeText).toHaveBeenCalledWith(address)
+    expect(await screen.findByText(en.walletStatus.copied)).toBeInTheDocument()
+  })
+
+  it('does not render a button when disconnected', () => {
+    vi.mocked(useWallet).mockReturnValue(base)
+    customRender(<WalletStatus />)
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
   })
 })
