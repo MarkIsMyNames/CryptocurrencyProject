@@ -7,6 +7,16 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 import { playwright } from '@vitest/browser-playwright';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const testEnv = Object.fromEntries(
+  readFileSync(path.join(dirname, '.env.example'), 'utf8')
+    .split('\n')
+    .filter((line) => line.includes('=') && !line.startsWith('#'))
+    .map((line) => {
+      const [key, ...rest] = line.split('=')
+      return [key.trim(), rest.join('=').trim()]
+    })
+)
+
 const themeSource = readFileSync(path.join(dirname, 'src/theme.ts'), 'utf8')
 const backgroundPage = themeSource.match(/backgroundPage:\s*'([^']+)'/)?.[1]
 if (!backgroundPage) throw new Error('Could not extract backgroundPage from src/theme.ts')
@@ -28,7 +38,8 @@ export default defineConfig({
         exclude: ['e2e/**', '.worktrees/**'],
         environment: 'jsdom',
         setupFiles: ['./src/test-setup.ts'],
-        globals: true
+        globals: true,
+        env: testEnv,
       }
     }, {
       extends: true,
@@ -40,6 +51,7 @@ export default defineConfig({
       })],
       test: {
         name: 'storybook',
+        env: testEnv,
         browser: {
           enabled: true,
           headless: true,

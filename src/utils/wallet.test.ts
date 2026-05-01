@@ -25,7 +25,7 @@ vi.mock('ethers', () => {
     static createRandom = vi.fn().mockReturnValue(mockInstance)
     static fromEncryptedJson = vi.fn()
   }
-  return { Wallet: MockWallet }
+  return { Wallet: MockWallet, isAddress: (v: string) => /^0x[0-9a-fA-F]{40}$/.test(v) }
 })
 
 describe('generateWallet', () => {
