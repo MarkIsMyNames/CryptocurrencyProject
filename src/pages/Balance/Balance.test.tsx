@@ -1,14 +1,10 @@
 import { customRender, screen, fireEvent, waitFor } from '../../test-utils'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import en from '../../locales/en.json'
 import { Balance } from './Balance'
 
 vi.mock('../../context/useWallet', () => ({
-  useWallet: () => ({
-    provider: { getBalance: mockGetBalance },
-    address: '0xabc123',
-    isConnected: true,
-  }),
+  useWallet: vi.fn(),
 }))
 
 vi.mock('../../utils/contract', () => ({
@@ -17,11 +13,34 @@ vi.mock('../../utils/contract', () => ({
   decodeContractError: vi.fn().mockReturnValue(en.errors.unknownError),
 }))
 
+vi.mock('ethers', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('ethers')>()
+  return {
+    ...actual,
+    JsonRpcProvider: vi.fn(function () {
+      return { getBalance: mockGetBalance }
+    }),
+  }
+})
+
+import { useWallet } from '../../context/useWallet'
 import { balanceOf, remainingTickets } from '../../utils/contract'
 
 const mockBalanceOf = vi.mocked(balanceOf)
 const mockRemainingTickets = vi.mocked(remainingTickets)
 const mockGetBalance = vi.fn().mockResolvedValue(BigInt('1500000000000000000'))
+
+const connectedWallet = {
+  provider: { getBalance: mockGetBalance },
+  address: '0xabc123',
+  isConnected: true,
+}
+
+const disconnectedWallet = {
+  provider: null,
+  address: null,
+  isConnected: false,
+}
 
 const VALID_ADDRESS = '0x1234567890abcdef1234567890abcdef12345678'
 
@@ -32,6 +51,10 @@ function checkAddress(address: string) {
 }
 
 describe('Balance', () => {
+  beforeEach(() => {
+    vi.mocked(useWallet).mockReturnValue(connectedWallet as ReturnType<typeof useWallet>)
+  })
+
   it('renders title and subtitle', () => {
     customRender(<Balance />)
     expect(screen.getByText(en.balance.title)).toBeInTheDocument()
@@ -94,5 +117,16 @@ describe('Balance', () => {
     await waitFor(() => {
       expect(screen.getByText(en.errors.unknownError)).toBeInTheDocument()
     })
+  })
+
+  it('uses a JsonRpcProvider when no wallet is connected', async () => {
+    vi.mocked(useWallet).mockReturnValue(disconnectedWallet as ReturnType<typeof useWallet>)
+    const { JsonRpcProvider } = await import('ethers')
+    customRender(<Balance />)
+    checkAddress(VALID_ADDRESS)
+    await waitFor(() => {
+      expect(screen.getByText(/1\.5/)).toBeInTheDocument()
+    })
+    expect(JsonRpcProvider).toHaveBeenCalled()
   })
 })

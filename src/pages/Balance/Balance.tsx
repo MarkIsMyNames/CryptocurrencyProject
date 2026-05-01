@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { isAddress, formatEther } from 'ethers'
+import { isAddress, formatEther, JsonRpcProvider } from 'ethers'
 import { useWallet } from '../../context/useWallet'
 import { balanceOf, remainingTickets, decodeContractError } from '../../utils/contract'
 import { config } from '../../config'
@@ -50,7 +50,7 @@ export function BalanceResultView({ seth, etk, remaining }: BalanceResult) {
 }
 
 export function Balance() {
-  const { provider, address: connectedAddress } = useWallet()
+  const { provider: walletProvider, address: connectedAddress } = useWallet()
   const [inputAddress, setInputAddress] = useState(connectedAddress ?? '')
   const [result, setResult] = useState<BalanceResult | null>(null)
   const [loading, setLoading] = useState(false)
@@ -62,10 +62,7 @@ export function Balance() {
       setError(strings.balance.invalidAddress)
       return
     }
-    if (!provider) {
-      setError(strings.errors.connectWallet)
-      return
-    }
+    const provider = walletProvider ?? new JsonRpcProvider(config.sepoliaRpcUrl)
     setLoading(true)
     try {
       const [rawEth, etk, remaining] = await Promise.all([
