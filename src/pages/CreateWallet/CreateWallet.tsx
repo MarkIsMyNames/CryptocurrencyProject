@@ -266,12 +266,8 @@ export function CreateWallet() {
           {en.createWallet.importKeystoreBtn}
         </PrimaryButton>
       </ButtonRow>
-      {idleSuccess !== null && (
-        <StatusMessage $type={Status.success}>{idleSuccess}</StatusMessage>
-      )}
-      {error !== null && (
-        <StatusMessage $type={Status.error}>{error}</StatusMessage>
-      )}
+      {idleSuccess !== null && <StatusMessage $type={Status.success}>{idleSuccess}</StatusMessage>}
+      {error !== null && <StatusMessage $type={Status.error}>{error}</StatusMessage>}
     </PageWrapper>
   )
 }

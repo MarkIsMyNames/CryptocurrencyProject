@@ -31,7 +31,9 @@ export function KeystorePasswordStep({
   onDecrypt,
 }: KeystorePasswordStepProps) {
   const [showPassword, setShowPassword] = useState(false)
-  function togglePassword() { setShowPassword((v) => !v) }
+  function togglePassword() {
+    setShowPassword((v) => !v)
+  }
   return (
     <PageWrapper>
       <Subtitle>{en.createWallet.keystorePasswordInstruction}</Subtitle>
