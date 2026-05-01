@@ -42,10 +42,6 @@ export const MetaMaskError: Story = {
   args: { error: en.createWallet.metaMaskNotFound },
 }
 
-export const MetaMaskConnected: Story = {
-  args: { isConnected: true },
-}
-
 export const ButtonHover: Story = {
   parameters: { pseudo: { hover: true } },
 }
