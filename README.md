@@ -9,73 +9,105 @@ purchased with SETH and burned at venue entry.
 
 ### Code Overview
 
-The project is a full-stack Web3 DApp split into a Solidity smart contract and a
-React frontend.
+The project is a full-stack Web3 DApp. The on-chain logic lives in a single
+Solidity contract; the interface is a React SPA that communicates with
+it through ethers.js. The two halves are deliberately kept independent: the
+contract knows nothing about the frontend, and the frontend treats the contract
+as a pure API it calls over JSON-RPC.
 
-**Smart Contract — `contracts/EventTicket.sol`**
+#### Smart Contract — `contracts/EventTicket.sol`
 
-`EventTicket` is an ERC-20 token where 1 ETK equals 1 ticket. It inherits from
-OpenZeppelin's `ERC20`, `Ownable`, and `ReentrancyGuard`. Key design choices:
+Three OpenZeppelin base contracts are composed to cover the security surface:
 
-| Detail | Value |
-|---|---|
-| Token symbol | ETK |
-| Decimals | 0 (overridden) — 1 ETK is always 1 whole ticket |
-| Ticket price | Set at deploy time via constructor; stored as `immutable` |
-| Max supply | Set at deploy time via constructor; stored as `immutable` |
-| Non-transferable | `_update` reverts unless the operation is a mint or burn |
-| Reentrancy | `nonReentrant` guard on `buyTicket` and `withdrawFunds` |
+| Detail | Value                                                                                                                                                                                                                                                                          |
+|---|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Token symbol | ETK — using an ERC-20 token means wallets like MetaMask can display balances natively                                                                                                                                                                                          |
+| Decimals | 0 (overridden) — 1 ETK is always 1 whole ticket; fractional tickets have no meaning in this domain                                                                                                                                                                             |
+| Ticket price | Set at deploy time via constructor; stored as `immutable` so the compiler bakes it into the bytecode rather than a storage slot, saving a storage read on every `buyTicket` call                                                                                               |
+| Max supply | Set at deploy time via constructor; `immutable` — `remainingTickets()` subtracts `totalSupply()` from this value on every read                                                                                                                                                 |
+| Non-transferable | `_update` reverts unless the caller is address zero (mint) or the recipient is address zero (burn) |
+| Reentrancy | `nonReentrant` guard on `buyTicket` and `withdrawFunds` because both functions transfer ETH; without it a malicious contract could re-enter before the state update commits and drain funds                                                                                    |
+| Errors | Custom errors (`IncorrectPayment`, `AlreadyOwnsTicket`, `SoldOut`, …) rather than `require` strings — 4-byte selector payload costs less gas and gives the frontend a machine-readable signal to map to a friendly message                                                     |
 
-Public functions:
+Public interface:
 
-- `buyTicket()` — payable; mints 1 ETK to the caller if payment matches
-  `ticketPrice`, the caller holds no existing ticket, and supply remains.
-- `redeemTicket()` — burns the caller's single ETK to record venue entry.
-- `remainingTickets()` — view; returns `maxSupply - totalSupply()`.
-- `withdrawFunds()` — owner only; transfers the contract balance to the owner
-  address.
+| Function | Access | Purpose |
+|---|---|---|
+| `buyTicket()` | anyone | Pays `ticketPrice` SETH, mints 1 ETK |
+| `redeemTicket()` | ticket holder | Burns the caller's ETK to record entry |
+| `remainingTickets()` | view | Returns `maxSupply − totalSupply()` |
+| `withdrawFunds()` | owner only | Transfers collected SETH to the owner |
 
-**Frontend — `src/`**
+#### Frontend — `src/`
 
-Built with React 19, TypeScript (strict), Vite, and styled-components v6.
+Built with React 19, TypeScript, Vite, and styled-components v6.
+
+The architecture separates concerns into four layers that flow in one direction:
+
+```
+env / config.ts  →  context (useWallet)  →  utils/contract.ts  →  pages / components
+```
+
+**Configuration layer (`config.ts`, `locales/en.json`, `theme.ts`, `.env`)**
+All environment-specific values (contract address, price, chain ID, RPC URL)
+are read from `.env` through `config.ts` and kept out of component code. All
+user-facing text lives in `locales/en.json`. This means changing the ticket
+price, the network, or any displayed string requires editing one file.
+
+**Wallet context (`context/useWallet.ts`, `WalletContext.tsx`)**
+Connection state (address, ETH balance, ETK balance, signer, provider) is held
+in a single React context that wraps the entire app. Pages do not manage wallet
+state themselves; they read from the context and call `refreshBalances()` after
+a transaction confirms. This means the Navbar's wallet indicator, the Balance
+page, and the BuyTicket page all stay in sync automatically without separate fetch logic.
+
+Two connection paths share the same context interface: MetaMask (browser
+extension, `BrowserProvider`) and keystore JSON (file upload + password decrypt,
+`Wallet`). Unifying them behind the same `signer`/`provider` shape means the
+rest of the app does not need to know which method was used.
+
+**Contract utility (`utils/contract.ts`)**
+All ethers calls are wrapped in typed functions (`buyTicket`, `redeemTicket`,
+`remainingTickets`, `balanceOf`) that accept a `ContractRunner` and return typed
+promises. Pages never import ethers or the ABI directly — they call these
+functions. `decodeContractError` centralises the mapping from ethers error codes
+and custom error names to the strings in `en.json`, so error handling in every
+page is a single `catch` block.
+
+**Pages and components**
 
 ```
 src/
-├── config.ts              — all env-driven constants (address, price, chain ID)
-├── locales/en.json        — all user-facing strings
-├── theme.ts               — design tokens (colours, spacing, typography)
+├── config.ts
+├── locales/en.json
+├── theme.ts
 ├── context/
-│   ├── useWallet.ts       — WalletContext: MetaMask + keystore connection state
-│   └── WalletContext.tsx  — provider component
+│   ├── useWallet.ts
+│   └── WalletContext.tsx
 ├── utils/
-│   └── contract.ts        — typed ethers v6 contract wrapper + error decoder
+│   └── contract.ts
 ├── components/
-│   ├── Navbar/            — top navigation bar with wallet status indicator
-│   ├── WalletStatus/      — connected address badge (truncated, copy-on-click)
-│   └── TxReceipt/         — transaction hash with Etherscan link
+│   ├── Navbar/            — persistent nav bar with live wallet indicator
+│   ├── WalletStatus/      — truncated address badge, copy on click
+│   └── TxReceipt/         — transaction hash with Etherscan deep link
 └── pages/
-    ├── CreateWallet/      — multi-step wizard: generate phrase → verify → connect
-    │   ├── PhraseStep/    — displays generated 12-word mnemonic
-    │   ├── VerifyStep/    — asks user to confirm three random words
-    │   ├── PasswordStep/  — encrypts wallet to keystore JSON
-    │   ├── CompleteStep/  — shows success and redirects
-    │   ├── KeystoreFileStep/   — file-picker for existing keystore
-    │   └── KeystorePasswordStep/ — password entry + decryption
-    ├── BuyTicket/         — shows price, remaining supply, and buy button
-    ├── RedeemTicket/      — shows ticket balance and redeem button
-    └── Balance/           — displays connected wallet ETH and ETK balances
+    ├── CreateWallet/      — multi-step wizard: generate mnemonic → verify words → encrypt keystore
+    │   ├── PhraseStep/
+    │   ├── VerifyStep/
+    │   ├── PasswordStep/
+    │   ├── CompleteStep/
+    │   ├── KeystoreFileStep/
+    │   └── KeystorePasswordStep/
+    ├── BuyTicket/         — shows price, remaining supply, buy button
+    ├── RedeemTicket/      — shows ticket balance, redeem button
+    └── Balance/           — live ETH and ETK balances for connected wallet
 ```
 
-Wallet connection supports MetaMask (browser extension) and keystore JSON files.
-The connected signer and provider are held in a single React context so all pages
-share live balance state. All contract calls are wrapped in `src/utils/contract.ts`,
-which maps ethers error codes to user-facing strings from `en.json`.
-
-**Testing**
-
-- Unit / component tests: Vitest + React Testing Library
-- Component explorer + accessibility: Storybook 10 with `addon-a11y` (WCAG 2.1 AA)
-- E2E: Playwright
+Every component directory contains a `.tsx`, `.styles.ts`, `.test.tsx`, and
+`.stories.tsx` file. Storybook stories cover all interactive states (hover, 
+disabled, loading, error, success) using `storybook-addon-pseudo-states`
+so reviewers can inspect every state without manual interaction. All stories are
+checked against WCAG 2.1 AA by `addon-a11y`.
 
 ---
 
@@ -147,9 +179,9 @@ VITE_TICKET_PRICE_WEI=10000000000000000
 VITE_SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
 ```
 
-`VITE_MAX_SUPPLY` and `VITE_TICKET_PRICE_WEI` must match the values used when the
-contract was deployed. The defaults (1000 tickets, 0.01 SETH) are pre-filled in
-`.env.example`.
+`VITE_MAX_SUPPLY` and `VITE_TICKET_PRICE_WEI` must match the values used when
+the contract was deployed. The defaults (1000 tickets, 0.01 SETH) are pre-filled
+in `.env.example`.
 
 ## Deploying the Contract
 
@@ -183,8 +215,8 @@ npm run dev
 
 ## Viewing Transactions
 
-After buying a ticket the app displays the transaction hash with a direct link to
-Sepolia Etherscan. To look up any transaction manually:
+After buying a ticket the app displays the transaction hash with a direct link
+to Sepolia Etherscan. To look up any transaction manually:
 
 1. Go to https://sepolia.etherscan.io
 2. Paste the transaction hash (starting with `0x`) into the search bar
