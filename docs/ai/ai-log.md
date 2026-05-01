@@ -11,7 +11,7 @@ Optimization entries tagged [OPTIMIZATION].
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** Project scaffold — package.json, vite.config.ts, tsconfig.json, src/test-setup.ts
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Scaffold a Vite + React 19.2 + TypeScript project. Requirements:
 - React 19.2.0, react-router-dom@6, styled-components@6, ethers@6
 - Dev deps: vitest, @vitest/coverage-v8, jsdom, @testing-library/react, @testing-library/jest-dom, @testing-library/user-event
@@ -48,7 +48,7 @@ AI produced a working scaffold but with several issues requiring correction:
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** eslint.config.js, .prettierrc, .prettierignore
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Implement Task 2: ESLint + Prettier configuration for a Vite + React 19.2 + TypeScript project. ESLint 10 is installed (dropped legacy .eslintrc.cjs support). Use flat config format (eslint.config.js). The scaffold already generated a basic eslint.config.js — rewrite it completely. Install eslint-plugin-jsx-a11y and eslint-config-prettier, replace eslint.config.js with the provided flat config, create .prettierrc and .prettierignore, update lint and format scripts in package.json, confirm zero lint errors and passing format check, then commit."
 
 **Review critique (Step 2):**
@@ -70,14 +70,14 @@ AI produced a working scaffold but with several issues requiring correction:
 **Tool:** Claude (claude-haiku-4-5)
 **Feature:** CLAUDE.md
 
-**Prompt (Step 1 — proactive guidance):**
-"Create CLAUDE.md at the project root covering: project context, tech stack, file/folder conventions, code style, testing requirements, AI logging format, smart contract rules, and git/PR conventions. The AI logging section must specify the four-step format (prompt → critique → resolution → commit hash) and note that optimization passes must be separate entries tagged [OPTIMIZATION]."
+**Prompt (Step 1):**
+"Create CLAUDE.md at the project root covering: project context, tech stack, file/folder conventions, code style, testing requirements, smart contract rules, and git/PR conventions."
 
 **Review critique (Step 2):**
 No issues found. The file was created with the exact content specified in the task requirements.
 
 **Resolution (Step 3):**
-Created CLAUDE.md at the project root with all sections as specified: project context (Block 8 submission), tech stack (React 19.2, Vite, TypeScript strict), file/folder conventions (component directory structure, styled-components theme usage, no raw colors except in src/theme.ts), code style (strict TypeScript, no comments unless necessary, Prettier enforced), testing requirements (Vitest + RTL + Storybook + Playwright), AI logging format (four-step process with optimization pass notation), smart contract rules (OpenZeppelin v5, ReentrancyGuard, custom errors), and git/PR conventions (feat/fix/chore/test/docs, feature/task-N branches, PR-based workflow). File committed successfully.
+No actionable steps
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 32c3b68
@@ -89,7 +89,7 @@ Created CLAUDE.md at the project root with all sections as specified: project co
 **Tool:** Claude (claude-haiku-4-5)
 **Feature:** src/theme.ts, src/config.ts, src/locales/en.json, src/styled.d.ts
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create four foundation files for the EventTicket DApp:
 - theme.ts: single source of truth for all colours using descriptive semantic names. Must cover backgrounds, brand, status, text, and border colours. Export as const with Theme type.
 - styled.d.ts: augment DefaultTheme to match Theme type so styled-components has full type inference.
@@ -119,7 +119,7 @@ Additionally, `.d.ts` files are ignored by `.gitignore` (line 19: `*.d.ts`), pre
 **Tool:** Claude (claude-haiku-4-5)
 **Feature:** contracts/EventTicket.sol
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Generate a Solidity ERC-20 smart contract for an event ticketing system on Ethereum Sepolia.
 Requirements:
 - OpenZeppelin v5 base: ERC20, Ownable, ReentrancyGuard
@@ -146,22 +146,6 @@ No changes needed. Contract accepted as designed.
 
 **Verdict:** Accepted without modification
 **Commit hash (Step 4):** e9a9090
-
----
-
-**Security review fixes applied after initial acceptance (2026-04-26):**
-
-Three security issues were identified in a follow-up review and corrected:
-
-1. **Soulbound / non-transferable tickets** — ERC-20 `transfer` and `transferFrom` were inherited without restriction, allowing ticket trading between wallets. Fixed by overriding `_update` to revert with `TicketsAreNonTransferable()` on any call where `from != address(0)` and `to != address(0)`. Only minting (`_mint`) and burning (`_burn`) are now permitted.
-
-2. **NothingToWithdraw guard** — `withdrawFunds()` would previously call `owner().call{value: 0}("")` when the contract balance was zero, wasting gas and emitting a misleading success. Fixed by adding an early revert with `NothingToWithdraw()` when `address(this).balance == 0`.
-
-3. **Constructor zero-value validation** — A `maxSupply` of 0 would make the contract permanently unusable (every `buyTicket` call reverts with `SoldOut`). Fixed by adding `if (_maxSupply == 0) revert InvalidConfiguration();` at the top of the constructor.
-
-Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`, `InvalidConfiguration`.
-
-**Commit hash (security fixes):** ee02873
 
 ---
 
@@ -199,8 +183,8 @@ Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`,
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** Storybook 10 with addon-a11y and storybook-addon-pseudo-states
 
-**Prompt (Step 1 — proactive guidance):**
-"Set up Storybook 10 with Vite builder, addon-a11y for WCAG 2.1 AA enforcement, and storybook-addon-pseudo-states for hover/focus state testing. Configure ThemeProvider decorator so all stories receive the styled-components theme."
+**Prompt (Step 1):**
+"Set up Storybook 10 with Vite builder, addon-a11y for WCAG 2.1 AA enforcement, and storybook-addon-pseudo-states for hover state testing. Configure ThemeProvider decorator so all stories receive the styled-components theme."
 
 **Review critique (Step 2):**
 `npx storybook init` failed to install dependencies due to a peer dependency conflict with `eslint-plugin-jsx-a11y`. Required `--legacy-peer-deps` to resolve. The init also added `@storybook/addon-essentials` to main.ts but that package is not published for Storybook 10 (functionality split into individual addons); replaced with `@storybook/addon-docs` which was installed by init. Generated `src/stories/` directory with sample stories was deleted as it conflicts with the per-component story structure. `preview.ts` was replaced with `preview.tsx` to support JSX ThemeProvider decorator syntax.
@@ -223,7 +207,7 @@ Three new custom errors added: `TicketsAreNonTransferable`, `NothingToWithdraw`,
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** playwright.config.ts + e2e/ skeleton specs
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Set up Playwright with Chromium-only config, baseURL http://localhost:5173, webServer integration for Vite dev server. Create skeleton e2e specs for Wallet Creation, Balance Check, Buy Ticket, and Redeem Ticket flows — each with a single navigation test. Full e2e tests will be filled in after all pages are implemented."
 
 **Review critique (Step 2):**
@@ -242,7 +226,7 @@ No changes required.
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** .github/workflows/ — lint, format, unit-tests, accessibility, e2e
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create five separate GitHub Actions workflows triggered on push to main and on PRs: lint.yml (ESLint + tsc --noEmit), format.yml (Prettier check), unit-tests.yml (Vitest with coverage), accessibility.yml (Storybook build), e2e.yml (Playwright with Chromium install and VITE_CONTRACT_ADDRESS stub)."
 
 **Review critique (Step 2):**
@@ -261,7 +245,7 @@ No changes required.
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/context/WalletContext.tsx, src/utils/contract.ts, src/utils/wallet.ts
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create WalletContext with connect/disconnect/refreshBalances actions, MetaMask BrowserProvider integration, Sepolia chain ID check, and typed state (address, ethBalance, etkBalance, isConnected, isConnecting, error). Create contract.ts with ABI array and getContract/decodeContractError helpers. Create wallet.ts with generateWallet and downloadKeystore using ethers.js Wallet.createRandom and encrypt."
 
 **Review critique (Step 2):**
@@ -280,8 +264,8 @@ Created src/globals.d.ts declaring Window.ethereum as Eip1193Provider intersecti
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/components/Navbar/
 
-**Prompt (Step 1 — proactive guidance):**
-"Create Navbar component with styled-components, routing links from en.json strings, NavBrand, NavLinks, NavLink (active state via .active class). Include Storybook stories with Default, HoverState (pseudo.hover), FocusState (pseudo.focus) and addon-a11y enabled."
+**Prompt (Step 1):**
+"Create Navbar component with styled-components, routing links from en.json strings, NavBrand, NavLinks, NavLink (active state via .active class). Include Storybook stories with Default, HoverState (pseudo.hover)."
 
 **Review critique (Step 2):**
 Two issues found: (1) Stories file imported from `@storybook/react` — ESLint storybook/no-renderer-packages rule requires the framework package `@storybook/react-vite` instead. (2) Test used `async` on a callback with no `await` — TypeScript strictTypeChecked flags this via @typescript-eslint/require-await.
@@ -299,7 +283,7 @@ Changed stories import to `@storybook/react-vite`. Removed `async` keyword from 
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/components/WalletStatus/
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create WalletStatus component showing a coloured dot (green=connected, red=disconnected) and either a truncated wallet address (first 6 + last 4 chars) or the 'Not connected' string from en.json. Use theme.colors.statusSuccess/statusError for dot colour. Storybook stories for Disconnected and Connected states via WalletContext.Provider decorator."
 
 **Review critique (Step 2):**
@@ -318,7 +302,7 @@ Added `export` keyword to `const WalletContext = createContext<WalletContextValu
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/pages/CreateWallet/
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create CreateWallet page with two paths: generate a new wallet (Wallet.createRandom) showing address, mnemonic, and toggle-revealed private key with keystore download; or connect MetaMask via useWallet().connect(). All strings from en.json, all styles via theme. Storybook stories for Default, Connecting state, and ButtonFocus."
 
 **Review critique (Step 2):**
@@ -337,7 +321,7 @@ Changed `const noopAsync = async () => undefined` to `const noopAsync = () => Pr
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/pages/Balance/
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create Balance page with an address input (pre-filled with connected wallet address), Check Balance button, and a grid showing SETH balance (formatted with formatEther), ETK ticket count, and remaining supply. Address validated with ethers isAddress(). Storybook stories for Default, InputFocus, ButtonHover."
 
 **Review critique (Step 2):**
@@ -356,7 +340,7 @@ Changed `balance.title` in en.json from "Check Balance" to "Wallet Balance". Rem
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/pages/BuyTicket/
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create BuyTicket page showing ticket price (from config.ticketPriceDisplay), remaining tickets, and user's current balance. Buy button calls contract.buyTicket({ value: parseEther('0.01') }), shows pending/success/error states. Disables button if already owns ticket, sold out, or transaction pending. All strings from en.json."
 
 **Review critique (Step 2):**
@@ -368,7 +352,6 @@ Removed `async` from the first test callback. Changed the error lookup variables
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 5c6af57
 
-
 ---
 
 ## [2026-04-27] #015 — Task 15: RedeemTicket page
@@ -376,7 +359,7 @@ Removed `async` from the first test callback. Changed the error lookup variables
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** src/pages/RedeemTicket/
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create RedeemTicket page showing wallet address and ticket status badge (valid/none). Redeem at Door button calls contract.redeemTicket(), waits for tx, shows success message. Button disabled when no ticket, pending, or already redeemed. Error strings from en.json via decodeContractError. Storybook stories for Default (disconnected), HasTicket, ButtonHover, ButtonFocus."
 
 **Review critique (Step 2):**
@@ -388,19 +371,21 @@ Updated three en.json values to match specification. Created RedeemTicket.styles
 **Verdict:** Modified before acceptance
 **Commit hash (Step 4):** 2b8b88d
 
+---
+
 ## [2026-04-27] #016 — Task 16: App.tsx routing and main.tsx wiring
 
 **Tool:** Claude (claude-haiku-4-5)
 **Feature:** src/App.tsx, src/main.tsx
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Wire up main.tsx with BrowserRouter, ThemeProvider, and WalletProvider wrapping the App. Replace App.tsx with React Router v6 Routes for /, /create-wallet, /balance, /buy-ticket, /redeem. Add GlobalStyle for box-sizing reset and body background from theme. Navbar and WalletStatus in header. Use styled-components for header to avoid inline styles triggering lint warnings."
 
 **Review critique (Step 2):**
 No issues found. All files followed specification exactly. Lint and tsc both pass clean. The pre-existing test failures for Storybook and e2e tests are unrelated to the routing implementation (they were failing before these changes).
 
 **Resolution (Step 3):**
-Created main.tsx with BrowserRouter, ThemeProvider, and WalletProvider nesting, and StrictMode. Replaced App.tsx with Routes for all four pages (/, /create-wallet, /balance, /buy-ticket, /redeem) plus redirect from / to /create-wallet. Added GlobalStyle with box-sizing reset and theme-based body colors. Used styled-components (AppHeader and WalletStatusWrapper) to avoid inline styles. Both files are clean and lint/tsc pass.
+No changes required.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** c71deab
@@ -437,7 +422,7 @@ No further changes needed.
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** e2e/ — full flow tests for all four pages
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Write full Playwright e2e tests for all four pages. wallet.spec: root redirect, generate wallet, wallet details visible, private key hidden. balance.spec: address input visible, invalid address error. buyTicket.spec: connect prompt, ticket price visible. redeemTicket.spec: connect prompt, page title. Use exact strings from en.json."
 
 **Review critique (Step 2):**
@@ -456,14 +441,14 @@ Started the dev server manually before running tests. All 10 tests passed withou
 **Tool:** Claude (claude-sonnet-4-6)
 **Feature:** README.md, docs/report/README.md
 
-**Prompt (Step 1 — proactive guidance):**
+**Prompt (Step 1):**
 "Create README.md with project description, prerequisites (Node.js 20+, npm 10+, MetaMask), MetaMask setup steps (Sepolia network config, faucet links), installation, environment setup (cp .env.example .env), running the app, test commands (vitest, storybook, playwright, lint, format:check), smart contract section, project structure pointer, and AI declaration section. Create docs/report/README.md as a placeholder listing the five sections the student must complete manually: Code Overview, Design Description, Transaction Links, Peer Review Reflection, Statement on use of Generative AI."
 
 **Review critique (Step 2):**
 No issues found. The files were created exactly as specified. The existing README.md was the Vite scaffold default and needed full replacement. Pre-existing lint/format warnings in src/ files are unrelated to this task's changes.
 
 **Resolution (Step 3):**
-Replaced the default Vite scaffold README.md with the project-specific content. Created docs/report/ directory with README.md placeholder listing the five manually-authored sections required for submission.
+No changes required.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 8ddda11
@@ -509,10 +494,10 @@ Documented the tradeoff rather than over-engineering.
 The unit test suite (Vitest) is failing. The vitest `projects` config in `vite.config.ts` has no `include`/`exclude` on the jsdom project, so Vitest is picking up Playwright spec files from `.worktrees/*/e2e/` and `e2e/`. Constrain the jsdom project to `src/**/*.test.{ts,tsx}` only and exclude `e2e/**` and `.worktrees/**`. Also `node_modules` is missing — install with `--legacy-peer-deps` due to `eslint-plugin-jsx-a11y` peer dep conflict. After the fix, all 13 test files should pass. Log the change in `docs/ai/ai-log.md`.
 
 **Review critique (Step 2):**
-The prompt accurately diagnosed both issues upfront: missing `node_modules` and the missing `include`/`exclude` on the vitest jsdom project. No reactive guessing was needed.
+No issues found. Test failures are resolved
 
 **Resolution (Step 3):**
-Ran `npm install --legacy-peer-deps`, then added `include: ['src/**/*.test.{ts,tsx}']` and `exclude: ['e2e/**', '.worktrees/**']` to the jsdom project in `vite.config.ts`. All 13 test files / 37 tests now pass.
+No changes required.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** dbed855
@@ -531,7 +516,7 @@ Ran `npm install --legacy-peer-deps`, then added `include: ['src/**/*.test.{ts,t
 No issues. The refactor was straightforward — no logic changed, only file boundaries. Build passed clean on first attempt.
 
 **Resolution (Step 3):**
-Created `src/App.styles.ts` exporting `GlobalStyle`, `AppHeader`, and `WalletStatusWrapper`. Updated `App.tsx` to import them. Deleted `src/App.css`.
+No changes required. AI created `src/App.styles.ts` exporting `GlobalStyle`, `AppHeader`, and `WalletStatusWrapper`. Updated `App.tsx` to import them. Deleted `src/App.css`.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** ed4e1f4
@@ -2958,3 +2943,26 @@ No issues — straightforward extraction.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** d55acf5
+
+## [2026-05-01] #129 — Chore: Fix ai-log Step 1 labels and simplify vite.config.ts
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** docs/ai/ai-log.md, vite.config.ts
+
+**Prompt (Step 1):**
+"In the AI log (Step 1 — proactive guidance) should really be (Step 1) fix. if (!backgroundPage) throw new Error('Could not extract backgroundPage from src/theme.ts') should this not be in the en.json and can the whole vite.config file not be simplified"
+
+**Review critique (Step 2):**
+- The error string belongs in `vite.config.ts`: `en.json` is for user-facing JSX strings; this is a build-time error thrown at Vite startup, never seen by app users.
+- `path`, `fileURLToPath`, and the manual `dirname` computation were unnecessary boilerplate — Node 22 supports `import.meta.dirname` natively.
+- Two comments explained *what* the code does rather than *why*, violating CLAUDE.md style rules.
+- Single-element arrays (`instances`, `storybookTest` call) were spread across multiple lines without benefit.
+
+**Resolution (Step 3):**
+- Replaced all `(Step 1 — proactive guidance)` labels with `(Step 1)` across ai-log.md.
+- Dropped `path` default import in favour of named `{ join }`, removed `fileURLToPath` and `node:url` imports, replaced `path.dirname(fileURLToPath(import.meta.url))` with `import.meta.dirname` throughout.
+- Deleted both informational comments from vite.config.ts.
+- Collapsed `instances` and `storybookTest({ configDir })` onto single lines.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** b2a7f6a
