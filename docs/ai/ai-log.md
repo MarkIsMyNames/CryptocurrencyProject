@@ -2888,3 +2888,73 @@ No issues — straightforward extraction.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** c8fe838
+
+## [2026-05-01] #126 — Fix: Invalid contract address shows friendly error instead of ENS failure
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/config.ts, src/utils/contract.ts, src/locales/en.json
+
+**Prompt (Step 1):**
+"Copying .env.example without updating VITE_CONTRACT_ADDRESS causes an ENS resolution error from ethers. The error message and the config validation throw should both come from en.json. The ethers error pattern should also be added to CONTRACT_ERRORS so it is caught by decodeContractError if it reaches the frontend."
+
+**Review critique (Step 2):**
+- The placeholder value `0xYourDeployedContractAddressHere` is truthy so it passes `requireEnv`, but it is not a valid Ethereum address — ethers attempts ENS resolution and throws `UNCONFIGURED_NAME`.
+- The validation error message was a hardcoded template literal in `config.ts`, violating the en.json convention.
+- The ethers `UNCONFIGURED_NAME` error was not in `CONTRACT_ERRORS`, so it fell through to the raw error message if it ever reached `decodeContractError`.
+- `isAddress` from ethers v6 has a type predicate `value is string`, which narrows `contractAddress` to `never` in the false branch — string concatenation with `never` is a lint error. Fixed by using `strings.errors.invalidContractAddress` directly (no interpolation needed).
+
+**Resolution (Step 3):**
+- Added `"invalidContractAddress"` to `en.json` errors section.
+- `config.ts` imports `strings` and throws `new Error(strings.errors.invalidContractAddress)` when `isAddress` fails.
+- Added `['UNCONFIGURED_NAME', 'ENS name']` entry to `CONTRACT_ERRORS` in `contract.ts` mapping to the same string.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 2659d7d
+
+## [2026-05-01] #127 — Fix: Balance page works without a connected wallet
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/Balance/Balance.tsx, src/pages/Balance/Balance.test.tsx
+
+**Prompt (Step 1):**
+"The Balance page requires a connected wallet to check any address's balance. It should not — checking a balance is a read-only operation that only needs an RPC connection, not a signer. Remove the wallet connection requirement."
+
+**Review critique (Step 2):**
+- `handleCheck` checked `if (!provider)` and returned early with `strings.errors.connectWallet` — this blocked any lookup when no wallet was connected, even though the operation requires no signing.
+- ethers `JsonRpcProvider` can talk directly to the Sepolia RPC URL (`config.sepoliaRpcUrl`) without any wallet, giving a fully capable read-only provider.
+- The wallet provider, when present, should still be preferred (avoids a second connection and respects the user's already-authenticated session).
+- Tests mocked `useWallet` with a hardcoded provider object — the disconnected path was never exercised.
+- Mocking `JsonRpcProvider` as a constructor with an arrow function failed because arrow functions cannot be `new`-called; a regular `function` expression was required.
+
+**Resolution (Step 3):**
+- Replaced `if (!provider) { setError(...) }` with `const provider = walletProvider ?? new JsonRpcProvider(config.sepoliaRpcUrl)` — uses the wallet provider when available, falls back to a public RPC provider when not.
+- Removed the `connectWallet` error path entirely from `handleCheck`.
+- Added a test: when `useWallet` returns `provider: null`, `JsonRpcProvider` is constructed and the balance result is still displayed.
+- Fixed the ethers mock to use a regular `function` expression so `new JsonRpcProvider()` resolves correctly in the test environment.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 5d1e43b
+
+## [2026-05-01] #128 — Fix: CI unit and storybook tests fail without .env
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** vite.config.ts, .env.example, src/utils/wallet.test.ts, src/pages/Balance/Balance.test.tsx
+
+**Prompt (Step 1):**
+"All 14 unit test suites and all 16 storybook suites fail in CI with 'VITE_CONTRACT_ADDRESS is not a valid Ethereum address' because there is no .env file in CI. Use .env.example as the source of test env vars instead of hardcoding values in the config."
+
+**Review critique (Step 2):**
+- The `isAddress` validation added to `config.ts` throws at module evaluation time — before any test can run — if `VITE_CONTRACT_ADDRESS` is missing or a placeholder.
+- `.env.example` still had the placeholder `0xYourDeployedContractAddressHere`, which would also fail `isAddress`. Updated to the real deployed address since it is already public in the README.
+- `wallet.test.ts` mocked `ethers` entirely with `{ Wallet: MockWallet }` — no `isAddress` export. When `config.ts` (imported transitively) called `isAddress`, Vitest threw "No isAddress export is defined on the ethers mock". Fix: add `isAddress` to the mock's return value using the same regex the real function uses.
+- `Balance.test.tsx` used `as ReturnType<typeof useWallet>` which TypeScript rejected because the partial mock object is missing required fields. Fix: cast through `unknown` first.
+
+**Resolution (Step 3):**
+- Updated `.env.example` to use the real deployed contract address.
+- In `vite.config.ts`, parse `.env.example` at config time and assign the result to `testEnv`. Both the unit test project and the storybook project now set `env: testEnv` — a single source of truth that stays in sync whenever `.env.example` changes.
+- Added `isAddress: (v: string) => /^0x[0-9a-fA-F]{40}$/.test(v)` to the ethers mock in `wallet.test.ts`.
+- Changed `as ReturnType<typeof useWallet>` to `as unknown as ReturnType<typeof useWallet>` in `Balance.test.tsx`.
+- 142 unit tests pass, lint and format clean.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** d55acf5

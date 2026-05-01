@@ -52,7 +52,7 @@ function checkAddress(address: string) {
 
 describe('Balance', () => {
   beforeEach(() => {
-    vi.mocked(useWallet).mockReturnValue(connectedWallet as ReturnType<typeof useWallet>)
+    vi.mocked(useWallet).mockReturnValue(connectedWallet as unknown as ReturnType<typeof useWallet>)
   })
 
   it('renders title and subtitle', () => {
@@ -120,7 +120,9 @@ describe('Balance', () => {
   })
 
   it('uses a JsonRpcProvider when no wallet is connected', async () => {
-    vi.mocked(useWallet).mockReturnValue(disconnectedWallet as ReturnType<typeof useWallet>)
+    vi.mocked(useWallet).mockReturnValue(
+      disconnectedWallet as unknown as ReturnType<typeof useWallet>,
+    )
     const { JsonRpcProvider } = await import('ethers')
     customRender(<Balance />)
     checkAddress(VALID_ADDRESS)
