@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useWallet, useConnectedWallet } from '../../context/useWallet'
 import { redeemTicket, decodeContractError } from '../../utils/contract'
+import { usePendingTx } from '../../hooks/usePendingTx'
 import { Status } from '../../config'
 import strings from '../../locales/en.json'
 import { type StatusType } from '../../styles/shared.styles'
@@ -23,6 +24,7 @@ function RedeemTicketConnected() {
   const [status, setStatus] = useState<StatusType>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
+  const { savePendingTx, clearPendingTx } = usePendingTx('pendingRedeemTx')
 
   const statusMessage =
     status === Status.pending
@@ -41,9 +43,11 @@ function RedeemTicketConnected() {
     try {
       const tx = await redeemTicket(signer)
       setTxHash(tx.hash)
+      savePendingTx(tx.hash)
       await tx.wait()
       setStatus(Status.success)
-      await refreshBalances(0n)
+      clearPendingTx()
+      await refreshBalances()
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)

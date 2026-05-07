@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useWallet, useConnectedWallet } from '../../context/useWallet'
 import { remainingTickets, buyTicket, decodeContractError } from '../../utils/contract'
+import { usePendingTx } from '../../hooks/usePendingTx'
 import { config, Status } from '../../config'
 import strings from '../../locales/en.json'
 import { type StatusType } from '../../styles/shared.styles'
@@ -24,6 +25,7 @@ function BuyTicketConnected() {
   const [status, setStatus] = useState<StatusType>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
+  const { savePendingTx, clearPendingTx } = usePendingTx('pendingBuyTx')
 
   const statusMessage =
     status === Status.pending
@@ -47,9 +49,11 @@ function BuyTicketConnected() {
     try {
       const tx = await buyTicket(signer, BigInt(config.ticketPriceWei))
       setTxHash(tx.hash)
+      savePendingTx(tx.hash)
       await tx.wait()
       setStatus(Status.success)
-      await refreshBalances(1n)
+      clearPendingTx()
+      await refreshBalances()
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
