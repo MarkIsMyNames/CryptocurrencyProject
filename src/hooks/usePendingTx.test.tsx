@@ -44,29 +44,29 @@ beforeEach(() => {
 
 describe('usePendingTx', () => {
   it('does nothing on mount when sessionStorage is empty', () => {
-    renderHook(() => usePendingTx('testKey'), { wrapper: makeWrapper(connectedValue) })
+    renderHook(() => usePendingTx('testKey', 1n), { wrapper: makeWrapper(connectedValue) })
     expect(mockWaitForTransaction).not.toHaveBeenCalled()
   })
 
   it('does nothing when wallet is disconnected even if hash is stored', () => {
     sessionStorage.setItem('testKey', '0xdeadbeef')
-    renderHook(() => usePendingTx('testKey'), { wrapper: makeWrapper(disconnectedValue) })
+    renderHook(() => usePendingTx('testKey', 1n), { wrapper: makeWrapper(disconnectedValue) })
     expect(mockWaitForTransaction).not.toHaveBeenCalled()
   })
 
-  it('waits for stored tx and refreshes balances on mount when connected', async () => {
+  it('waits for stored tx and calls refreshBalances with expectedEtk on mount', async () => {
     sessionStorage.setItem('testKey', '0xdeadbeef')
     mockWaitForTransaction.mockResolvedValue({})
     mockRefreshBalances.mockResolvedValue(undefined)
 
-    renderHook(() => usePendingTx('testKey'), { wrapper: makeWrapper(connectedValue) })
+    renderHook(() => usePendingTx('testKey', 1n), { wrapper: makeWrapper(connectedValue) })
 
     await act(async () => {
       await Promise.resolve()
     })
 
     expect(mockWaitForTransaction).toHaveBeenCalledWith('0xdeadbeef')
-    expect(mockRefreshBalances).toHaveBeenCalledOnce()
+    expect(mockRefreshBalances).toHaveBeenCalledWith(1n)
     expect(sessionStorage.getItem('testKey')).toBeNull()
   })
 
@@ -75,7 +75,7 @@ describe('usePendingTx', () => {
     mockWaitForTransaction.mockRejectedValue(new Error('timeout'))
     mockRefreshBalances.mockResolvedValue(undefined)
 
-    renderHook(() => usePendingTx('testKey'), { wrapper: makeWrapper(connectedValue) })
+    renderHook(() => usePendingTx('testKey', 1n), { wrapper: makeWrapper(connectedValue) })
 
     await act(async () => {
       await Promise.resolve()
@@ -85,7 +85,7 @@ describe('usePendingTx', () => {
   })
 
   it('savePendingTx writes hash to sessionStorage', () => {
-    const { result } = renderHook(() => usePendingTx('testKey'), {
+    const { result } = renderHook(() => usePendingTx('testKey', 1n), {
       wrapper: makeWrapper(connectedValue),
     })
     act(() => {
@@ -96,7 +96,7 @@ describe('usePendingTx', () => {
 
   it('clearPendingTx removes hash from sessionStorage', () => {
     sessionStorage.setItem('testKey', '0xcafebabe')
-    const { result } = renderHook(() => usePendingTx('testKey'), {
+    const { result } = renderHook(() => usePendingTx('testKey', 1n), {
       wrapper: makeWrapper(connectedValue),
     })
     act(() => {
@@ -115,7 +115,7 @@ describe('usePendingTx', () => {
     )
     mockRefreshBalances.mockResolvedValue(undefined)
 
-    const { rerender } = renderHook(() => usePendingTx('testKey'), {
+    const { rerender } = renderHook(() => usePendingTx('testKey', 1n), {
       wrapper: makeWrapper(connectedValue),
     })
 

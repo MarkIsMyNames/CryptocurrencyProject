@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useWallet } from '../context/useWallet'
 
-export function usePendingTx(storageKey: string) {
+export function usePendingTx(storageKey: string, expectedEtk: bigint) {
   const { provider, isConnected, refreshBalances } = useWallet()
   const watching = useRef(false)
 
@@ -14,7 +14,7 @@ export function usePendingTx(storageKey: string) {
     void (async () => {
       try {
         await provider.waitForTransaction(hash)
-        await refreshBalances()
+        await refreshBalances(expectedEtk)
       } catch {
         // tx watch failed — balance will be stale until next manual refresh
       } finally {
@@ -22,7 +22,7 @@ export function usePendingTx(storageKey: string) {
         watching.current = false
       }
     })()
-  }, [isConnected, provider, storageKey, refreshBalances])
+  }, [isConnected, provider, storageKey, expectedEtk, refreshBalances])
 
   function savePendingTx(hash: string) {
     sessionStorage.setItem(storageKey, hash)
