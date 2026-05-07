@@ -53,7 +53,7 @@ function BuyTicketConnected() {
       await tx.wait()
       setStatus(Status.success)
       clearPendingTx()
-      await refreshBalances(1n)
+      await Promise.all([refreshBalances(1n), remainingTickets(provider).then(setRemaining)])
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
