@@ -3,6 +3,8 @@
 Web3 ticketing system on Ethereum Sepolia Testnet. ERC-20 tickets (ETK) are
 purchased with SETH and burned at venue entry.
 
+**Live deployment:** [markblockchain.vercel.app](https://markblockchain.vercel.app)
+
 ---
 
 ## Report

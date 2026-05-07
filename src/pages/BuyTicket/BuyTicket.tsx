@@ -49,7 +49,7 @@ function BuyTicketConnected() {
       setTxHash(tx.hash)
       await tx.wait()
       setStatus(Status.success)
-      await refreshBalances()
+      await refreshBalances(1n)
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)

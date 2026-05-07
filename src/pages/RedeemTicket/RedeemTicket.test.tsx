@@ -90,6 +90,17 @@ describe('RedeemTicket', () => {
     })
   })
 
+  it('calls refreshBalances with 0n after successful redemption', async () => {
+    const mockRefresh = vi.fn().mockResolvedValue(undefined)
+    mockUseWallet.mockReturnValue({ ...connectedWallet, refreshBalances: mockRefresh })
+    mockRedeemTicket.mockResolvedValue({ wait: vi.fn().mockResolvedValue({}) })
+    customRender(<RedeemTicket />)
+    fireEvent.click(screen.getByText(en.redeem.redeemBtn))
+    await waitFor(() => {
+      expect(mockRefresh).toHaveBeenCalledWith(0n)
+    })
+  })
+
   it('shows no-ticket error when wallet has no ETK', async () => {
     mockRedeemTicket.mockRejectedValue(new Error('NoTicketToRedeem'))
     customRender(<RedeemTicket />)

@@ -14,7 +14,7 @@ export interface WalletContextValue {
   connect: () => Promise<boolean>
   connectWithWallet: (privateKey: string) => Promise<boolean>
   disconnect: () => void
-  refreshBalances: () => Promise<void>
+  refreshBalances: (expectedEtk?: bigint) => Promise<void>
 }
 
 export interface ConnectedWalletContextValue extends WalletContextValue {

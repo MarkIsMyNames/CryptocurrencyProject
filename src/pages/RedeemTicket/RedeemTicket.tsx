@@ -43,7 +43,7 @@ function RedeemTicketConnected() {
       setTxHash(tx.hash)
       await tx.wait()
       setStatus(Status.success)
-      await refreshBalances()
+      await refreshBalances(0n)
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
