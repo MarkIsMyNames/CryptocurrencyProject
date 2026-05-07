@@ -3100,3 +3100,27 @@ No issues — straightforward extraction.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 4893731
+
+---
+
+## [2026-05-07] #136 — Fix: Remaining ticket count not refreshing after purchase (re-apply after merge revert)
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/pages/BuyTicket/BuyTicket.tsx, src/pages/BuyTicket/BuyTicket.test.tsx
+
+**Prompt (Step 1):**
+"Redo this fix as the update removed it — the remaining ticket count still doesn't update after a successful purchase because the merge reverted the refreshRemaining() function out of BuyTicket.tsx."
+
+**Review critique (Step 2):**
+- The merge had reverted `refreshRemaining()` back to the inline `remainingTickets(provider).then(setRemaining)` pattern inside `useEffect`.
+- `handleBuy` was calling only `refreshBalances(1n)` after a successful purchase — `refreshRemaining()` was not being called so the displayed count stayed stale.
+- `BuyTicket.test.tsx` used an inline (non-hoisted) mock for `remainingTickets`, making it impossible to swap the resolved value mid-test to verify the UI update.
+
+**Resolution (Step 3):**
+- Extracted `refreshRemaining()` as a named async function that calls `remainingTickets(provider)` and sets state.
+- `useEffect` now calls `void refreshRemaining()` instead of the inline `.then`.
+- `handleBuy` now calls `await Promise.all([refreshBalances(1n), refreshRemaining()])` so both updates happen concurrently.
+- Hoisted `mockRemainingTickets` in `BuyTicket.test.tsx` and added a test asserting the displayed count drops from 950 → 949 after a successful purchase.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 288a552
