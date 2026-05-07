@@ -26,6 +26,10 @@ contract EventTicket is ERC20, Ownable, ReentrancyGuard {
     error NothingToWithdraw();
     error InvalidConfiguration();
 
+    /// @notice Deploy the EventTicket contract.
+    /// @param _maxSupply     Total number of tickets available for sale.
+    /// @param _ticketPriceWei Price per ticket in wei; stored immutably.
+    /// @param initialOwner   Address that receives Ownable ownership.
     constructor(
         uint256 _maxSupply,
         uint256 _ticketPriceWei,
