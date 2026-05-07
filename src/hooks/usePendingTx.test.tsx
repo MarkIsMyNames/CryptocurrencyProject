@@ -108,7 +108,11 @@ describe('usePendingTx', () => {
   it('does not start a second watcher if already watching', async () => {
     sessionStorage.setItem('testKey', '0xdeadbeef')
     let resolveWait!: (value: unknown) => void
-    mockWaitForTransaction.mockReturnValue(new Promise((r) => { resolveWait = r }))
+    mockWaitForTransaction.mockReturnValue(
+      new Promise((r) => {
+        resolveWait = r
+      }),
+    )
     mockRefreshBalances.mockResolvedValue(undefined)
 
     const { rerender } = renderHook(() => usePendingTx('testKey'), {
@@ -119,7 +123,9 @@ describe('usePendingTx', () => {
     rerender()
 
     resolveWait(undefined)
-    await act(async () => { await Promise.resolve() })
+    await act(async () => {
+      await Promise.resolve()
+    })
 
     expect(mockWaitForTransaction).toHaveBeenCalledOnce()
   })
