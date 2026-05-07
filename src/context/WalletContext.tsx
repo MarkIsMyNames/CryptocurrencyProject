@@ -144,20 +144,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     )
   }, [connect, connectWithWallet])
 
-  const refreshBalances = useCallback(async (expectedEtk?: bigint) => {
-    if (!state.provider || !state.address) throw new Error(strings.errors.notConnected)
-    const maxAttempts = expectedEtk !== undefined ? 10 : 1
-    for (let i = 0; i < maxAttempts; i++) {
-      const [ethBalance, etkBalance] = await fetchBalances(state.provider, state.address)
-      if (expectedEtk === undefined || etkBalance === expectedEtk) {
-        setState((prev) => ({ ...prev, ethBalance, etkBalance }))
-        return
+  const refreshBalances = useCallback(
+    async (expectedEtk?: bigint) => {
+      if (!state.provider || !state.address) throw new Error(strings.errors.notConnected)
+      const maxAttempts = expectedEtk !== undefined ? 10 : 1
+      for (let i = 0; i < maxAttempts; i++) {
+        const [ethBalance, etkBalance] = await fetchBalances(state.provider, state.address)
+        if (expectedEtk === undefined || etkBalance === expectedEtk) {
+          setState((prev) => ({ ...prev, ethBalance, etkBalance }))
+          return
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1500))
       }
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-    }
-    const [ethBalance, etkBalance] = await fetchBalances(state.provider, state.address)
-    setState((prev) => ({ ...prev, ethBalance, etkBalance }))
-  }, [state.provider, state.address])
+      const [ethBalance, etkBalance] = await fetchBalances(state.provider, state.address)
+      setState((prev) => ({ ...prev, ethBalance, etkBalance }))
+    },
+    [state.provider, state.address],
+  )
 
   return (
     <WalletContext.Provider

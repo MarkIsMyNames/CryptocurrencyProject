@@ -24,7 +24,7 @@ vi.mock('ethers', async (importOriginal) => {
 })
 
 vi.mock('../utils/contract', () => ({
-  balanceOf: (...args: unknown[]) => mockBalanceOf(...args),
+  balanceOf: (...args: unknown[]): Promise<bigint> => mockBalanceOf(...args) as Promise<bigint>,
   decodeContractError: vi.fn((e: unknown) => String(e)),
 }))
 
