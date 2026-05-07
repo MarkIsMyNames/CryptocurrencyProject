@@ -4,11 +4,12 @@ import en from '../../locales/en.json'
 import { BuyTicket } from './BuyTicket'
 
 const mockBuyTicket = vi.hoisted(() => vi.fn())
+const mockRemainingTickets = vi.hoisted(() => vi.fn().mockResolvedValue(BigInt(950)))
 const mockUseWallet = vi.hoisted(() => vi.fn())
 
 vi.mock('../../utils/contract', () => ({
   buyTicket: mockBuyTicket,
-  remainingTickets: vi.fn().mockResolvedValue(BigInt(950)),
+  remainingTickets: mockRemainingTickets,
   decodeContractError: vi.fn().mockReturnValue('unknownError'),
 }))
 
@@ -93,6 +94,17 @@ describe('BuyTicket', () => {
     fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
       expect(screen.getByText('unknownError')).toBeInTheDocument()
+    })
+  })
+
+  it('updates remaining ticket count after successful purchase', async () => {
+    mockRemainingTickets.mockResolvedValueOnce(BigInt(950)).mockResolvedValueOnce(BigInt(949))
+    mockBuyTicket.mockResolvedValue({ wait: vi.fn().mockResolvedValue({}) })
+    customRender(<BuyTicket />)
+    await waitFor(() => screen.getByText('950'))
+    fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
+    await waitFor(() => {
+      expect(screen.getByText('949')).toBeInTheDocument()
     })
   })
 

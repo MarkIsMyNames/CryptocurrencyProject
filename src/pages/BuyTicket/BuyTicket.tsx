@@ -34,8 +34,12 @@ function BuyTicketConnected() {
         ? strings.buyTicket.success
         : errorMessage
 
+  async function refreshRemaining() {
+    setRemaining(await remainingTickets(provider))
+  }
+
   useEffect(() => {
-    void remainingTickets(provider).then(setRemaining)
+    void refreshRemaining()
   }, [provider])
 
   const isSoldOut = remaining !== null && remaining === 0n
@@ -53,7 +57,7 @@ function BuyTicketConnected() {
       await tx.wait()
       setStatus(Status.success)
       clearPendingTx()
-      await refreshBalances(1n)
+      await Promise.all([refreshBalances(1n), refreshRemaining()])
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
