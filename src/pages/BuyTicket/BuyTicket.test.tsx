@@ -74,7 +74,7 @@ describe('BuyTicket', () => {
     })
   })
 
-  it('calls refreshBalances after successful purchase', async () => {
+  it('calls refreshBalances with 1n after successful purchase', async () => {
     const mockRefresh = vi.fn().mockResolvedValue(undefined)
     mockUseWallet.mockReturnValue({ ...connectedWallet, refreshBalances: mockRefresh })
     mockBuyTicket.mockResolvedValue({ wait: vi.fn().mockResolvedValue({}) })
@@ -82,7 +82,7 @@ describe('BuyTicket', () => {
     await waitFor(() => screen.getByText(en.buyTicket.buyBtn))
     fireEvent.click(screen.getByText(en.buyTicket.buyBtn))
     await waitFor(() => {
-      expect(mockRefresh).toHaveBeenCalledOnce()
+      expect(mockRefresh).toHaveBeenCalledWith(1n)
     })
   })
 

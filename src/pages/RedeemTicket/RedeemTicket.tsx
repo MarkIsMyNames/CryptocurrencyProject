@@ -24,7 +24,7 @@ function RedeemTicketConnected() {
   const [status, setStatus] = useState<StatusType>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
-  const { savePendingTx, clearPendingTx } = usePendingTx('pendingRedeemTx')
+  const { savePendingTx, clearPendingTx } = usePendingTx('pendingRedeemTx', 0n)
 
   const statusMessage =
     status === Status.pending
@@ -47,7 +47,7 @@ function RedeemTicketConnected() {
       await tx.wait()
       setStatus(Status.success)
       clearPendingTx()
-      await refreshBalances()
+      await refreshBalances(0n)
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)

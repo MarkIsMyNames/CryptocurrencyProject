@@ -25,7 +25,7 @@ function BuyTicketConnected() {
   const [status, setStatus] = useState<StatusType>(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [txHash, setTxHash] = useState<string | null>(null)
-  const { savePendingTx, clearPendingTx } = usePendingTx('pendingBuyTx')
+  const { savePendingTx, clearPendingTx } = usePendingTx('pendingBuyTx', 1n)
 
   const statusMessage =
     status === Status.pending
@@ -53,7 +53,7 @@ function BuyTicketConnected() {
       await tx.wait()
       setStatus(Status.success)
       clearPendingTx()
-      await refreshBalances()
+      await refreshBalances(1n)
     } catch (err) {
       setErrorMessage(decodeContractError(err))
       setStatus(Status.error)
