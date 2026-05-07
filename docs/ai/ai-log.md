@@ -3075,3 +3075,28 @@ No issues — straightforward extraction.
 
 **Verdict:** Accepted
 **Commit hash (Step 4):** 2ce1cdf
+
+---
+
+## [2026-05-07] #135 — Fix: Balance not updating after buy/redeem due to RPC indexing lag
+
+**Tool:** Claude (claude-sonnet-4-6)
+**Feature:** src/hooks/usePendingTx.ts, src/pages/BuyTicket/BuyTicket.tsx, src/pages/RedeemTicket/RedeemTicket.tsx
+
+**Prompt (Step 1):**
+"After a successful buy transaction the UI still shows no tickets. The refreshBalances call runs immediately after tx.wait() but the RPC node hasn't indexed the new block yet so it returns stale data. refreshBalances already has an expectedEtk retry mechanism but it is not being used — wire it up in both pages and in usePendingTx so all code paths poll until the chain state reflects the confirmed transaction."
+
+**Review critique (Step 2):**
+- `handleBuy` and `handleRedeem` both called `refreshBalances()` with no argument, bypassing the retry loop in `WalletContext` entirely (the loop only activates when `expectedEtk` is provided).
+- `usePendingTx` also called `refreshBalances()` with no argument, meaning post-reload recovery had the same RPC timing problem.
+- The `usePendingTx` hook accepted no `expectedEtk` parameter so it had no way to pass the correct value to `refreshBalances` even if wired up.
+
+**Resolution (Step 3):**
+- Added `expectedEtk: bigint` as a required parameter to `usePendingTx` and forwarded it to `refreshBalances(expectedEtk)` inside the watcher.
+- Updated `BuyTicket` to call `usePendingTx('pendingBuyTx', 1n)` and `refreshBalances(1n)`.
+- Updated `RedeemTicket` to call `usePendingTx('pendingRedeemTx', 0n)` and `refreshBalances(0n)`.
+- Tightened test assertions in `BuyTicket.test.tsx` and `RedeemTicket.test.tsx` from `toHaveBeenCalledOnce()` to `toHaveBeenCalledWith(1n)` / `toHaveBeenCalledWith(0n)`.
+- Updated `usePendingTx.test.tsx` to pass `expectedEtk` and assert `refreshBalances` is called with it.
+
+**Verdict:** Accepted
+**Commit hash (Step 4):** 4893731
