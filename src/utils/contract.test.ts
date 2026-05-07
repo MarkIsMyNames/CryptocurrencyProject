@@ -41,6 +41,24 @@ describe('decodeContractError', () => {
     expect(decodeContractError(new Error('NoTicketToRedeem()'))).toBe(strings.errors.noTicket)
   })
 
+  it('decodes AlreadyOwnsTicket hex selector as alreadyOwned', () => {
+    expect(
+      decodeContractError(new Error('execution reverted (unknown custom error) data="0x1a43bf63"')),
+    ).toBe(strings.errors.alreadyOwned)
+  })
+
+  it('decodes SoldOut hex selector as soldOut', () => {
+    expect(
+      decodeContractError(new Error('execution reverted (unknown custom error) data="0x52df9fe5"')),
+    ).toBe(strings.errors.soldOut)
+  })
+
+  it('decodes NoTicketToRedeem hex selector as noTicket', () => {
+    expect(
+      decodeContractError(new Error('execution reverted (unknown custom error) data="0xe58c3a17"')),
+    ).toBe(strings.errors.noTicket)
+  })
+
   it('decodes user rejected as cancelled', () => {
     expect(decodeContractError(new Error('user rejected the request'))).toBe(
       strings.errors.cancelled,

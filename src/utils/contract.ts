@@ -10,6 +10,14 @@ export const EVENT_TICKET_ABI = [
   'function totalSupply() view returns (uint256)',
   'event TicketPurchased(address indexed buyer)',
   'event TicketRedeemed(address indexed holder)',
+  'error IncorrectPayment(uint256 sent, uint256 required)',
+  'error AlreadyOwnsTicket()',
+  'error SoldOut()',
+  'error NoTicketToRedeem()',
+  'error WithdrawFailed()',
+  'error TicketsAreNonTransferable()',
+  'error NothingToWithdraw()',
+  'error InvalidConfiguration()',
 ] as const
 
 interface EventTicketContract {
@@ -48,10 +56,10 @@ export function redeemTicket(signer: ContractRunner): Promise<ContractTransactio
 
 const CONTRACT_ERRORS: Array<[string[], string]> = [
   [['BAD_DATA', 'could not decode result data'], strings.errors.contractNotDeployed],
-  [['IncorrectPayment'], strings.errors.incorrectAmount],
-  [['AlreadyOwnsTicket'], strings.errors.alreadyOwned],
-  [['SoldOut'], strings.errors.soldOut],
-  [['NoTicketToRedeem'], strings.errors.noTicket],
+  [['IncorrectPayment', '0x0d35e921'], strings.errors.incorrectAmount],
+  [['AlreadyOwnsTicket', '0x1a43bf63'], strings.errors.alreadyOwned],
+  [['SoldOut', '0x52df9fe5'], strings.errors.soldOut],
+  [['NoTicketToRedeem', '0xe58c3a17'], strings.errors.noTicket],
   [['user rejected'], strings.errors.cancelled],
   [['INSUFFICIENT_FUNDS', 'insufficient funds'], strings.errors.insufficientFunds],
   [['network changed', 'chain'], strings.errors.wrongNetwork],
